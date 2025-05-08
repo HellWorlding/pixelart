@@ -42,9 +42,10 @@
             // 
             // btnExplanation
             // 
-            this.btnExplanation.Location = new System.Drawing.Point(80, 284);
+            this.btnExplanation.Location = new System.Drawing.Point(91, 355);
+            this.btnExplanation.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnExplanation.Name = "btnExplanation";
-            this.btnExplanation.Size = new System.Drawing.Size(169, 85);
+            this.btnExplanation.Size = new System.Drawing.Size(193, 106);
             this.btnExplanation.TabIndex = 0;
             this.btnExplanation.Text = "설명하기";
             this.btnExplanation.UseVisualStyleBackColor = true;
@@ -52,20 +53,23 @@
             // 
             // btnColor
             // 
-            this.btnColor.Location = new System.Drawing.Point(555, 284);
+            this.btnColor.Location = new System.Drawing.Point(634, 355);
+            this.btnColor.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnColor.Name = "btnColor";
-            this.btnColor.Size = new System.Drawing.Size(169, 85);
+            this.btnColor.Size = new System.Drawing.Size(193, 106);
             this.btnColor.TabIndex = 1;
             this.btnColor.Text = "색칠하기";
             this.btnColor.UseVisualStyleBackColor = true;
+            this.btnColor.Click += new System.EventHandler(this.btnColor_Click);
             // 
             // startpage
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(914, 562);
             this.Controls.Add(this.btnColor);
             this.Controls.Add(this.btnExplanation);
+            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "startpage";
             this.Text = "Form1";
             this.ResumeLayout(false);
