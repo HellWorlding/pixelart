@@ -1,6 +1,6 @@
 ﻿namespace PixelColorling
 {
-    partial class Form1
+    partial class Coloring
     {
         /// <summary>
         /// Required designer variable.
@@ -60,6 +60,8 @@
             this.panelCanvas.Name = "panelCanvas";
             this.panelCanvas.Size = new System.Drawing.Size(550, 423);
             this.panelCanvas.TabIndex = 13;
+            this.panelCanvas.Paint += new System.Windows.Forms.PaintEventHandler(this.panelCanvas_Paint);
+            this.panelCanvas.MouseClick += new System.Windows.Forms.MouseEventHandler(this.panelCanvas_MouseClick);
             // 
             // btnSave
             // 
@@ -69,6 +71,7 @@
             this.btnSave.TabIndex = 12;
             this.btnSave.Text = "결과 저장";
             this.btnSave.UseVisualStyleBackColor = true;
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
             // btnGenerate
             // 
@@ -78,6 +81,7 @@
             this.btnGenerate.TabIndex = 11;
             this.btnGenerate.Text = "도안 생성";
             this.btnGenerate.UseVisualStyleBackColor = true;
+            this.btnGenerate.Click += new System.EventHandler(this.btnGenerate_Click);
             // 
             // cmbDifficulty
             // 
@@ -101,8 +105,9 @@
             this.btnLoadImage.TabIndex = 9;
             this.btnLoadImage.Text = "이미지 불러오기";
             this.btnLoadImage.UseVisualStyleBackColor = true;
+            this.btnLoadImage.Click += new System.EventHandler(this.btnLoadImage_Click);
             // 
-            // mainPage
+            // Coloring
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -114,8 +119,8 @@
             this.Controls.Add(this.btnGenerate);
             this.Controls.Add(this.cmbDifficulty);
             this.Controls.Add(this.btnLoadImage);
-            this.Name = "mainPage";
-            this.Text = "Form1";
+            this.Name = "Coloring";
+            this.Text = "Coloring";
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace PixelColorling
 {
-    public partial class Form1 : Form
+    public partial class Coloring : Form
     {
         private Bitmap originalImage; // 원본 이미지 저장용
         private int blockSize = 10;          // 난이도별 블럭 크기
@@ -23,13 +23,14 @@ namespace PixelColorling
         private bool[,] isFilled;           // 셀이 색칠되었는지 여부
         private Color[,] filledColors;      // 셀에 실제 색칠한 색상
 
-        public Form1()
+
+        public Coloring()
         {
-            InitializeComponent();
-            this.Load += Form1_Load_1;
+            InitializeComponent(); 
+            this.Load += Coloring_Load; 
         }
 
-        private void Form1_Load_1(object sender, EventArgs e)
+        private void Coloring_Load(object sender, EventArgs e)
         {
             cmbDifficulty.SelectedIndex = 1;
         }
@@ -62,7 +63,7 @@ namespace PixelColorling
             int wBlocks = originalImage.Width / blockSize;
             int hBlocks = originalImage.Height / blockSize;
 
-            // 2. 배열 초기화 (순서 중요!)
+            // 2. 배열 초기화
             blockColors = new Color[hBlocks, wBlocks];
             colorNumbers = new int[hBlocks, wBlocks];
             isFilled = new bool[hBlocks, wBlocks];
@@ -342,6 +343,5 @@ namespace PixelColorling
                 MessageBox.Show("선택한 색상과 셀의 색상 번호가 다릅니다!");
             }
         }
-
     }
 }
