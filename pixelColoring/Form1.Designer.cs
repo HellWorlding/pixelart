@@ -42,6 +42,7 @@
             this.btnColoringKmeans = new System.Windows.Forms.Button();
             this.lblKmeansiter = new System.Windows.Forms.Label();
             this.numKmeansIter = new System.Windows.Forms.NumericUpDown();
+            this.btnSave = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.picPreview)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numPixelSize)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picOriginalThumb)).BeginInit();
@@ -74,12 +75,12 @@
             // 
             // btnPixelate
             // 
-            this.btnPixelate.Location = new System.Drawing.Point(1302, 176);
+            this.btnPixelate.Location = new System.Drawing.Point(1282, 176);
             this.btnPixelate.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnPixelate.Name = "btnPixelate";
-            this.btnPixelate.Size = new System.Drawing.Size(66, 18);
+            this.btnPixelate.Size = new System.Drawing.Size(83, 18);
             this.btnPixelate.TabIndex = 2;
-            this.btnPixelate.Text = "Pixelate";
+            this.btnPixelate.Text = "픽셀화하기";
             this.btnPixelate.UseVisualStyleBackColor = true;
             this.btnPixelate.Click += new System.EventHandler(this.btnPixelate_Click);
             // 
@@ -88,7 +89,7 @@
             this.numPixelSize.Location = new System.Drawing.Point(1235, 53);
             this.numPixelSize.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.numPixelSize.Name = "numPixelSize";
-            this.numPixelSize.Size = new System.Drawing.Size(105, 21);
+            this.numPixelSize.Size = new System.Drawing.Size(130, 21);
             this.numPixelSize.TabIndex = 3;
             // 
             // picOriginalThumb
@@ -135,12 +136,12 @@
             this.numKsize.Location = new System.Drawing.Point(1235, 102);
             this.numKsize.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.numKsize.Name = "numKsize";
-            this.numKsize.Size = new System.Drawing.Size(105, 21);
+            this.numKsize.Size = new System.Drawing.Size(130, 21);
             this.numKsize.TabIndex = 8;
             // 
             // btnColoringKmeans
             // 
-            this.btnColoringKmeans.Location = new System.Drawing.Point(1235, 215);
+            this.btnColoringKmeans.Location = new System.Drawing.Point(1232, 199);
             this.btnColoringKmeans.Name = "btnColoringKmeans";
             this.btnColoringKmeans.Size = new System.Drawing.Size(133, 18);
             this.btnColoringKmeans.TabIndex = 0;
@@ -162,14 +163,25 @@
             this.numKmeansIter.Location = new System.Drawing.Point(1235, 151);
             this.numKmeansIter.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.numKmeansIter.Name = "numKmeansIter";
-            this.numKmeansIter.Size = new System.Drawing.Size(105, 21);
+            this.numKmeansIter.Size = new System.Drawing.Size(130, 21);
             this.numKmeansIter.TabIndex = 10;
+            // 
+            // btnSave
+            // 
+            this.btnSave.Location = new System.Drawing.Point(1235, 234);
+            this.btnSave.Name = "btnSave";
+            this.btnSave.Size = new System.Drawing.Size(130, 24);
+            this.btnSave.TabIndex = 12;
+            this.btnSave.Text = "저장하기";
+            this.btnSave.UseVisualStyleBackColor = true;
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1377, 614);
+            this.Controls.Add(this.btnSave);
             this.Controls.Add(this.lblKmeansiter);
             this.Controls.Add(this.numKmeansIter);
             this.Controls.Add(this.btnColoringKmeans);
@@ -211,6 +223,7 @@
         private System.Windows.Forms.Button btnColoringKmeans;
         private System.Windows.Forms.Label lblKmeansiter;
         private System.Windows.Forms.NumericUpDown numKmeansIter;
+        private System.Windows.Forms.Button btnSave;
     }
 }
 

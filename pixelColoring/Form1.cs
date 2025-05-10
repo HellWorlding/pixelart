@@ -13,8 +13,13 @@ namespace pixel
 {
     public partial class Form1 : Form
     {
+        
+
         // 원본 이미지 비트맵
         Bitmap originalImage;
+        // 픽셀화된 이미지 비트맵
+        Bitmap pixelatedImage;
+
         // 픽셀 분할 크기
         int pixelSize;
         // 셀마다 색상 번호 저장 그리드
@@ -28,6 +33,8 @@ namespace pixel
 
         // 색상 번호와 색상 매핑
         private Dictionary<int, Color> numberToColor = new Dictionary<int, Color>();
+
+        
 
         public Form1()
         {
@@ -53,7 +60,7 @@ namespace pixel
                 numPixelSize.Maximum = minSide / 10;
 
                 // 그리드 크기 최소 설정
-                numPixelSize.Value = Math.Min(10, numPixelSize.Maximum);
+                //numPixelSize.Value = Math.Min(10, numPixelSize.Maximum);
 
                 //k means 클러스터링 수 설정
                 numKsize.Minimum = 2;
@@ -83,8 +90,10 @@ namespace pixel
             int smallW = originalImage.Width / pixelSize;
             int smallH = originalImage.Height / pixelSize;
 
+
             // 줄인 이미지
             Bitmap smallImage = new Bitmap(originalImage, new Size(smallW, smallH));
+            pixelatedImage = new Bitmap(smallW, smallH);  // 새 비트맵 초기화
 
             int gridW = smallImage.Width;
             int gridH = smallImage.Height;
@@ -411,9 +420,11 @@ namespace pixel
                             if (numberGrid[i, j] == targetNumber)
                             {
                                 pixelColors[pt] = newColor;
+                                pixelatedImage.SetPixel(j, i, newColor);  // 색상 동기화
                             }
                         }
                     }
+
                 }
             }
 
@@ -496,7 +507,8 @@ namespace pixel
             int gridH = numberGrid.GetLength(0);
             int gridW = numberGrid.GetLength(1);
             pixelColors.Clear(); // 기존 색칠 초기화
-
+            pixelatedImage = new Bitmap(numberGrid.GetLength(1), numberGrid.GetLength(0)); // 새로 생성
+            // 색상 번호에 해당하는 색상으로 픽셀화된 이미지 채우기
             for (int y = 0; y < gridH; y++)
             {
                 for (int x = 0; x < gridW; x++)
@@ -505,6 +517,7 @@ namespace pixel
                     if (numberToColor.TryGetValue(number, out Color color))
                     {
                         pixelColors[new Point(x, y)] = color;
+                        pixelatedImage.SetPixel(x, y, color);  // 반영
                     }
                 }
             }
@@ -517,6 +530,24 @@ namespace pixel
             numKsize.Value = 8;
             numPixelSize.Value = 10;
             numKmeansIter.Value = 40;
+        }
+
+        
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            //새 폼 생성
+            var saveForm = new SaveKMeansForm(
+                originalImage,
+                pixelatedImage,
+                pixelSize,
+                numberGrid,
+                numberToColor,
+                pixelColors,
+                k
+            );
+
+            saveForm.ShowDialog();
         }
     }
 }
