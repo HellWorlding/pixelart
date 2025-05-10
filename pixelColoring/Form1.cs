@@ -7,16 +7,27 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace pixel
 {
     public partial class Form1 : Form
     {
+        // 원본 이미지 비트맵
         Bitmap originalImage;
+        // 픽셀 분할 크기
         int pixelSize;
+        // 셀마다 색상 번호 저장 그리드
         int[,] numberGrid;
+        // 사용자 색칠한 셀 정보(point -> color)
         Dictionary<Point, Color> pixelColors = new Dictionary<Point, Color>();
+        // 사용자가 현재 클릭한 셀(색칠 대상)
         Point? selectedPoint = null;
+        // 대표 색상 수 (원한다면 NumericUpDown으로 조절 가능)
+        int k = 8;
+
+        // 색상 번호와 색상 매핑
+        private Dictionary<int, Color> numberToColor = new Dictionary<int, Color>();
 
         public Form1()
         {
@@ -35,9 +46,23 @@ namespace pixel
                 picPreview.Image = null;
 
                 int minSide = Math.Min(originalImage.Width, originalImage.Height);
-                numPixelSize.Minimum = 2;
+                int maxSide = Math.Max(originalImage.Width, originalImage.Height);
+                // 최소 줄이기 사이즈(픽셀화 크기) 설정, 원본의 1/2 또는 긴 셀 개수 100
+                numPixelSize.Minimum = Math.Max(2, maxSide / 100);
+                // 최대 줄이기 사이즈 (픽셀화 크기) 설정, 원본중 작은 사이드의 1 /10
                 numPixelSize.Maximum = minSide / 10;
+
+                // 그리드 크기 최소 설정
                 numPixelSize.Value = Math.Min(10, numPixelSize.Maximum);
+
+                //k means 클러스터링 수 설정
+                numKsize.Minimum = 2;
+                numKsize.Maximum = 30;
+                numKsize.Value = 8;
+
+                // k means 반복 횟수 설정
+                numKmeansIter.Minimum = 3;
+                numKmeansIter.Maximum = 200;
             }
         }
 
@@ -49,40 +74,55 @@ namespace pixel
                 return;
             }
 
+            // 이전 색칠 정보 초기화
+            pixelColors.Clear();
+            selectedPoint = null;
+
+            // 이미지 축소
             pixelSize = (int)numPixelSize.Value;
             int smallW = originalImage.Width / pixelSize;
             int smallH = originalImage.Height / pixelSize;
 
+            // 줄인 이미지
             Bitmap smallImage = new Bitmap(originalImage, new Size(smallW, smallH));
 
             int gridW = smallImage.Width;
             int gridH = smallImage.Height;
+            // 색 번호 도안
             numberGrid = new int[gridH, gridW];
-
-            List<double[]> pixels = new List<double[]>();
+            // 축소 이미지 저장용
             Color[,] colorGrid = new Color[gridH, gridW];
+            
+            // K means 위한 픽셀 리스트
+            List<double[]> pixels = new List<double[]>();
 
             for (int y = 0; y < gridH; y++)
             {
                 for (int x = 0; x < gridW; x++)
                 {
-                    Color c = smallImage.GetPixel(x, y);
-                    colorGrid[y, x] = c;
-                    pixels.Add(new double[] { c.R, c.G, c.B });
+                    Color c = smallImage.GetPixel(x, y); //x, y 색 추출
+                    colorGrid[y, x] = c; //축소 이미지 색 저장
+                    pixels.Add(new double[] { c.R, c.G, c.B }); //rgb 리스트에 추가
                 }
             }
 
-            int k = 8; // 대표 색상 수 (원한다면 NumericUpDown으로 조절 가능)
-            var centroids = RunKMeans(pixels, k);
+            // k means 클러스터링 색상들
+            k = (int)numKsize.Value;
+            List<double[]> centroids = RunKMeans(pixels, k);
 
+            // 대표 색상 리스트
             List<Color> representativeColors = centroids
                 .Select(c => Color.FromArgb((int)c[0], (int)c[1], (int)c[2]))
                 .ToList();
-
+            // k means로 구한 대표 색상으로 색상 번호 매핑 (도안 숫자)
             Dictionary<Color, int> colorToNumber = new Dictionary<Color, int>();
             for (int i = 0; i < representativeColors.Count; i++)
                 colorToNumber[representativeColors[i]] = i + 1;
 
+            // 색상 번호와 색상 매핑
+            numberToColor = colorToNumber.ToDictionary(kv => kv.Value, kv => kv.Key);
+            
+            // 축소 이미지 클러스터링 번호 매핑
             for (int y = 0; y < gridH; y++)
             {
                 for (int x = 0; x < gridW; x++)
@@ -102,8 +142,10 @@ namespace pixel
             // 색상 가이드 표시 
             panelLegend.Controls.Clear();
 
+
             foreach (var pair in colorToNumber.OrderBy(p => p.Value))
             {
+                // 색상과 번호 쌍을 패널에 추가
                 Panel swatch = new Panel();
                 swatch.BackColor = pair.Key;
                 swatch.Size = new Size(20, 20);
@@ -132,22 +174,22 @@ namespace pixel
         }
 
 
-        double ColorDistance(Color a, Color b)
+        double ColorDistanceSquared(Color a, Color b)
         {
-            return Math.Sqrt(
-                Math.Pow(a.R - b.R, 2) +
-                Math.Pow(a.G - b.G, 2) +
-                Math.Pow(a.B - b.B, 2));
+            return 
+                Math.Pow((int)a.R - b.R, 2) +
+                Math.Pow((int)a.G - b.G, 2) +
+                Math.Pow((int)a.B - b.B, 2);
         }
 
         Color FindClosestColor(Color input, List<Color> palette)
         {
             Color closest = palette[0];
-            double minDist = ColorDistance(input, closest);
+            double minDist = ColorDistanceSquared(input, closest);
 
             foreach (var color in palette)
             {
-                double dist = ColorDistance(input, color);
+                double dist = ColorDistanceSquared(input, color);
                 if (dist < minDist)
                 {
                     minDist = dist;
@@ -158,20 +200,23 @@ namespace pixel
             return closest;
         }
 
-        List<double[]> RunKMeans(List<double[]> data, int k, int maxIterations = 10)
+        List<double[]> RunKMeans(List<double[]> data, int k, int maxIterations = 40)
         {
             Random rand = new Random();
-            var centroids = new List<double[]>();
+            List<double[]> centroids = new List<double[]>();
 
+            // 임의의 k개 색상 선택
             for (int i = 0; i < k; i++)
                 centroids.Add(data[rand.Next(data.Count)]);
-
+            // 반복
             for (int iter = 0; iter < maxIterations; iter++)
             {
+                // 클러스터 전체 저장
                 var clusters = new List<List<double[]>>();
                 for (int i = 0; i < k; i++)
                     clusters.Add(new List<double[]>());
 
+                // 각 데이터 포인트에 대해 가장 가까운 K값 찾기
                 foreach (var point in data)
                 {
                     double minDist = double.MaxValue;
@@ -179,10 +224,10 @@ namespace pixel
 
                     for (int i = 0; i < k; i++)
                     {
-                        double dist = Math.Sqrt(
+                        double dist = 
                             Math.Pow(point[0] - centroids[i][0], 2) +
                             Math.Pow(point[1] - centroids[i][1], 2) +
-                            Math.Pow(point[2] - centroids[i][2], 2));
+                            Math.Pow(point[2] - centroids[i][2], 2);
 
                         if (dist < minDist)
                         {
@@ -190,10 +235,11 @@ namespace pixel
                             bestCluster = i;
                         }
                     }
-
+                    // 각 클러스터에 픽셀 할당
                     clusters[bestCluster].Add(point);
                 }
 
+                // 클러스터의 중심점 업데이트
                 for (int i = 0; i < k; i++)
                 {
                     if (clusters[i].Count == 0) continue;
@@ -211,6 +257,7 @@ namespace pixel
                 }
             }
 
+            // 최종 클러스터 색상 반환
             return centroids;
         }
 
@@ -330,16 +377,127 @@ namespace pixel
             {
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
-                    if (pixelColors.ContainsKey(clickedPoint))
-                        pixelColors.Remove(clickedPoint);  // 색칠 취소
-                    else
-                        pixelColors[clickedPoint] = dlg.Color;  //새 색상 적용
+                    int targetNumber = numberGrid[y, x];
+
+                    // 이미 해당 번호가 칠해졌으면 → 색 지우기
+                    bool isAlreadyFilled = pixelColors.Values.Contains(dlg.Color);
+
+                    // 전체 셀 순회
+                    for (int i = 0; i < gridH; i++)
+                    {
+                        for (int j = 0; j < gridW; j++)
+                        {
+                            Point pt = new Point(j, i);
+
+                            if (numberGrid[i, j] == targetNumber)
+                            {
+                                if (isAlreadyFilled)
+                                {
+                                    // 색칠 취소
+                                    pixelColors.Remove(pt);
+                                }
+                                else
+                                {
+                                    // 새 색상 적용
+                                    pixelColors[pt] = dlg.Color;
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
             picPreview.Invalidate();
         }
 
+
+        // 마우스가 그리드 위에 있을 때 번호 표시
+        private void picPreview_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (numberGrid == null) return;
+
+            int gridW = numberGrid.GetLength(1);
+            int gridH = numberGrid.GetLength(0);
+            float cellSize = Math.Min((float)picPreview.Width / gridW, (float)picPreview.Height / gridH);
+            float totalW = cellSize * gridW;
+            float totalH = cellSize * gridH;
+            float offsetX = (picPreview.Width - totalW) / 2;
+            float offsetY = (picPreview.Height - totalH) / 2;
+
+            int x = (int)((e.X - offsetX) / cellSize);
+            int y = (int)((e.Y - offsetY) / cellSize);
+
+            if (x < 0 || y < 0 || x >= gridW || y >= gridH) return;
+
+            int number = numberGrid[y, x];
+            Point pt = new Point(x, y);
+
+            string tip = $"번호: {number}";
+
+            Color? kmeansColor = null;
+            Color? filledColor = null;
+
+            if (numberToColor.TryGetValue(number, out Color kc))
+            {
+                kmeansColor = kc;
+                tip += $"\nK-Means RGB: ({kc.R}, {kc.G}, {kc.B})";
+            }
+
+            if (pixelColors.TryGetValue(pt, out Color fc))
+            {
+                filledColor = fc;
+                tip += $"\n사용자 색상 RGB: ({fc.R}, {fc.G}, {fc.B})";
+            }
+
+            if (kmeansColor.HasValue && filledColor.HasValue)
+            {
+                int dr = Math.Abs(kmeansColor.Value.R - filledColor.Value.R);
+                int dg = Math.Abs(kmeansColor.Value.G - filledColor.Value.G);
+                int db = Math.Abs(kmeansColor.Value.B - filledColor.Value.B);
+
+                double rSim = 100.0 - (dr / 255.0 * 100.0);
+                double gSim = 100.0 - (dg / 255.0 * 100.0);
+                double bSim = 100.0 - (db / 255.0 * 100.0);
+
+                tip += $"\n유사도 (R/G/B): {rSim:F1}% / {gSim:F1}% / {bSim:F1}%";
+            }
+
+            toolTip1.SetToolTip(picPreview, tip);
+        }
+
+        private void btnColoringKmeans_Click(object sender, EventArgs e)
+        {
+            if (numberGrid == null || numberToColor == null)
+            {
+                MessageBox.Show("먼저 픽셀화를 해주세요.");
+                return;
+            }
+
+            int gridH = numberGrid.GetLength(0);
+            int gridW = numberGrid.GetLength(1);
+            pixelColors.Clear(); // 기존 색칠 초기화
+
+            for (int y = 0; y < gridH; y++)
+            {
+                for (int x = 0; x < gridW; x++)
+                {
+                    int number = numberGrid[y, x];
+                    if (numberToColor.TryGetValue(number, out Color color))
+                    {
+                        pixelColors[new Point(x, y)] = color;
+                    }
+                }
+            }
+
+            picPreview.Invalidate(); // 다시 그리기
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            numKsize.Value = 8;
+            numPixelSize.Value = 10;
+            numKmeansIter.Value = 40;
+        }
     }
 }
 ///셀 혹시 잘못 칠했으면 다시 해당 셀 누르고 확인 누르면 기존 색 지워지고 셀이랑 원래 숫자가 뜸 
