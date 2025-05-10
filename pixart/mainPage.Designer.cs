@@ -40,42 +40,34 @@
             // panelPalette
             // 
             this.panelPalette.AutoScroll = true;
-            this.panelPalette.Location = new System.Drawing.Point(10, 81);
-            this.panelPalette.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.panelPalette.Location = new System.Drawing.Point(12, 101);
             this.panelPalette.Name = "panelPalette";
-            this.panelPalette.Size = new System.Drawing.Size(192, 270);
+            this.panelPalette.Size = new System.Drawing.Size(219, 337);
             this.panelPalette.TabIndex = 15;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(11, 35);
+            this.label1.Location = new System.Drawing.Point(13, 44);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(41, 12);
+            this.label1.Size = new System.Drawing.Size(52, 15);
             this.label1.TabIndex = 14;
             this.label1.Text = "난이도";
             // 
             // panelCanvas
             // 
-            this.panelCanvas.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.panelCanvas.AutoScroll = true;
-            this.panelCanvas.AutoSize = true;
-            this.panelCanvas.Location = new System.Drawing.Point(210, 12);
-            this.panelCanvas.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.panelCanvas.Location = new System.Drawing.Point(238, 15);
             this.panelCanvas.Name = "panelCanvas";
-            this.panelCanvas.Size = new System.Drawing.Size(490, 338);
+            this.panelCanvas.Size = new System.Drawing.Size(550, 423);
             this.panelCanvas.TabIndex = 13;
             this.panelCanvas.Paint += new System.Windows.Forms.PaintEventHandler(this.panelCanvas_Paint);
             this.panelCanvas.MouseClick += new System.Windows.Forms.MouseEventHandler(this.panelCanvas_MouseClick);
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(109, 55);
-            this.btnSave.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnSave.Location = new System.Drawing.Point(125, 69);
             this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(94, 21);
+            this.btnSave.Size = new System.Drawing.Size(107, 26);
             this.btnSave.TabIndex = 12;
             this.btnSave.Text = "결과 저장";
             this.btnSave.UseVisualStyleBackColor = true;
@@ -83,10 +75,9 @@
             // 
             // btnGenerate
             // 
-            this.btnGenerate.Location = new System.Drawing.Point(10, 55);
-            this.btnGenerate.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnGenerate.Location = new System.Drawing.Point(12, 69);
             this.btnGenerate.Name = "btnGenerate";
-            this.btnGenerate.Size = new System.Drawing.Size(94, 21);
+            this.btnGenerate.Size = new System.Drawing.Size(107, 26);
             this.btnGenerate.TabIndex = 11;
             this.btnGenerate.Text = "도안 생성";
             this.btnGenerate.UseVisualStyleBackColor = true;
@@ -96,23 +87,21 @@
             // 
             this.cmbDifficulty.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbDifficulty.FormattingEnabled = true;
-            this.cmbDifficulty.ItemHeight = 12;
+            this.cmbDifficulty.ItemHeight = 15;
             this.cmbDifficulty.Items.AddRange(new object[] {
             "쉬움",
             "보통",
             "어려움"});
-            this.cmbDifficulty.Location = new System.Drawing.Point(58, 32);
-            this.cmbDifficulty.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.cmbDifficulty.Location = new System.Drawing.Point(66, 40);
             this.cmbDifficulty.Name = "cmbDifficulty";
-            this.cmbDifficulty.Size = new System.Drawing.Size(146, 20);
+            this.cmbDifficulty.Size = new System.Drawing.Size(166, 23);
             this.cmbDifficulty.TabIndex = 10;
             // 
             // btnLoadImage
             // 
-            this.btnLoadImage.Location = new System.Drawing.Point(10, 10);
-            this.btnLoadImage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnLoadImage.Location = new System.Drawing.Point(12, 12);
             this.btnLoadImage.Name = "btnLoadImage";
-            this.btnLoadImage.Size = new System.Drawing.Size(192, 18);
+            this.btnLoadImage.Size = new System.Drawing.Size(220, 22);
             this.btnLoadImage.TabIndex = 9;
             this.btnLoadImage.Text = "이미지 불러오기";
             this.btnLoadImage.UseVisualStyleBackColor = true;
@@ -120,9 +109,9 @@
             // 
             // Coloring
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(700, 360);
+            this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.panelPalette);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.panelCanvas);
@@ -130,7 +119,6 @@
             this.Controls.Add(this.btnGenerate);
             this.Controls.Add(this.cmbDifficulty);
             this.Controls.Add(this.btnLoadImage);
-            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "Coloring";
             this.Text = "Coloring";
             this.ResumeLayout(false);

@@ -22,7 +22,7 @@ namespace PixelColorling
         private Color selectedColor = Color.Transparent;
         private bool[,] isFilled;           // 셀이 색칠되었는지 여부
         private Color[,] filledColors;      // 셀에 실제 색칠한 색상
-        private float zoom = 1.0f; // 확대배율 추가
+
 
         public Coloring()
         {
@@ -86,54 +86,10 @@ namespace PixelColorling
                 }
             }
 
-            // 불러온 그림 크기에 따라 
-            panelCanvas.Size = new Size(wBlocks * blockSize, hBlocks * blockSize);
-
             // 4. 도안 그리기 요청 + 팔레트 생성
             panelCanvas.Invalidate();   // 다시 그리기
             CreateColorPalette();       // 색상 팔레트 생성
-
-            // 도안 패널 크기 맞추고
-            FitCanvas();
-            // 그에 맞춰 폼 전체 크기 맞추기
-            ResizeFormToFit();
         }
-
-        // panelCanvas 크기에 맞춰 Form 전체 크기 조정
-        private void FitCanvas()
-        {
-            // 도안 크기(블록수×blockSize) 만큼 panelCanvas 크기 맞추기
-            int wBlocks = originalImage.Width / blockSize;
-            int hBlocks = originalImage.Height / blockSize;
-
-            panelCanvas.Size = new Size(wBlocks * blockSize, hBlocks * blockSize);
-            panelCanvas.Invalidate();
-        }
-
-        // 폼을 도안 크기에 맞춰 크기 조정 (여유 공간 포함)
-        private void ResizeFormToFit()
-        {
-            // 클라이언트(내용) 영역 너비 = palette 폭 + canvas 폭
-            int clientW = panelLeft.Width + panelCanvas.Width;
-
-            // 클라이언트 높이는 두 영역 중 큰 쪽
-            int clientH = Math.Max(panelLeft.Height, panelCanvas.Height);
-
-            // 제목표시줄/테두리 보정값
-            int extraW = this.Width - this.ClientSize.Width;
-            int extraH = this.Height - this.ClientSize.Height;
-
-            // 여유 공간 (양쪽 각 20px씩)
-            const int marginW = 40;
-            const int marginH = 40;
-
-            // 폼 크기 설정
-            this.ClientSize = new Size(clientW + marginW, clientH + marginH);
-            this.Size = new Size(clientW + extraW + marginW,
-                                        clientH + extraH + marginH);
-        }
-
-
 
         //평균 색상 계산
         private Color GetAverageColor(int startX, int startY, int size)
@@ -152,53 +108,33 @@ namespace PixelColorling
 
             return Color.FromArgb(r / count, g / count, b / count);
         }
-
-        //팔레트 초기화 메서드.  등장 횟수별로 색상 팔레트 정렬
+        //팔레트 초기화 메서드
         private void CreateColorPalette()
         {
-            // 1) 색상 번호별 등장 횟수 카운트
-            var counts = new Dictionary<int, int>();
-            int rows = colorNumbers.GetLength(0);
-            int cols = colorNumbers.GetLength(1);
-            for (int y = 0; y < rows; y++)
-                for (int x = 0; x < cols; x++)
-                {
-                    int key = colorNumbers[y, x];
-                    if (counts.TryGetValue(key, out var existing))
-                        counts[key] = existing + 1;
-                    else
-                        counts[key] = 1;
-                }
-                    
-
-            // 2) 등장 횟수 내림차순 > 번호 순차 정렬
-            var sortedNums = counts
-              .OrderByDescending(kv => kv.Value)
-              .ThenBy(kv => kv.Key)
-              .Select(kv => kv.Key);
-
             panelPalette.Controls.Clear(); // 기존 팔레트 제거
 
             // 색상 → 번호 매핑 순서대로 정렬
             var sortedColors = colorMap.OrderBy(kv => kv.Value);
 
-            // 4) 등장 빈도순으로 버튼 생성
-            foreach (int num in sortedNums)
+            foreach (var kv in sortedColors)
             {
-                // num 에 매핑된 색 찾아오기
-                Color c = colorMap.First(kv => kv.Value == num).Key;
+                Color color = kv.Key;
+                int number = kv.Value;
 
-                Button btn = new Button
+                Button colorButton = new Button
                 {
-                    BackColor = c,
-                    Text = num.ToString(),
+                    BackColor = color,
                     Width = 40,
                     Height = 40,
                     Margin = new Padding(5),
-                    Tag = c
+                    Text = number.ToString(),
+                    ForeColor = Color.Black,
+                    Tag = color
                 };
-                btn.Click += ColorButton_Click;
-                panelPalette.Controls.Add(btn);
+
+                colorButton.Click += ColorButton_Click;
+
+                panelPalette.Controls.Add(colorButton);
             }
         }
 
@@ -248,75 +184,64 @@ namespace PixelColorling
 
         private void panelCanvas_Paint(object sender, PaintEventArgs e)
         {
-            var g = e.Graphics;
-            g.Clear(Color.White);
-
-         
-            // 도안이 없고 원본 이미지만 있을 때: 원본 미리보기
+            // 도안이 없고, 이미지만 불러온 상태일 경우 원본 미리보기
             if (blockColors == null && originalImage != null)
             {
-                // 비율 유지해서 원본 이미지를 패널 크기에 맞춰 그림
+                // 비율 유지해서 그리기
                 float scaleX = (float)panelCanvas.Width / originalImage.Width;
                 float scaleY = (float)panelCanvas.Height / originalImage.Height;
                 float scale = Math.Min(scaleX, scaleY);
 
-                int drawW = (int)(originalImage.Width * scale);
-                int drawH = (int)(originalImage.Height * scale);
-                int offsetX = (panelCanvas.Width - drawW) / 2;
-                int offsetY = (panelCanvas.Height - drawH) / 2;
+                int drawWidth = (int)(originalImage.Width * scale);
+                int drawHeight = (int)(originalImage.Height * scale);
 
-                g.DrawImage(originalImage,
-                            new Rectangle(offsetX, offsetY, drawW, drawH));
-                return;
+                int offsetX = (panelCanvas.Width - drawWidth) / 2;
+                int offsetY = (panelCanvas.Height - drawHeight) / 2;
+
+                e.Graphics.DrawImage(originalImage, new Rectangle(offsetX, offsetY, drawWidth, drawHeight));
+                return; // 더 이상 그릴 도안이 없으므로 여기서 종료
             }
 
-            if (blockColors == null)
-                return;  // 아무 것도 그릴 게 없으면 그냥 빠져나감
+            if (blockColors == null) return;
 
-            //  도안(번호 그리기) 
-            // 원하는 확대 배율(1.0 = 원래 크기, 2.0 = 두 배 등)
-            float zoom = 1.5f; // 화면 확대 비율
-            int renderSize = (int)(blockSize * zoom); // 실제 한 셀 크기
+            Graphics g = e.Graphics;
+            g.Clear(Color.White);
 
-            int rows = blockColors.GetLength(0);
-            int cols = blockColors.GetLength(1);
+            int hBlocks = blockColors.GetLength(0);
+            int wBlocks = blockColors.GetLength(1);
 
-            Font font = new Font("Arial", renderSize * 0.4f);
-            Pen pen = new Pen(Color.Gray);
-            
-            try
+            Font font = new Font("Arial", 8);
+
+            for (int y = 0; y < hBlocks; y++)
             {
-                for (int y = 0; y < rows; y++)
+                for (int x = 0; x < wBlocks; x++)
                 {
-                    for (int x = 0; x < cols; x++)
+                    Rectangle rect = new Rectangle(x * blockSize, y * blockSize, blockSize, blockSize);
+
+                    // 1. 색칠된 셀이면 색상 채우기
+                    if (isFilled != null && isFilled[y, x])
                     {
-                        var rect = new Rectangle(
-                            x * renderSize,
-                            y * renderSize,
-                            renderSize,
-                            renderSize);
-
-                        // 색칠된 셀 채우기
-                        if (isFilled != null && isFilled[y, x])
+                        using (SolidBrush brush = new SolidBrush(filledColors[y, x]))
                         {
-                            using (var brush = new SolidBrush(filledColors[y, x]))
-                                g.FillRectangle(brush, rect);
+                            g.FillRectangle(brush, rect);
                         }
+                    }
 
-                        // 테두리
-                        g.DrawRectangle(pen, rect);
+                    // 2. 테두리 그리기
+                    g.DrawRectangle(Pens.Gray, rect);
 
-                        // 번호 그리기
+                    // 3. 색칠 안 된 셀만 번호 표시
+                    if (!isFilled[y, x])
+                    {
                         string num = colorNumbers[y, x].ToString();
                         g.DrawString(num, font, Brushes.Black, rect.Location);
                     }
+
                 }
             }
-            finally
-            {
-                font.Dispose();
-                pen.Dispose();
-            }
+
+
+
         }
 
         private void btnSave_Click(object sender, EventArgs e)

@@ -348,7 +348,17 @@ namespace pixel
             }
         }
 
-
+        // 랜덤 색상 생성(색상 겹쳤을 시)
+        private int RandomOffset(Random rnd)
+        {
+            // -12 ~ +12 (2.5% of 255 ≈ 6)
+            return rnd.Next(-6, 7);
+        }
+        // byte 범위 내에서 색상 값 설정
+        private int ClampColorComponent(int value)
+        {
+            return Math.Max(0, Math.Min(255, value));
+        }
 
 
 
@@ -378,9 +388,19 @@ namespace pixel
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
                     int targetNumber = numberGrid[y, x];
+                    Color baseColor = dlg.Color;
+                    Color newColor = baseColor;
+                    Random rnd = new Random();
 
-                    // 이미 해당 번호가 칠해졌으면 → 색 지우기
-                    bool isAlreadyFilled = pixelColors.Values.Contains(dlg.Color);
+                    // 같은 색이 이미 있으면 유사한 다른 색으로 변경 (±6 정도 범위)
+                    while (pixelColors.Values.Contains(newColor))
+                    {
+                        newColor = Color.FromArgb(
+                            ClampColorComponent(baseColor.R + RandomOffset(rnd)),
+                            ClampColorComponent(baseColor.G + RandomOffset(rnd)),
+                            ClampColorComponent(baseColor.B + RandomOffset(rnd))
+                        );
+                    }
 
                     // 전체 셀 순회
                     for (int i = 0; i < gridH; i++)
@@ -388,19 +408,9 @@ namespace pixel
                         for (int j = 0; j < gridW; j++)
                         {
                             Point pt = new Point(j, i);
-
                             if (numberGrid[i, j] == targetNumber)
                             {
-                                if (isAlreadyFilled)
-                                {
-                                    // 색칠 취소
-                                    pixelColors.Remove(pt);
-                                }
-                                else
-                                {
-                                    // 새 색상 적용
-                                    pixelColors[pt] = dlg.Color;
-                                }
+                                pixelColors[pt] = newColor;
                             }
                         }
                     }
@@ -416,39 +426,48 @@ namespace pixel
         {
             if (numberGrid == null) return;
 
-            int gridW = numberGrid.GetLength(1);
-            int gridH = numberGrid.GetLength(0);
+            int gridW = numberGrid.GetLength(1); //가로 셀 개수
+            int gridH = numberGrid.GetLength(0); //세로 셀 개수
+
+            // 그리드 크기 계산
             float cellSize = Math.Min((float)picPreview.Width / gridW, (float)picPreview.Height / gridH);
             float totalW = cellSize * gridW;
             float totalH = cellSize * gridH;
             float offsetX = (picPreview.Width - totalW) / 2;
             float offsetY = (picPreview.Height - totalH) / 2;
 
+            // 마우스 좌표를 셀 좌표로 변환
             int x = (int)((e.X - offsetX) / cellSize);
             int y = (int)((e.Y - offsetY) / cellSize);
 
+            // 범위 벗어나면 무시
             if (x < 0 || y < 0 || x >= gridW || y >= gridH) return;
 
-            int number = numberGrid[y, x];
-            Point pt = new Point(x, y);
+            int number = numberGrid[y, x]; // 해당 셀의 색상 번호
+            Point pt = new Point(x, y); // 좌표를 Point로 변환
 
-            string tip = $"번호: {number}";
+            string tip = $"번호: {number}"; // 기본 툴팁 메시지
 
+            // K-Means 색상
             Color? kmeansColor = null;
+            //사용자 직접 칠한 색상
             Color? filledColor = null;
 
+            // K-Means 색상 정보 가져오기
             if (numberToColor.TryGetValue(number, out Color kc))
             {
                 kmeansColor = kc;
                 tip += $"\nK-Means RGB: ({kc.R}, {kc.G}, {kc.B})";
             }
 
+            // 사용자 색상 정보 가져오기
             if (pixelColors.TryGetValue(pt, out Color fc))
             {
                 filledColor = fc;
                 tip += $"\n사용자 색상 RGB: ({fc.R}, {fc.G}, {fc.B})";
             }
 
+            // 두 색상 모두 존재하면 유사도 표시
             if (kmeansColor.HasValue && filledColor.HasValue)
             {
                 int dr = Math.Abs(kmeansColor.Value.R - filledColor.Value.R);
@@ -465,6 +484,7 @@ namespace pixel
             toolTip1.SetToolTip(picPreview, tip);
         }
 
+        // 버튼 클릭 시 K-Means 색상으로 전체 셀 자동 색칠
         private void btnColoringKmeans_Click(object sender, EventArgs e)
         {
             if (numberGrid == null || numberToColor == null)
@@ -500,5 +520,3 @@ namespace pixel
         }
     }
 }
-///셀 혹시 잘못 칠했으면 다시 해당 셀 누르고 확인 누르면 기존 색 지워지고 셀이랑 원래 숫자가 뜸 
-//k-means로 색상을 더 군집화해야할 듯 미세하게 다른 색도 걍 다른 색이라 인지해버려서 
