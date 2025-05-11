@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -58,6 +59,12 @@ namespace pixel
         };
         Dictionary<int, char> clusterSymbolMap = new Dictionary<int, char>();
 
+        // K값에 따라 다른 이미지 로딩
+        private Dictionary<int, Bitmap> kToImageMap = null;
+
+        // 기존 저장 모드
+        private string previousMode = null;
+
         int cnt = 0;
         double avgxx = 0, avgyy = 0, avgdd1 = 0, avgdd2 = 0;
 
@@ -87,8 +94,21 @@ namespace pixel
         }
         private void cmbSaveForm_SelectedIndexChanged(object sender, EventArgs e)
         {
+            string currentMode = cmbSaveForm.SelectedItem?.ToString();
+
+            // "콜라주 사진 만들기"가 선택됐고, 이전 모드가 다른 경우 → 이미지 다시 고르게 만듦
+            if (currentMode == "콜라주 사진 만들기" && previousMode != "콜라주 사진 만들기")
+            {
+                kToImageMap = null;  // 이전 모드에서 돌아온 경우이므로 새로 불러오기 허용
+            }
+
+            if (currentMode == previousMode)
+                return;
+
+            previousMode = currentMode;
             UpdatePreview();
         }
+
         private void UpdatePreview()
         {
             string mode = cmbSaveForm.SelectedItem?.ToString();
@@ -216,6 +236,115 @@ namespace pixel
                 picSavePreview.Image = resizedImage;
                 picSavePreview.Invalidate();
             }
+            else if (mode == "콜라주 사진 만들기")
+            {
+                if (numberGrid == null || pixelColors == null)
+                {
+                    MessageBox.Show("먼저 픽셀화를 진행하세요.");
+                    return;
+                }
+
+                int width = originalImage.Width;
+                int height = originalImage.Height;
+                int cellSize = pixelSize;
+
+                // 사용자로부터 이미지 선택 (1회만)
+                if (kToImageMap == null)
+                {
+                    kToImageMap = new Dictionary<int, Bitmap>();
+                    for (int i = 1; i <= k; i++)
+                    {
+                        using (OpenFileDialog ofd = new OpenFileDialog())
+                        {
+                            ofd.Title = $"K = {i}에 사용할 이미지를 선택하세요";
+                            ofd.Filter = "이미지 파일 (*.png;*.jpg;*.jpeg;*.bmp)|*.png;*.jpg;*.jpeg;*.bmp";
+
+                            if (ofd.ShowDialog() == DialogResult.OK)
+                                kToImageMap[i] = new Bitmap(ofd.FileName);
+                            else
+                            {
+                                Bitmap blank = new Bitmap(width, height);
+                                using (Graphics g = Graphics.FromImage(blank)) g.Clear(Color.White);
+                                kToImageMap[i] = blank;
+                            }
+                        }
+                    }
+                }
+
+                // 1. K별 평균 색 계산
+                Dictionary<int, List<Color>> kColorSamples = new Dictionary<int, List<Color>>();
+                for (int y = 0; y < numberGrid.GetLength(0); y++)
+                {
+                    for (int x = 0; x < numberGrid.GetLength(1); x++)
+                    {
+                        Point pt = new Point(x, y);
+                        if (!pixelColors.ContainsKey(pt)) continue;
+
+                        int kVal = numberGrid[y, x];
+                        if (!kColorSamples.ContainsKey(kVal)) kColorSamples[kVal] = new List<Color>();
+                        kColorSamples[kVal].Add(pixelColors[pt]);
+                    }
+                }
+
+                Dictionary<int, Color> kTargetColor = new Dictionary<int, Color>();
+                foreach (var kv in kColorSamples)
+                {
+                    int kr = 0, kg = 0, kb = 0;
+                    foreach (var c in kv.Value)
+                    {
+                        kr += c.R; kg += c.G; kb += c.B;
+                    }
+                    int count = kv.Value.Count;
+                    kTargetColor[kv.Key] = Color.FromArgb(kr / count, kg / count, kb / count);
+                }
+
+                // 2. 각 K 이미지 보정 + 리사이즈
+                Dictionary<int, Bitmap> resizedKImage = new Dictionary<int, Bitmap>();
+                foreach (var pair in kToImageMap)
+                {
+                    int clusterId = pair.Key;
+                    Color target = kTargetColor.ContainsKey(clusterId) ? kTargetColor[clusterId] : Color.Gray;
+
+
+                    Bitmap adjusted = TintGrayscaleImage(kToImageMap[clusterId], target);
+
+                    Bitmap resized = new Bitmap(width, height);
+                    using (Graphics g = Graphics.FromImage(resized))
+                    {
+                        g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                        g.DrawImage(adjusted, 0, 0, width, height);
+                    }
+                    adjusted.Dispose();
+                    resizedKImage[clusterId] = resized;
+                }
+
+                // 3. 콜라주 구성
+                resizedImage = new Bitmap(width, height);
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        int gx = x / cellSize;
+                        int gy = y / cellSize;
+
+                        if (gx < 0 || gx >= numberGrid.GetLength(1) || gy < 0 || gy >= numberGrid.GetLength(0)) continue;
+
+                        int kCluster = numberGrid[gy, gx];
+                        if (resizedKImage.ContainsKey(kCluster))
+                        {
+                            Color c = resizedKImage[kCluster].GetPixel(x, y);
+                            resizedImage.SetPixel(x, y, c);
+                        }
+                    }
+                }
+
+                picSavePreview.Image = resizedImage;
+                picSavePreview.Invalidate();
+            }
+
+
+
+
         }
 
         private void btnImgSave_Click(object sender, EventArgs e)
@@ -394,6 +523,51 @@ namespace pixel
             return gray;
         }
 
+        // 이미지와 목표 색상을 매개변수로 한 다음 비트맵으로 반환
+        public static Bitmap TintGrayscaleImage(Bitmap input, Color tintColor)
+        {
+            int width = input.Width;
+            int height = input.Height;
+
+            Bitmap result = new Bitmap(width, height, PixelFormat.Format24bppRgb);
+            Rectangle rect = new Rectangle(0, 0, width, height);
+
+            BitmapData data = input.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+            BitmapData outputData = result.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
+
+            int stride = data.Stride;
+            byte[] buffer = new byte[stride * height];
+            byte[] outBuffer = new byte[stride * height];
+
+            Marshal.Copy(data.Scan0, buffer, 0, buffer.Length);
+            input.UnlockBits(data);
+
+            for (int y = 0; y < height; y++)
+            {
+                int row = y * stride;
+                for (int x = 0; x < width; x++)
+                {
+                    int idx = row + x * 3;
+                    byte b = buffer[idx];
+                    byte g = buffer[idx + 1];
+                    byte r = buffer[idx + 2];
+
+                    // 회색조 밝기 (가중 평균)
+                    int gray = (int)(r * 0.3 + g * 0.59 + b * 0.11);
+
+                    outBuffer[idx + 2] = (byte)Math.Min(255, (gray * tintColor.R) / 255);
+                    outBuffer[idx + 1] = (byte)Math.Min(255, (gray * tintColor.G) / 255);
+                    outBuffer[idx] = (byte)Math.Min(255, (gray * tintColor.B) / 255);
+                }
+            }
+
+            Marshal.Copy(outBuffer, 0, outputData.Scan0, outBuffer.Length);
+            result.UnlockBits(outputData);
+
+            return result;
+        }
+
 
     }
 }
+

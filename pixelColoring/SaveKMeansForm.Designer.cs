@@ -52,7 +52,8 @@ namespace pixel
             this.cmbSaveForm.Items.AddRange(new object[] {
             "단순 비트맵 저장",
             "색상 기반 기호 표현",
-            "방향 기반 기호 표현"});
+            "방향 기반 기호 표현",
+            "콜라주 사진 만들기"});
             this.cmbSaveForm.Location = new System.Drawing.Point(667, 30);
             this.cmbSaveForm.Name = "cmbSaveForm";
             this.cmbSaveForm.Size = new System.Drawing.Size(121, 20);
