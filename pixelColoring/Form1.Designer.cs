@@ -35,7 +35,7 @@
             this.numPixelSize = new System.Windows.Forms.NumericUpDown();
             this.picOriginalThumb = new System.Windows.Forms.PictureBox();
             this.panelLegend = new System.Windows.Forms.FlowLayoutPanel();
-            this.lblDownsize = new System.Windows.Forms.Label();
+            this.lblFixelCount = new System.Windows.Forms.Label();
             this.lblKnumber = new System.Windows.Forms.Label();
             this.numKsize = new System.Windows.Forms.NumericUpDown();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
@@ -64,12 +64,12 @@
             // 
             // btnLoad
             // 
-            this.btnLoad.Location = new System.Drawing.Point(1258, 11);
+            this.btnLoad.Location = new System.Drawing.Point(1232, 4);
             this.btnLoad.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnLoad.Name = "btnLoad";
-            this.btnLoad.Size = new System.Drawing.Size(66, 18);
+            this.btnLoad.Size = new System.Drawing.Size(133, 25);
             this.btnLoad.TabIndex = 1;
-            this.btnLoad.Text = "Load";
+            this.btnLoad.Text = "이미지　불러오기";
             this.btnLoad.UseVisualStyleBackColor = true;
             this.btnLoad.Click += new System.EventHandler(this.btnLoad_Click);
             // 
@@ -113,14 +113,14 @@
             this.panelLegend.Size = new System.Drawing.Size(175, 229);
             this.panelLegend.TabIndex = 5;
             // 
-            // lblDownsize
+            // lblFixelCount
             // 
-            this.lblDownsize.AutoSize = true;
-            this.lblDownsize.Location = new System.Drawing.Point(1233, 39);
-            this.lblDownsize.Name = "lblDownsize";
-            this.lblDownsize.Size = new System.Drawing.Size(93, 12);
-            this.lblDownsize.TabIndex = 7;
-            this.lblDownsize.Text = "다운사이즈 크기";
+            this.lblFixelCount.AutoSize = true;
+            this.lblFixelCount.Location = new System.Drawing.Point(1233, 39);
+            this.lblFixelCount.Name = "lblFixelCount";
+            this.lblFixelCount.Size = new System.Drawing.Size(73, 12);
+            this.lblFixelCount.TabIndex = 7;
+            this.lblFixelCount.Text = "가로 픽셀 수";
             // 
             // lblKnumber
             // 
@@ -187,7 +187,7 @@
             this.Controls.Add(this.btnColoringKmeans);
             this.Controls.Add(this.lblKnumber);
             this.Controls.Add(this.numKsize);
-            this.Controls.Add(this.lblDownsize);
+            this.Controls.Add(this.lblFixelCount);
             this.Controls.Add(this.panelLegend);
             this.Controls.Add(this.picOriginalThumb);
             this.Controls.Add(this.numPixelSize);
@@ -216,7 +216,7 @@
         private System.Windows.Forms.NumericUpDown numPixelSize;
         private System.Windows.Forms.PictureBox picOriginalThumb;
         private System.Windows.Forms.FlowLayoutPanel panelLegend;
-        private System.Windows.Forms.Label lblDownsize;
+        private System.Windows.Forms.Label lblFixelCount;
         private System.Windows.Forms.Label lblKnumber;
         private System.Windows.Forms.NumericUpDown numKsize;
         private System.Windows.Forms.ToolTip toolTip1;

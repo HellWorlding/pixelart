@@ -32,12 +32,29 @@ namespace pixel
         // 원래 이미지 크기로 바꾸기
         private Bitmap resizedImage;
 
-        // 특수기호로 표현, k 최대 개수인 30개
+        // 특수기호로 표현, 200개, 현재 k 최대값은 100
         private static readonly char[] allSymbols = new char[]
         {
-            '★','○','●','◎','◇','◆','□','■','△','▲',
-            '▽','▼','※','♠','♣','♥','♦','♬','∞','x',
-            '◈','▦','#', '*', '@', '%', '&', '$', '+', '='
+            '★','☆','○','●','◎','◇','◆','□','■','△',
+            '▲','▽','▼','※','♠','♣','♥','♡','♦','♢',
+            '♬','♪','∞','◈','▦','▧','▨','▩','◐','◑',
+            '◒','◓','◔','◕','◖','◗','◘','◙','◚','◛',
+            '◜','◝','◞','◟','■','▣','▤','▥','▦','▧',
+            '▨','▩','▰','▱','▮','▯','▭','▮','▬','▲',
+            '#', '*', '@', '%', '&', '$', '+', '=', '~',
+            '^', '`', '-', '_', '|', '\\', '/', ':', ';',
+            '.', ',', '\'', '"', '(', ')', '[', ']', '{', '}',
+            '<', '>', '¤', 'µ', '©', '®', '℗', '™', '√', 'π',
+            '‣','•','‥','…','‰','‱','′','″','‵','‶',
+            '‷','‸','‹','›','※','⁂','⁃','⁇','⁈','⁉',
+            '⁎','⁑','⁕','⁘','⁙','⁚','⁛','⁜','⁝','⁞',
+            '⟀','⟁','⟡','⟣','⟤','⟥','⟦','⟧','⟨','⟩',
+            '⟪','⟫','⟬','⟭','⟮','⟯','⦀','⦁','⦂','⦃',
+            '⦄','⦅','⦆','⦇','⦈','⦉','⦊','⦋','⦌','⦍',
+            '⦎','⦏','⦐','⦑','⦒','⦓','⦔','⦕','⦖','⦗',
+            '⦘','⧈','⧉','⧊','⧋','⧌','⧍','⧎','⧏','⧐',
+            '⧑','⧒','⧓','⧔','⧕','⧖','⧗','⧘','⧙','⧚',
+            '⧛','⧜','⧝','⧞','⧟','⧠','⧡','⧢','⧣','⧤'
         };
         Dictionary<int, char> clusterSymbolMap = new Dictionary<int, char>();
 
@@ -114,19 +131,23 @@ namespace pixel
                     {
                         for (int x = 0; x < w; x++)
                         {
-                            int number = numberGrid[y, x];
-                            Rectangle cellRect = new Rectangle(x * cellSize, y * cellSize, cellSize, cellSize);
+                            Point pt = new Point(x, y);
 
-                            if (clusterSymbolMap.TryGetValue(number, out char symbol) &&
-                                numberToColor.TryGetValue(number, out Color color))
+                            // 사용자가 색칠한 셀만 기호로 표시
+                            if (pixelColors.TryGetValue(pt, out Color customColor))
                             {
-                                using (Brush textBrush = new SolidBrush(color))
+                                int number = numberGrid[y, x];
+                                Rectangle cellRect = new Rectangle(x * cellSize, y * cellSize, cellSize, cellSize);
+
+                                if (clusterSymbolMap.TryGetValue(number, out char symbol))
                                 {
-                                    g.DrawString(symbol.ToString(), font, textBrush, cellRect, format);
+                                    using (Brush textBrush = new SolidBrush(customColor))
+                                    {
+                                        g.DrawString(symbol.ToString(), font, textBrush, cellRect, format);
+                                    }
                                 }
                             }
-
-                            // 박스 제거됨: g.DrawRectangle(...) 호출 없음
+                            // 그렇지 않으면 아무 것도 표시하지 않음
                         }
                     }
                 }
@@ -159,42 +180,41 @@ namespace pixel
                     {
                         for (int x = 0; x < w; x++)
                         {
-                            Rectangle rect = new Rectangle(x * cellSize, y * cellSize, cellSize, cellSize);
-                            Direction dir = directionMap[y, x];
-                            char symbol;
+                            Point pt = new Point(x, y);
 
-                            switch (dir)
+                            // 사용자 색칠 셀만 표시
+                            if (pixelColors.TryGetValue(pt, out Color customColor))
                             {
-                                case Direction.Horizontal:
-                                    symbol = '⎯'; // 가로선
-                                    break;
-                                case Direction.Vertical:
-                                    symbol = '│'; // 세로선
-                                    break;
-                                case Direction.DiagonalDown:
-                                    symbol = '＼'; // ↘ 대각선
-                                    break;
-                                case Direction.DiagonalUp:
-                                    symbol = '／'; // ↗ 대각선
-                                    break;
-                                default:
-                                    symbol = 'ｘ'; // 아무 방향도 아님
-                                    break;
-                            }
+                                Direction dir = directionMap[y, x];
+                                char symbol;
 
-                            int number = numberGrid[y, x];
-                            if (numberToColor.TryGetValue(number, out Color color))
-                            {
-                                using (Brush brush = new SolidBrush(color))
+                                switch (dir)
+                                {
+                                    case Direction.Horizontal:
+                                        symbol = '⎯'; break;
+                                    case Direction.Vertical:
+                                        symbol = '│'; break;
+                                    case Direction.DiagonalDown:
+                                        symbol = '＼'; break;
+                                    case Direction.DiagonalUp:
+                                        symbol = '／'; break;
+                                    default:
+                                        symbol = 'ｘ'; break;
+                                }
+
+                                Rectangle rect = new Rectangle(x * cellSize, y * cellSize, cellSize, cellSize);
+                                using (Brush brush = new SolidBrush(customColor))
+                                {
                                     g.DrawString(symbol.ToString(), font, brush, rect, format);
+                                }
                             }
+                            // else: 아무 것도 출력하지 않음
                         }
                     }
                 }
 
                 picSavePreview.Image = resizedImage;
                 picSavePreview.Invalidate();
-                //MessageBox.Show($"평균 변화량: {avgxx / cnt}, {avgyy / cnt}, {avgdd1 / cnt}, {avgdd2 / cnt}");
             }
         }
 
@@ -210,7 +230,8 @@ namespace pixel
             {
                 sfd.Filter = "PNG 파일 (*.png)|*.png|JPEG 파일 (*.jpg)|*.jpg|Bitmap 파일 (*.bmp)|*.bmp";
                 sfd.Title = "이미지 저장";
-                sfd.FileName = "pixel_output.png";
+                string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HHmmss");
+                sfd.FileName = $"pixel_output_{timestamp}.png";
 
                 if (sfd.ShowDialog() == DialogResult.OK)
                 {

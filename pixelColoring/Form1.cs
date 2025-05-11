@@ -52,19 +52,26 @@ namespace pixel
                 originalImage = new Bitmap(ofd.FileName);
                 picPreview.Image = null;
 
-                int minSide = Math.Min(originalImage.Width, originalImage.Height);
-                int maxSide = Math.Max(originalImage.Width, originalImage.Height);
-                // 최소 줄이기 사이즈(픽셀화 크기) 설정, 원본의 1/2 또는 긴 셀 개수 100
-                numPixelSize.Minimum = Math.Max(2, maxSide / 100);
-                // 최대 줄이기 사이즈 (픽셀화 크기) 설정, 원본중 작은 사이드의 1 /10
-                numPixelSize.Maximum = minSide / 10;
+                //int minSide = Math.Min(originalImage.Width, originalImage.Height);
+                //int maxSide = Math.Max(originalImage.Width, originalImage.Height);
+                //// 최소 줄이기 사이즈(픽셀화 크기) 설정, 원본의 1/2 또는 긴 셀 개수 100
+                //numPixelSize.Minimum = Math.Max(2, maxSide / 100);
+                //// 최대 줄이기 사이즈 (픽셀화 크기) 설정, 원본중 작은 사이드의 1 /10
+                //numPixelSize.Maximum = minSide / 10;
 
+                int imageWidth = originalImage.Width;
+
+                // 가로 셀 수를 기준으로 설정
+                numPixelSize.Minimum = 10; // 최소 가로 셀 수 (직관적 최소값)
+                numPixelSize.Maximum = imageWidth / 2; // 셀 하나가 최소 2픽셀은 되도록 제한
+
+                
                 // 그리드 크기 최소 설정
                 //numPixelSize.Value = Math.Min(10, numPixelSize.Maximum);
 
                 //k means 클러스터링 수 설정
                 numKsize.Minimum = 2;
-                numKsize.Maximum = 30;
+                numKsize.Maximum = 100;
                 numKsize.Value = 8;
 
                 // k means 반복 횟수 설정
@@ -81,14 +88,24 @@ namespace pixel
                 return;
             }
 
+            // 픽셀 메시지 박스 확인(하던 작업 초기화 방지)
+            DialogResult result = MessageBox.Show("픽셀화 하시겠습니까?", "확인", MessageBoxButtons.YesNo);
+            if (result == DialogResult.No)
+                return;
+
             // 이전 색칠 정보 초기화
             pixelColors.Clear();
             selectedPoint = null;
 
             // 이미지 축소
-            pixelSize = (int)numPixelSize.Value;
-            int smallW = originalImage.Width / pixelSize;
-            int smallH = originalImage.Height / pixelSize;
+            int desiredGridW = (int)numPixelSize.Value;       // 사용자가 지정한 가로 셀 수
+            pixelSize = originalImage.Width / desiredGridW;   // 자동 계산된 셀 크기
+            int smallW = desiredGridW;                        // 줄일 이미지의 너비 = 셀 개수
+            int smallH = originalImage.Height / pixelSize;    // 셀 크기로 나눈 줄일 이미지의 높이
+
+            //pixelSize = (int)numPixelSize.Value;
+            //int smallW = originalImage.Width / pixelSize;
+            //int smallH = originalImage.Height / pixelSize;
 
 
             // 줄인 이미지
@@ -503,6 +520,10 @@ namespace pixel
                 MessageBox.Show("먼저 픽셀화를 해주세요.");
                 return;
             }
+            DialogResult result = MessageBox.Show("K-Means 색상으로 전체 픽셀을 색칠하시겠습니까?", "확인", MessageBoxButtons.YesNo);
+            if (result == DialogResult.No)
+                return;
+            
 
             int gridH = numberGrid.GetLength(0);
             int gridW = numberGrid.GetLength(1);
@@ -528,7 +549,7 @@ namespace pixel
         private void Form1_Load(object sender, EventArgs e)
         {
             numKsize.Value = 8;
-            numPixelSize.Value = 10;
+            numPixelSize.Value = 30;
             numKmeansIter.Value = 40;
         }
 
