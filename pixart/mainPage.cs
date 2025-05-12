@@ -181,25 +181,12 @@ namespace PixelColorling
             return Color.FromArgb(r, g, b);
         }
 
-
         private void panelCanvas_Paint(object sender, PaintEventArgs e)
         {
-            // 도안이 없고, 이미지만 불러온 상태일 경우 원본 미리보기
             if (blockColors == null && originalImage != null)
             {
-                // 비율 유지해서 그리기
-                float scaleX = (float)panelCanvas.Width / originalImage.Width;
-                float scaleY = (float)panelCanvas.Height / originalImage.Height;
-                float scale = Math.Min(scaleX, scaleY);
-
-                int drawWidth = (int)(originalImage.Width * scale);
-                int drawHeight = (int)(originalImage.Height * scale);
-
-                int offsetX = (panelCanvas.Width - drawWidth) / 2;
-                int offsetY = (panelCanvas.Height - drawHeight) / 2;
-
-                e.Graphics.DrawImage(originalImage, new Rectangle(offsetX, offsetY, drawWidth, drawHeight));
-                return; // 더 이상 그릴 도안이 없으므로 여기서 종료
+                // 원본 미리보기 코드 (생략)
+                return;
             }
 
             if (blockColors == null) return;
@@ -210,15 +197,21 @@ namespace PixelColorling
             int hBlocks = blockColors.GetLength(0);
             int wBlocks = blockColors.GetLength(1);
 
-            Font font = new Font("Arial", 8);
+            // 💡 셀 크기를 panelCanvas의 크기에 맞게 자동 계산
+            float cellWidth = (float)panelCanvas.Width / wBlocks;
+            float cellHeight = (float)panelCanvas.Height / hBlocks;
+
+            Font font = new Font("Arial", Math.Max(8, (int)Math.Min(cellWidth, cellHeight) / 2));
 
             for (int y = 0; y < hBlocks; y++)
             {
                 for (int x = 0; x < wBlocks; x++)
                 {
-                    Rectangle rect = new Rectangle(x * blockSize, y * blockSize, blockSize, blockSize);
+                    float left = x * cellWidth;
+                    float top = y * cellHeight;
+                    RectangleF rect = new RectangleF(left, top, cellWidth, cellHeight);
 
-                    // 1. 색칠된 셀이면 색상 채우기
+                    // 1. 색칠된 셀은 색으로 채우기
                     if (isFilled != null && isFilled[y, x])
                     {
                         using (SolidBrush brush = new SolidBrush(filledColors[y, x]))
@@ -227,23 +220,19 @@ namespace PixelColorling
                         }
                     }
 
-                    // 2. 테두리 그리기
-                    g.DrawRectangle(Pens.Gray, rect);
+                    // 2. 테두리
+                    g.DrawRectangle(Pens.Gray, left, top, cellWidth, cellHeight);
 
-                    // 3. 색칠 안 된 셀만 번호 표시
+                    // 3. 번호 표시
                     if (!isFilled[y, x])
                     {
                         string num = colorNumbers[y, x].ToString();
                         g.DrawString(num, font, Brushes.Black, rect.Location);
                     }
-
                 }
             }
-
-
-
         }
-
+        
         private void btnSave_Click(object sender, EventArgs e)
         {
             if (blockColors == null)
@@ -282,7 +271,7 @@ namespace PixelColorling
 
                         // 3. 번호 쓰기 (색칠 여부와 상관없이 항상 표시)
                         string num = colorNumbers[y, x].ToString();
-                        g.DrawString(num, font, Brushes.Black, rect.Location);
+                        //g.DrawString(num, font, Brushes.Black, rect.Location);
                     }
                 }
             }
@@ -312,6 +301,7 @@ namespace PixelColorling
             }
         }
 
+
         private void panelCanvas_MouseClick(object sender, MouseEventArgs e)
         {
             if (blockColors == null || selectedColor == Color.Transparent)
@@ -320,12 +310,19 @@ namespace PixelColorling
                 return;
             }
 
-            int x = e.X / blockSize;
-            int y = e.Y / blockSize;
+            int wBlocks = blockColors.GetLength(1); // 셀 개수 (가로)
+            int hBlocks = blockColors.GetLength(0); // 셀 개수 (세로)
 
-            if (y < 0 || y >= blockColors.GetLength(0) || x < 0 || x >= blockColors.GetLength(1))
+            float cellWidth = (float)panelCanvas.Width / wBlocks;
+            float cellHeight = (float)panelCanvas.Height / hBlocks;
+
+            int x = (int)(e.X / cellWidth);
+            int y = (int)(e.Y / cellHeight);
+
+            if (y < 0 || y >= hBlocks || x < 0 || x >= wBlocks)
                 return;
 
+            // 셀 색상 단순화
             Color simplifiedClicked = SimplifyColor(blockColors[y, x], colorCount);
             Color simplifiedSelected = SimplifyColor(selectedColor, colorCount);
 
@@ -335,7 +332,12 @@ namespace PixelColorling
                 filledColors[y, x] = selectedColor;
 
                 // 해당 셀만 다시 그리기
-                Rectangle invalidateRect = new Rectangle(x * blockSize, y * blockSize, blockSize, blockSize);
+                Rectangle invalidateRect = new Rectangle(
+                    (int)(x * cellWidth),
+                    (int)(y * cellHeight),
+                    (int)(cellWidth),
+                    (int)(cellHeight)
+                );
                 panelCanvas.Invalidate(invalidateRect);
             }
             else
@@ -343,5 +345,6 @@ namespace PixelColorling
                 MessageBox.Show("선택한 색상과 셀의 색상 번호가 다릅니다!");
             }
         }
+
     }
 }

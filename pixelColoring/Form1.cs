@@ -568,7 +568,7 @@ namespace pixel
                 k
             );
 
-            saveForm.ShowDialog();
+            saveForm.Show();
         }
     }
 }
