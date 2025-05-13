@@ -32,10 +32,15 @@ namespace PixelColorling
 
         private void Coloring_Load(object sender, EventArgs e)
         {
-            cmbDifficulty.SelectedIndex = 1;
+            // 난이도 설정 제거, 가로 픽셀 수로 조정
+
+            // 가로 셀 수 기본 설정 (예: 30)
+            numPixelSize.Value = 30;
+            numPixelSize.Minimum = 5;
+            numPixelSize.Maximum = 100;
         }
 
-        //도안 생성 버튼 이벤트
+
         private void btnGenerate_Click(object sender, EventArgs e)
         {
             if (originalImage == null)
@@ -44,33 +49,27 @@ namespace PixelColorling
                 return;
             }
 
-            switch (cmbDifficulty.SelectedItem.ToString())
-            {
-                case "쉬움":
-                    blockSize = 14;
-                    colorCount = 8;
-                    break;
-                case "보통":
-                    blockSize = 10;
-                    colorCount = 12;
-                    break;
-                case "어려움":
-                    blockSize = 7;
-                    colorCount = 18;
-                    break;
-            }
+            // 1. 입력받은 가로 셀 개수
+            int desiredGridW = (int)numPixelSize.Value;
 
+            // 2. 셀 크기 결정 (정사각형 셀 기준)
+            blockSize = originalImage.Width / desiredGridW;
+
+            // 3. 실제 도안 셀 개수 (가로, 세로)
             int wBlocks = originalImage.Width / blockSize;
             int hBlocks = originalImage.Height / blockSize;
 
-            // 2. 배열 초기화
+            // 색상 수는 고정 또는 별도 설정
+            colorCount = 12;
+
+            // 4. 배열 초기화
             blockColors = new Color[hBlocks, wBlocks];
             colorNumbers = new int[hBlocks, wBlocks];
             isFilled = new bool[hBlocks, wBlocks];
             filledColors = new Color[hBlocks, wBlocks];
             colorMap.Clear();
 
-            // 3. 각 블럭의 평균 색상 계산 + 색상 번호 매핑
+            // 5. 셀 평균 색상 계산 및 색상 번호 매핑
             for (int y = 0; y < hBlocks; y++)
             {
                 for (int x = 0; x < wBlocks; x++)
@@ -86,10 +85,11 @@ namespace PixelColorling
                 }
             }
 
-            // 4. 도안 그리기 요청 + 팔레트 생성
-            panelCanvas.Invalidate();   // 다시 그리기
-            CreateColorPalette();       // 색상 팔레트 생성
+            // 6. 새로 그리기
+            panelCanvas.Invalidate();
+            CreateColorPalette();
         }
+
 
         //평균 색상 계산
         private Color GetAverageColor(int startX, int startY, int size)
@@ -183,12 +183,6 @@ namespace PixelColorling
 
         private void panelCanvas_Paint(object sender, PaintEventArgs e)
         {
-            if (blockColors == null && originalImage != null)
-            {
-                // 원본 미리보기 코드 (생략)
-                return;
-            }
-
             if (blockColors == null) return;
 
             Graphics g = e.Graphics;
@@ -197,33 +191,34 @@ namespace PixelColorling
             int hBlocks = blockColors.GetLength(0);
             int wBlocks = blockColors.GetLength(1);
 
-            // 💡 셀 크기를 panelCanvas의 크기에 맞게 자동 계산
-            float cellWidth = (float)panelCanvas.Width / wBlocks;
-            float cellHeight = (float)panelCanvas.Height / hBlocks;
+            // 1. 셀 크기를 도안 비율 유지하며 패널에 맞춤
+            float scaleX = (float)panelCanvas.Width / wBlocks;
+            float scaleY = (float)panelCanvas.Height / hBlocks;
+            float cellSize = Math.Min(scaleX, scaleY);  // 정사각형 유지
 
-            Font font = new Font("Arial", Math.Max(8, (int)Math.Min(cellWidth, cellHeight) / 2));
+            float totalW = cellSize * wBlocks;
+            float totalH = cellSize * hBlocks;
+            float offsetX = (panelCanvas.Width - totalW) / 2;
+            float offsetY = (panelCanvas.Height - totalH) / 2;
+
+            Font font = new Font("Arial", Math.Max(8, (int)(cellSize * 0.5f)));
 
             for (int y = 0; y < hBlocks; y++)
             {
                 for (int x = 0; x < wBlocks; x++)
                 {
-                    float left = x * cellWidth;
-                    float top = y * cellHeight;
-                    RectangleF rect = new RectangleF(left, top, cellWidth, cellHeight);
+                    float left = offsetX + x * cellSize;
+                    float top = offsetY + y * cellSize;
+                    RectangleF rect = new RectangleF(left, top, cellSize, cellSize);
 
-                    // 1. 색칠된 셀은 색으로 채우기
                     if (isFilled != null && isFilled[y, x])
                     {
                         using (SolidBrush brush = new SolidBrush(filledColors[y, x]))
-                        {
                             g.FillRectangle(brush, rect);
-                        }
                     }
 
-                    // 2. 테두리
-                    g.DrawRectangle(Pens.Gray, left, top, cellWidth, cellHeight);
+                    g.DrawRectangle(Pens.Gray, left, top, cellSize, cellSize);
 
-                    // 3. 번호 표시
                     if (!isFilled[y, x])
                     {
                         string num = colorNumbers[y, x].ToString();
@@ -232,7 +227,8 @@ namespace PixelColorling
                 }
             }
         }
-        
+
+
         private void btnSave_Click(object sender, EventArgs e)
         {
             if (blockColors == null)
@@ -346,5 +342,38 @@ namespace PixelColorling
             }
         }
 
+        private void btnColorAll_Click(object sender, EventArgs e)
+        {
+            if (blockColors == null || colorMap.Count == 0)
+            {
+                MessageBox.Show("먼저 도안을 생성해주세요.");
+                return;
+            }
+
+            int hBlocks = blockColors.GetLength(0);
+            int wBlocks = blockColors.GetLength(1);
+
+            isFilled = new bool[hBlocks, wBlocks];
+            filledColors = new Color[hBlocks, wBlocks];
+
+            // 색상 번호 → 색상 역매핑
+            Dictionary<int, Color> numberToColor = colorMap.ToDictionary(kv => kv.Value, kv => kv.Key);
+
+            for (int y = 0; y < hBlocks; y++)
+            {
+                for (int x = 0; x < wBlocks; x++)
+                {
+                    int num = colorNumbers[y, x];
+
+                    if (numberToColor.TryGetValue(num, out Color color))
+                    {
+                        isFilled[y, x] = true;
+                        filledColors[y, x] = color;
+                    }
+                }
+            }
+
+            panelCanvas.Invalidate();  // 전체 다시 그리기
+        }
     }
 }
