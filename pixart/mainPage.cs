@@ -306,19 +306,25 @@ namespace PixelColorling
                 return;
             }
 
-            int wBlocks = blockColors.GetLength(1); // 셀 개수 (가로)
-            int hBlocks = blockColors.GetLength(0); // 셀 개수 (세로)
+            int wBlocks = blockColors.GetLength(1);
+            int hBlocks = blockColors.GetLength(0);
 
-            float cellWidth = (float)panelCanvas.Width / wBlocks;
-            float cellHeight = (float)panelCanvas.Height / hBlocks;
+            float scaleX = (float)panelCanvas.Width / wBlocks;
+            float scaleY = (float)panelCanvas.Height / hBlocks;
+            float cellSize = Math.Min(scaleX, scaleY);
 
-            int x = (int)(e.X / cellWidth);
-            int y = (int)(e.Y / cellHeight);
+            float totalW = cellSize * wBlocks;
+            float totalH = cellSize * hBlocks;
+            float offsetX = (panelCanvas.Width - totalW) / 2;
+            float offsetY = (panelCanvas.Height - totalH) / 2;
 
-            if (y < 0 || y >= hBlocks || x < 0 || x >= wBlocks)
+            // 실제 클릭 좌표를 도안 셀 인덱스로 변환
+            int x = (int)((e.X - offsetX) / cellSize);
+            int y = (int)((e.Y - offsetY) / cellSize);
+
+            if (x < 0 || x >= wBlocks || y < 0 || y >= hBlocks)
                 return;
 
-            // 셀 색상 단순화
             Color simplifiedClicked = SimplifyColor(blockColors[y, x], colorCount);
             Color simplifiedSelected = SimplifyColor(selectedColor, colorCount);
 
@@ -327,12 +333,11 @@ namespace PixelColorling
                 isFilled[y, x] = true;
                 filledColors[y, x] = selectedColor;
 
-                // 해당 셀만 다시 그리기
                 Rectangle invalidateRect = new Rectangle(
-                    (int)(x * cellWidth),
-                    (int)(y * cellHeight),
-                    (int)(cellWidth),
-                    (int)(cellHeight)
+                    (int)(offsetX + x * cellSize),
+                    (int)(offsetY + y * cellSize),
+                    (int)cellSize,
+                    (int)cellSize
                 );
                 panelCanvas.Invalidate(invalidateRect);
             }
@@ -341,6 +346,7 @@ namespace PixelColorling
                 MessageBox.Show("선택한 색상과 셀의 색상 번호가 다릅니다!");
             }
         }
+
 
         private void btnColorAll_Click(object sender, EventArgs e)
         {
