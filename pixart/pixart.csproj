@@ -46,6 +46,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="dualMode.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="dualMode.Designer.cs">
+      <DependentUpon>dualMode.cs</DependentUpon>
+    </Compile>
     <Compile Include="mainPage.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -66,6 +72,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="dualMode.resx">
+      <DependentUpon>dualMode.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="explanation.resx">
       <DependentUpon>explanation.cs</DependentUpon>
     </EmbeddedResource>

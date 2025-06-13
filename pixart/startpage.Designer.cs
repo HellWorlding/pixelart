@@ -32,6 +32,7 @@
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.btnExplanation = new System.Windows.Forms.Button();
             this.btnColor = new System.Windows.Forms.Button();
+            this.btnDualMode = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // imageList1
@@ -42,7 +43,7 @@
             // 
             // btnExplanation
             // 
-            this.btnExplanation.Location = new System.Drawing.Point(91, 355);
+            this.btnExplanation.Location = new System.Drawing.Point(71, 355);
             this.btnExplanation.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnExplanation.Name = "btnExplanation";
             this.btnExplanation.Size = new System.Drawing.Size(193, 106);
@@ -53,7 +54,7 @@
             // 
             // btnColor
             // 
-            this.btnColor.Location = new System.Drawing.Point(634, 355);
+            this.btnColor.Location = new System.Drawing.Point(361, 355);
             this.btnColor.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnColor.Name = "btnColor";
             this.btnColor.Size = new System.Drawing.Size(193, 106);
@@ -62,11 +63,23 @@
             this.btnColor.UseVisualStyleBackColor = true;
             this.btnColor.Click += new System.EventHandler(this.btnColor_Click);
             // 
+            // btnDualMode
+            // 
+            this.btnDualMode.Location = new System.Drawing.Point(638, 355);
+            this.btnDualMode.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnDualMode.Name = "btnDualMode";
+            this.btnDualMode.Size = new System.Drawing.Size(193, 106);
+            this.btnDualMode.TabIndex = 2;
+            this.btnDualMode.Text = "듀얼모드";
+            this.btnDualMode.UseVisualStyleBackColor = true;
+            this.btnDualMode.Click += new System.EventHandler(this.btnDualMode_Click);
+            // 
             // startpage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(914, 562);
+            this.Controls.Add(this.btnDualMode);
             this.Controls.Add(this.btnColor);
             this.Controls.Add(this.btnExplanation);
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -81,6 +94,7 @@
         private System.Windows.Forms.ImageList imageList1;
         private System.Windows.Forms.Button btnExplanation;
         private System.Windows.Forms.Button btnColor;
+        private System.Windows.Forms.Button btnDualMode;
     }
 }
 

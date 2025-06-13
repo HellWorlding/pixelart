@@ -33,5 +33,13 @@ namespace pixart
             mainForm.FormClosed += (s, args) => this.Close(); // mainPage 닫히면 startpage도 함께 종료
             mainForm.Show();
         }
+
+        private void btnDualMode_Click(object sender, EventArgs e)
+        {
+            dualMode dualForm = new dualMode();
+            this.Hide(); // startpage 숨기고
+            dualForm.FormClosed += (s, args) => this.Close(); // 닫히면 종료
+            dualForm.Show();
+        }
     }
 }
