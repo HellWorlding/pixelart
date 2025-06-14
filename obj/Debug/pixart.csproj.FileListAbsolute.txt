@@ -1,0 +1,15 @@
+C:\Users\user\Desktop\PIX\pixart\bin\Debug\pixart.exe.config
+C:\Users\user\Desktop\PIX\pixart\bin\Debug\pixart.exe
+C:\Users\user\Desktop\PIX\pixart\bin\Debug\pixart.pdb
+C:\Users\user\Desktop\PIX\pixart\obj\Debug\pixart.csproj.AssemblyReference.cache
+C:\Users\user\Desktop\PIX\pixart\obj\Debug\pixart.dualMode.resources
+C:\Users\user\Desktop\PIX\pixart\obj\Debug\pixart.explanation.resources
+C:\Users\user\Desktop\PIX\pixart\obj\Debug\pixel.KmeansColoring.resources
+C:\Users\user\Desktop\PIX\pixart\obj\Debug\PixelColorling.Coloring.resources
+C:\Users\user\Desktop\PIX\pixart\obj\Debug\pixel.SaveKMeansForm.resources
+C:\Users\user\Desktop\PIX\pixart\obj\Debug\pixart.startpage.resources
+C:\Users\user\Desktop\PIX\pixart\obj\Debug\pixart.Properties.Resources.resources
+C:\Users\user\Desktop\PIX\pixart\obj\Debug\pixart.csproj.GenerateResource.cache
+C:\Users\user\Desktop\PIX\pixart\obj\Debug\pixart.csproj.CoreCompileInputs.cache
+C:\Users\user\Desktop\PIX\pixart\obj\Debug\pixart.exe
+C:\Users\user\Desktop\PIX\pixart\obj\Debug\pixart.pdb
