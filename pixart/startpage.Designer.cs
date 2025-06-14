@@ -43,10 +43,9 @@
             // 
             // btnExplanation
             // 
-            this.btnExplanation.Location = new System.Drawing.Point(71, 355);
-            this.btnExplanation.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnExplanation.Location = new System.Drawing.Point(62, 284);
             this.btnExplanation.Name = "btnExplanation";
-            this.btnExplanation.Size = new System.Drawing.Size(193, 106);
+            this.btnExplanation.Size = new System.Drawing.Size(169, 85);
             this.btnExplanation.TabIndex = 0;
             this.btnExplanation.Text = "설명하기";
             this.btnExplanation.UseVisualStyleBackColor = true;
@@ -54,10 +53,9 @@
             // 
             // btnColor
             // 
-            this.btnColor.Location = new System.Drawing.Point(361, 355);
-            this.btnColor.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnColor.Location = new System.Drawing.Point(316, 284);
             this.btnColor.Name = "btnColor";
-            this.btnColor.Size = new System.Drawing.Size(193, 106);
+            this.btnColor.Size = new System.Drawing.Size(169, 85);
             this.btnColor.TabIndex = 1;
             this.btnColor.Text = "색칠하기";
             this.btnColor.UseVisualStyleBackColor = true;
@@ -65,10 +63,9 @@
             // 
             // btnDualMode
             // 
-            this.btnDualMode.Location = new System.Drawing.Point(638, 355);
-            this.btnDualMode.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnDualMode.Location = new System.Drawing.Point(558, 284);
             this.btnDualMode.Name = "btnDualMode";
-            this.btnDualMode.Size = new System.Drawing.Size(193, 106);
+            this.btnDualMode.Size = new System.Drawing.Size(169, 85);
             this.btnDualMode.TabIndex = 2;
             this.btnDualMode.Text = "듀얼모드";
             this.btnDualMode.UseVisualStyleBackColor = true;
@@ -76,13 +73,12 @@
             // 
             // startpage
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(914, 562);
+            this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.btnDualMode);
             this.Controls.Add(this.btnColor);
             this.Controls.Add(this.btnExplanation);
-            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "startpage";
             this.Text = "Form1";
             this.ResumeLayout(false);

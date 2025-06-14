@@ -52,11 +52,23 @@
     <Compile Include="dualMode.Designer.cs">
       <DependentUpon>dualMode.cs</DependentUpon>
     </Compile>
+    <Compile Include="KmeansColoring.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="KmeansColoring.Designer.cs">
+      <DependentUpon>KmeansColoring.cs</DependentUpon>
+    </Compile>
     <Compile Include="mainPage.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="mainPage.Designer.cs">
       <DependentUpon>mainPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SaveKMeansForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SaveKMeansForm.Designer.cs">
+      <DependentUpon>SaveKMeansForm.cs</DependentUpon>
     </Compile>
     <Compile Include="startpage.cs">
       <SubType>Form</SubType>
@@ -78,8 +90,14 @@
     <EmbeddedResource Include="explanation.resx">
       <DependentUpon>explanation.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="KmeansColoring.resx">
+      <DependentUpon>KmeansColoring.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="mainPage.resx">
       <DependentUpon>mainPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SaveKMeansForm.resx">
+      <DependentUpon>SaveKMeansForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="startpage.resx">
       <DependentUpon>startpage.cs</DependentUpon>

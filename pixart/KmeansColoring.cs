@@ -11,7 +11,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace pixel
 {
-    public partial class Form1 : Form
+    public partial class KmeansColoring : Form
     {
 
 
@@ -36,7 +36,7 @@ namespace pixel
 
 
 
-        public Form1()
+        public KmeansColoring()
         {
             InitializeComponent();
         }
@@ -573,6 +573,11 @@ namespace pixel
             //);
 
             //saveForm.Show();
+        }
+
+        private void toolStripComboBox1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
