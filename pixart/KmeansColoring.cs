@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using pixart;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace pixel
@@ -557,7 +558,8 @@ namespace pixel
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            var saveForm = new SaveKMeansForm(originalImage, pixelatedImage, pixelSize);
+            //var saveForm = new SaveKMeansForm(originalImage, pixelatedImage, pixelSize);
+            var saveForm = new SaveForm(pixelatedImage, originalImage.Size);
             saveForm.Show();
 
 
@@ -579,5 +581,7 @@ namespace pixel
         {
 
         }
+
+
     }
 }

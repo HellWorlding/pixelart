@@ -43,14 +43,13 @@
             this.lblKmeansiter = new System.Windows.Forms.Label();
             this.numKmeansIter = new System.Windows.Forms.NumericUpDown();
             this.btnSave = new System.Windows.Forms.Button();
-            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.toolStripComboBox1 = new System.Windows.Forms.ToolStripComboBox();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.panelCompare = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.picPreview)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numPixelSize)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picOriginalThumb)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numKsize)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numKmeansIter)).BeginInit();
-            this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // picPreview
@@ -179,28 +178,27 @@
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
-            // toolStrip1
+            // menuStrip1
             // 
-            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripComboBox1});
-            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
-            this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(1377, 25);
-            this.toolStrip1.TabIndex = 13;
-            this.toolStrip1.Text = "toolStrip1";
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(1377, 24);
+            this.menuStrip1.TabIndex = 13;
+            this.menuStrip1.Text = "menuStrip1";
             // 
-            // toolStripComboBox1
+            // panelCompare
             // 
-            this.toolStripComboBox1.Name = "toolStripComboBox1";
-            this.toolStripComboBox1.Size = new System.Drawing.Size(121, 25);
-            this.toolStripComboBox1.Click += new System.EventHandler(this.toolStripComboBox1_Click);
+            this.panelCompare.Location = new System.Drawing.Point(1196, 385);
+            this.panelCompare.Name = "panelCompare";
+            this.panelCompare.Size = new System.Drawing.Size(170, 111);
+            this.panelCompare.TabIndex = 14;
             // 
             // KmeansColoring
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1377, 614);
-            this.Controls.Add(this.toolStrip1);
+            this.Controls.Add(this.panelCompare);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.lblKmeansiter);
             this.Controls.Add(this.numKmeansIter);
@@ -214,6 +212,8 @@
             this.Controls.Add(this.btnPixelate);
             this.Controls.Add(this.btnLoad);
             this.Controls.Add(this.picPreview);
+            this.Controls.Add(this.menuStrip1);
+            this.MainMenuStrip = this.menuStrip1;
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "KmeansColoring";
             this.Text = "Form1";
@@ -223,8 +223,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.picOriginalThumb)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numKsize)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numKmeansIter)).EndInit();
-            this.toolStrip1.ResumeLayout(false);
-            this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -246,8 +244,8 @@
         private System.Windows.Forms.Label lblKmeansiter;
         private System.Windows.Forms.NumericUpDown numKmeansIter;
         private System.Windows.Forms.Button btnSave;
-        private System.Windows.Forms.ToolStrip toolStrip1;
-        private System.Windows.Forms.ToolStripComboBox toolStripComboBox1;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.Panel panelCompare;
     }
 }
 

@@ -1,8 +1,6 @@
-﻿using System.Windows.Forms;
-
-namespace pixel
+﻿namespace pixart
 {
-    partial class SaveKMeansForm
+    partial class SaveForm
     {
         /// <summary>
         /// Required designer variable.
@@ -30,9 +28,9 @@ namespace pixel
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SaveForm));
             this.picSavePreview = new System.Windows.Forms.PictureBox();
-            this.cmbSaveForm = new System.Windows.Forms.ComboBox();
-            this.btnImgSave = new System.Windows.Forms.Button();
+            this.btnSave = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.picSavePreview)).BeginInit();
             this.SuspendLayout();
             // 
@@ -42,44 +40,29 @@ namespace pixel
             this.picSavePreview.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.picSavePreview.Name = "picSavePreview";
             this.picSavePreview.Size = new System.Drawing.Size(1013, 606);
-            this.picSavePreview.TabIndex = 1;
+            this.picSavePreview.TabIndex = 2;
             this.picSavePreview.TabStop = false;
-            this.picSavePreview.Paint += new System.Windows.Forms.PaintEventHandler(this.picSavePreview_Paint);
             // 
-            // cmbSaveForm
+            // btnSave
             // 
-            this.cmbSaveForm.FormattingEnabled = true;
-            this.cmbSaveForm.Items.AddRange(new object[] {
-            "단순 비트맵 저장",
-            "색상 기반 기호 표현",
-            "방향 기반 기호 표현",
-            "콜라주 사진 만들기"});
-            this.cmbSaveForm.Location = new System.Drawing.Point(1031, 69);
-            this.cmbSaveForm.Name = "cmbSaveForm";
-            this.cmbSaveForm.Size = new System.Drawing.Size(121, 20);
-            this.cmbSaveForm.TabIndex = 2;
-            this.cmbSaveForm.SelectedIndexChanged += new System.EventHandler(this.cmbSaveForm_SelectedIndexChanged);
+            this.btnSave.Font = new System.Drawing.Font("굴림", 20F);
+            this.btnSave.Image = ((System.Drawing.Image)(resources.GetObject("btnSave.Image")));
+            this.btnSave.Location = new System.Drawing.Point(1031, 11);
+            this.btnSave.Name = "btnSave";
+            this.btnSave.Size = new System.Drawing.Size(110, 110);
+            this.btnSave.TabIndex = 3;
+            this.btnSave.UseVisualStyleBackColor = true;
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
-            // btnImgSave
-            // 
-            this.btnImgSave.Location = new System.Drawing.Point(1031, 109);
-            this.btnImgSave.Name = "btnImgSave";
-            this.btnImgSave.Size = new System.Drawing.Size(121, 52);
-            this.btnImgSave.TabIndex = 3;
-            this.btnImgSave.Text = "저장하기";
-            this.btnImgSave.UseVisualStyleBackColor = true;
-            this.btnImgSave.Click += new System.EventHandler(this.btnImgSave_Click);
-            // 
-            // SaveKMeansForm
+            // SaveForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1154, 637);
-            this.Controls.Add(this.btnImgSave);
-            this.Controls.Add(this.cmbSaveForm);
+            this.ClientSize = new System.Drawing.Size(1154, 631);
+            this.Controls.Add(this.btnSave);
             this.Controls.Add(this.picSavePreview);
-            this.Name = "SaveKMeansForm";
-            this.Text = "Form2";
+            this.Name = "SaveForm";
+            this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.picSavePreview)).EndInit();
             this.ResumeLayout(false);
 
@@ -88,7 +71,6 @@ namespace pixel
         #endregion
 
         private System.Windows.Forms.PictureBox picSavePreview;
-        private ComboBox cmbSaveForm;
-        private Button btnImgSave;
+        private System.Windows.Forms.Button btnSave;
     }
 }
