@@ -37,6 +37,7 @@ namespace PixelColorling
         Dictionary<int, Color> colorNumberToRGB = new Dictionary<int, Color>();
         private ColorDialog colorDialog1 = new ColorDialog();
         private int penThickness = 1; // 기본값, 초기 펜 굵기
+        private bool colorPartitionMode = false; //부분 색칠
 
 
         private Bitmap paintedResultBitmap; // 도안 결과 저장용
@@ -75,14 +76,14 @@ namespace PixelColorling
 
             // 배열 초기화
             blockColors = new Color[hBlocks, wBlocks];
-            simplifiedColors = new Color[hBlocks, wBlocks]; // ✅ 추가
+            simplifiedColors = new Color[hBlocks, wBlocks];
             colorNumbers = new int[hBlocks, wBlocks];
             isFilled = new bool[hBlocks, wBlocks];
             filledColors = new Color[hBlocks, wBlocks];
             colorMap.Clear();
-            colorNumberToRGB.Clear(); // ✅ 추가
+            colorNumberToRGB.Clear();
 
-            // 전체 픽셀 캐시
+            // 픽셀 캐시
             Color[,] pixelCache = new Color[originalImage.Height, originalImage.Width];
             for (int y = 0; y < originalImage.Height; y++)
             {
@@ -92,8 +93,12 @@ namespace PixelColorling
                 }
             }
 
-            Dictionary<Color, int> simplifiedColorToNumber = new Dictionary<Color, int>();
+            // 색상 → 번호 매핑 (양자화된 RGB를 int 키로 변환)
             int currentNumber = 1;
+            Dictionary<int, int> colorKeyToNumber = new Dictionary<int, int>();
+
+            // RGB를 정수 키로 변환하는 함수
+            int SimplifiedColorKey(Color c) => (c.R << 16) | (c.G << 8) | c.B;
 
             for (int by = 0; by < hBlocks; by++)
             {
@@ -125,38 +130,35 @@ namespace PixelColorling
                     blockColors[by, bx] = avg;
 
                     Color simplified = SimplifyColor(avg, colorCount);
-                    simplifiedColors[by, bx] = simplified; // ✅ Simplified 색상 저장
+                    simplifiedColors[by, bx] = simplified;
 
-                    if (!simplifiedColorToNumber.ContainsKey(simplified))
+                    int key = SimplifiedColorKey(simplified);
+
+                    if (!colorKeyToNumber.ContainsKey(key))
                     {
-                        simplifiedColorToNumber[simplified] = currentNumber;
+                        colorKeyToNumber[key] = currentNumber;
                         colorMap[simplified] = currentNumber;
-                        colorNumberToRGB[currentNumber] = simplified; // ✅ 번호 → 색 매핑
+                        colorNumberToRGB[currentNumber] = simplified;
                         currentNumber++;
                     }
 
-                    int colorNum = simplifiedColorToNumber[simplified];
-                    colorNumbers[by, bx] = colorNum;
+                    colorNumbers[by, bx] = colorKeyToNumber[key];
                 }
             }
-
 
             int smallW = desiredGridW;
             int smallH = originalImage.Height / blockSize;
 
-            // 사용자가 색칠한 결과를 저장할 비트맵 초기화
             paintedResultBitmap = new Bitmap(smallW, smallH);
             using (Graphics g = Graphics.FromImage(paintedResultBitmap))
             {
-                g.Clear(Color.White);  // 또는 Transparent
+                g.Clear(Color.White);
             }
-
-
-
 
             panelCanvas.Invalidate();
             CreateColorPalette();
         }
+
 
 
 
@@ -282,30 +284,34 @@ namespace PixelColorling
 
                     if (isFilled != null && isFilled[y, x])
                     {
-                        SolidBrush brush = new SolidBrush(filledColors[y, x]);
-                        g.FillRectangle(brush, rect);
-                        brush.Dispose();
+                        using (SolidBrush brush = new SolidBrush(filledColors[y, x]))
+                            g.FillRectangle(brush, rect);
                     }
 
                     g.DrawRectangle(Pens.Gray, left, top, cellSize, cellSize);
 
                     if (!isFilled[y, x])
                     {
-                        string num = colorNumbers[y, x].ToString();
-                        g.DrawString(num, font, Brushes.Black, rect.Location);
-                    }
+                        int colorNum = colorNumbers[y, x];
+                        string num = colorNum.ToString();
 
-                    //if (selectedPoint.HasValue && selectedPoint.Value == new Point(x, y))
-                    //{
-                    //    Pen redPen = new Pen(Color.Red, 2);
-                    //    g.DrawRectangle(redPen, left, top, cellSize, cellSize);
-                    //    redPen.Dispose();
-                    //}
+                        if (colorNumberToRGB.TryGetValue(colorNum, out Color color))
+                        {
+                            using (Brush brush = new SolidBrush(color))
+                                g.DrawString(num, font, brush, rect.Location);
+                        }
+                        else
+                        {
+                            g.DrawString(num, font, Brushes.Black, rect.Location);
+                        }
+                    }
                 }
             }
 
             font.Dispose();
         }
+
+
 
 
 
@@ -349,6 +355,63 @@ namespace PixelColorling
         }
 
 
+        //private void panelCanvas_MouseClick(object sender, MouseEventArgs e)
+        //{
+        //    try
+        //    {
+        //        if (blockColors == null) return;
+
+        //        int hBlocks = blockColors.GetLength(0);
+        //        int wBlocks = blockColors.GetLength(1);
+
+        //        float scaleX = (float)panelCanvas.Width / wBlocks;
+        //        float scaleY = (float)panelCanvas.Height / hBlocks;
+        //        float cellSize = Math.Min(scaleX, scaleY);
+        //        int totalW = (int)(cellSize * wBlocks);
+        //        int totalH = (int)(cellSize * hBlocks);
+        //        int offsetX = (panelCanvas.Width - totalW) / 2;
+        //        int offsetY = (panelCanvas.Height - totalH) / 2;
+
+        //        int x = (int)((e.X - offsetX) / cellSize);
+        //        int y = (int)((e.Y - offsetY) / cellSize);
+
+        //        if (x >= 0 && x < wBlocks && y >= 0 && y < hBlocks)
+        //        {
+        //            isFilled[y, x] = true;
+        //            filledColors[y, x] = selectedColor;
+        //            selectedPoint = new Point(x, y);
+
+        //            // ✅ paintedResultBitmap에 블록 단위 색 반영
+        //            if (paintedResultBitmap != null)
+        //            {
+        //                for (int dy = 0; dy < blockSize; dy++)
+        //                {
+        //                    int py = y * blockSize + dy;
+        //                    if (py >= paintedResultBitmap.Height) continue;
+
+        //                    for (int dx = 0; dx < blockSize; dx++)
+        //                    {
+        //                        int px = x * blockSize + dx;
+        //                        if (px >= paintedResultBitmap.Width) continue;
+
+        //                        paintedResultBitmap.SetPixel(px, py, selectedColor);
+        //                    }
+        //                }
+        //            }
+
+        //            // ✅ 셀만 리프레시
+        //            RectangleF rect = new RectangleF(offsetX + x * cellSize, offsetY + y * cellSize, cellSize, cellSize);
+        //            panelCanvas.Invalidate(Rectangle.Ceiling(rect));
+        //        }
+        //        paintedResultBitmap.SetPixel(x, y, selectedColor);
+
+        //        panelCompare.Invalidate();
+        //    }
+        //    catch (Exception ex)
+        //    {
+
+        //    }
+        //}
         private void panelCanvas_MouseClick(object sender, MouseEventArgs e)
         {
             try
@@ -366,46 +429,82 @@ namespace PixelColorling
                 int offsetX = (panelCanvas.Width - totalW) / 2;
                 int offsetY = (panelCanvas.Height - totalH) / 2;
 
-                int x = (int)((e.X - offsetX) / cellSize);
-                int y = (int)((e.Y - offsetY) / cellSize);
+                int cx = (int)((e.X - offsetX) / cellSize);
+                int cy = (int)((e.Y - offsetY) / cellSize);
+                if (cx < 0 || cx >= wBlocks || cy < 0 || cy >= hBlocks) return;
 
-                if (x >= 0 && x < wBlocks && y >= 0 && y < hBlocks)
+                selectedPoint = new Point(cx, cy);
+
+                if (colorPartitionMode)
                 {
-                    isFilled[y, x] = true;
-                    filledColors[y, x] = selectedColor;
-                    selectedPoint = new Point(x, y);
+                    int targetNumber = colorNumbers[cy, cx];
 
-                    // ✅ paintedResultBitmap에 블록 단위 색 반영
-                    if (paintedResultBitmap != null)
+                    for (int y = 0; y < hBlocks; y++)
                     {
-                        for (int dy = 0; dy < blockSize; dy++)
+                        for (int x = 0; x < wBlocks; x++)
                         {
-                            int py = y * blockSize + dy;
-                            if (py >= paintedResultBitmap.Height) continue;
-
-                            for (int dx = 0; dx < blockSize; dx++)
+                            if (colorNumbers[y, x] == targetNumber)
                             {
-                                int px = x * blockSize + dx;
-                                if (px >= paintedResultBitmap.Width) continue;
+                                isFilled[y, x] = true;
+                                filledColors[y, x] = selectedColor;
 
-                                paintedResultBitmap.SetPixel(px, py, selectedColor);
+                                if (paintedResultBitmap != null &&
+                                    x >= 0 && x < paintedResultBitmap.Width &&
+                                    y >= 0 && y < paintedResultBitmap.Height)
+                                {
+                                    paintedResultBitmap.SetPixel(x, y, selectedColor);
+                                }
+
+                                RectangleF rect = new RectangleF(offsetX + x * cellSize, offsetY + y * cellSize, cellSize, cellSize);
+                                panelCanvas.Invalidate(Rectangle.Ceiling(rect));
                             }
                         }
                     }
 
-                    // ✅ 셀만 리프레시
-                    RectangleF rect = new RectangleF(offsetX + x * cellSize, offsetY + y * cellSize, cellSize, cellSize);
-                    panelCanvas.Invalidate(Rectangle.Ceiling(rect));
+                    panelCompare.Invalidate();
+
+                    // ❌ Partition 모드 유지 (자동 해제 제거)
+                    return;
                 }
-                paintedResultBitmap.SetPixel(x, y, selectedColor);
+
+                // 일반 펜 모드
+                int radius = penThickness / 2;
+                for (int dy = -radius; dy <= radius; dy++)
+                {
+                    for (int dx = -radius; dx <= radius; dx++)
+                    {
+                        int x = cx + dx;
+                        int y = cy + dy;
+
+                        if (x >= 0 && x < wBlocks && y >= 0 && y < hBlocks)
+                        {
+                            isFilled[y, x] = true;
+                            filledColors[y, x] = selectedColor;
+
+                            if (paintedResultBitmap != null &&
+                                x >= 0 && x < paintedResultBitmap.Width &&
+                                y >= 0 && y < paintedResultBitmap.Height)
+                            {
+                                paintedResultBitmap.SetPixel(x, y, selectedColor);
+                            }
+
+                            RectangleF rect = new RectangleF(offsetX + x * cellSize, offsetY + y * cellSize, cellSize, cellSize);
+                            panelCanvas.Invalidate(Rectangle.Ceiling(rect));
+                        }
+                    }
+                }
 
                 panelCompare.Invalidate();
             }
             catch (Exception ex)
             {
-                
+                MessageBox.Show("에러: " + ex.Message);
             }
         }
+
+
+
+
 
 
 
@@ -482,53 +581,84 @@ namespace PixelColorling
             Graphics g = e.Graphics;
             g.Clear(Color.White);
 
-            Point pt = selectedPoint.Value;
-            int y = pt.Y;
-            int x = pt.X;
+            int hBlocks = blockColors.GetLength(0);
+            int wBlocks = blockColors.GetLength(1);
+            int radius = penThickness / 2;
 
-            // 색상 정보
-            int colorNum = colorNumbers[y, x];
-            Color originalColor = colorNumberToRGB.ContainsKey(colorNum) ? colorNumberToRGB[colorNum] : Color.Gray;
-            Color? filledColor = isFilled[y, x] ? (Color?)filledColors[y, x] : null;
+            // 1️⃣ 셀 크기 계산 (패널 안에 딱 맞게)
+            int availableW = panelCompare.Width - 40;
+            int availableH = panelCompare.Height - 40;
+            int cellSize = Math.Min(availableW / (penThickness * 2 + 1), availableH / penThickness);
 
-            // 너비 기준 계산
-            int gap = 20;
-            int padding = 10;
-            int cellSize = Math.Min(panelCompare.Height - 2 * padding, (panelCompare.Width - 3 * gap) / 2);
-
-            int totalWidth = 2 * cellSize + gap;
+            int totalWidth = (penThickness * 2 + 1) * cellSize;
+            int totalHeight = penThickness * cellSize;
             int offsetX = (panelCompare.Width - totalWidth) / 2;
-            int offsetY = padding;
+            int offsetY = (panelCompare.Height - totalHeight) / 2;
 
-            Rectangle rectOriginal = new Rectangle(offsetX, offsetY, cellSize, cellSize);
-            Rectangle rectFilled = new Rectangle(offsetX + cellSize + gap, offsetY, cellSize, cellSize);
+            Font font = new Font("Arial", 8);
+            Point pt = selectedPoint.Value;
+            Brush labelBrush = Brushes.Black;
 
-            using (SolidBrush brush = new SolidBrush(originalColor))
+            for (int dy = -radius; dy <= radius; dy++)
             {
-                g.FillRectangle(brush, rectOriginal);
-            }
-
-            g.DrawRectangle(Pens.Black, rectOriginal);
-            g.DrawString("Original", DefaultFont, Brushes.Black, rectOriginal.X, rectOriginal.Bottom + 5);
-
-            if (filledColor.HasValue)
-            {
-                using (SolidBrush brush = new SolidBrush(filledColor.Value))
+                for (int dx = -radius; dx <= radius; dx++)
                 {
-                    g.FillRectangle(brush, rectFilled);
+                    int x = pt.X + dx;
+                    int y = pt.Y + dy;
+                    int lx = dx + radius;
+                    int ly = dy + radius;
+
+                    Rectangle rectOriginal = new Rectangle(
+                        offsetX + lx * cellSize,
+                        offsetY + ly * cellSize,
+                        cellSize, cellSize);
+
+                    Rectangle rectFilled = new Rectangle(
+                        offsetX + (penThickness + 1 + lx) * cellSize,
+                        offsetY + ly * cellSize,
+                        cellSize, cellSize);
+
+                    if (x >= 0 && x < wBlocks && y >= 0 && y < hBlocks)
+                    {
+                        int colorNum = colorNumbers[y, x];
+                        Color originalColor = colorNumberToRGB.ContainsKey(colorNum) ? colorNumberToRGB[colorNum] : Color.Gray;
+                        Color? filledColor = isFilled[y, x] ? (Color?)filledColors[y, x] : null;
+
+                        using (SolidBrush brush = new SolidBrush(originalColor))
+                            g.FillRectangle(brush, rectOriginal);
+                        g.DrawRectangle(Pens.Black, rectOriginal);
+
+                        if (filledColor.HasValue)
+                        {
+                            using (SolidBrush brush = new SolidBrush(filledColor.Value))
+                                g.FillRectangle(brush, rectFilled);
+                        }
+                        else
+                        {
+                            using (HatchBrush hatch = new HatchBrush(HatchStyle.LargeGrid, Color.LightGray, Color.White))
+                                g.FillRectangle(hatch, rectFilled);
+                        }
+                        g.DrawRectangle(Pens.Black, rectFilled);
+                    }
                 }
             }
-            else
-            {
-                using (HatchBrush hatch = new HatchBrush(HatchStyle.LargeGrid, Color.LightGray, Color.White))
-                {
-                    g.FillRectangle(hatch, rectFilled);
-                }
-            }
 
-            g.DrawRectangle(Pens.Black, rectFilled);
-            g.DrawString("Colored", DefaultFont, Brushes.Black, rectFilled.X, rectFilled.Bottom + 5);
+            // 라벨
+            g.DrawString("Original", font, labelBrush,
+                offsetX + (penThickness * cellSize - 40) / 2,
+                offsetY + penThickness * cellSize + 5);
+            g.DrawString("Colored", font, labelBrush,
+                offsetX + ((penThickness + 1) * cellSize) + (penThickness * cellSize - 40) / 2,
+                offsetY + penThickness * cellSize + 5);
+
+            font.Dispose();
         }
+
+
+
+
+
+
 
         private void toolStripButton7_Click(object sender, EventArgs e)
         {
@@ -542,19 +672,32 @@ namespace PixelColorling
 
         private void btnSize1_Click(object sender, EventArgs e)
         {
+            colorPartitionMode = false;
             penThickness = 1; // 기본 굵기
+            panel1.Visible = !panel1.Visible;
         }
 
         private void btnSize3_Click(object sender, EventArgs e)
         {
+            colorPartitionMode = false;
             penThickness = 3;
             panel1.Visible = !panel1.Visible;
         }
 
         private void btnSize5_Click(object sender, EventArgs e)
         {
-            //penThickness = 5;
+            colorPartitionMode = false;
+            penThickness = 5;
             panel1.Visible = !panel1.Visible;
         }
+
+        private void btnColorPartition_Click(object sender, EventArgs e)
+        {
+            colorPartitionMode = true;
+            penThickness=1; // 부분 색칠 모드에서는 기본 굵기 사용
+            MessageBox.Show("번호 기준 색칠 모드: 색칠할 셀을 클릭하세요.");
+        }
+
+
     }
 }

@@ -45,6 +45,7 @@
             this.btnSize5 = new System.Windows.Forms.Button();
             this.btnSize3 = new System.Windows.Forms.Button();
             this.btnSize1 = new System.Windows.Forms.Button();
+            this.btnColorPartition = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.numPixelSize)).BeginInit();
             this.toolStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -173,13 +174,14 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.btnColorPartition);
             this.panel1.Controls.Add(this.btnSize5);
             this.panel1.Controls.Add(this.btnSize3);
             this.panel1.Controls.Add(this.btnSize1);
             this.panel1.Location = new System.Drawing.Point(34, 35);
             this.panel1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(107, 26);
+            this.panel1.Size = new System.Drawing.Size(147, 26);
             this.panel1.TabIndex = 19;
             // 
             // btnSize5
@@ -214,6 +216,17 @@
             this.btnSize1.Text = "1";
             this.btnSize1.UseVisualStyleBackColor = true;
             this.btnSize1.Click += new System.EventHandler(this.btnSize1_Click);
+            // 
+            // btnColorPartition
+            // 
+            this.btnColorPartition.Location = new System.Drawing.Point(102, 2);
+            this.btnColorPartition.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnColorPartition.Name = "btnColorPartition";
+            this.btnColorPartition.Size = new System.Drawing.Size(42, 21);
+            this.btnColorPartition.TabIndex = 3;
+            this.btnColorPartition.Text = "부분";
+            this.btnColorPartition.UseVisualStyleBackColor = true;
+            this.btnColorPartition.Click += new System.EventHandler(this.btnColorPartition_Click);
             // 
             // Coloring
             // 
@@ -263,5 +276,6 @@
         private System.Windows.Forms.Button btnSize5;
         private System.Windows.Forms.Button btnSize3;
         private System.Windows.Forms.Button btnSize1;
+        private System.Windows.Forms.Button btnColorPartition;
     }
 }
