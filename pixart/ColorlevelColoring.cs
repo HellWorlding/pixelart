@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -239,26 +240,52 @@ namespace PixelColorling
             {
                 try
                 {
-                    // 기존 이미지 해제
                     if (originalImage != null)
                         originalImage.Dispose();
 
-                    // 선택한 이미지 로드
-                    originalImage = new Bitmap(ofd.FileName);
+                    Bitmap loaded = new Bitmap(ofd.FileName);
+                    originalImage = new Bitmap(loaded); // 원본 저장
+                    loaded.Dispose();
 
-                    // 이미지 사이즈 확인용 출력 (선택사항)
-                    MessageBox.Show($"이미지 크기: {originalImage.Width} x {originalImage.Height}");
+                    // 패널 크기에 맞게 리사이즈된 이미지 생성
+                    Bitmap resizedCanvas = ResizeToFit(originalImage, panelCanvas.Width, panelCanvas.Height);
+                    Bitmap resizedOriginal = ResizeToFit(originalImage, panelOriginalImg.Width, panelOriginalImg.Height);
 
-                    // 패널에 바로 렌더링 해보기 (테스트용)
-                    panelCanvas.Invalidate(); // 패널 다시 그리기
+                    // 배경 이미지로 설정 (만약 panelOriginalImg가 PictureBox면 .Image 사용)
+                    panelCanvas.BackgroundImage = resizedCanvas;
+                    panelCanvas.BackgroundImageLayout = ImageLayout.Center;
+
+                    panelOriginalImg.BackgroundImage = resizedOriginal;
+                    panelOriginalImg.BackgroundImageLayout = ImageLayout.Center;
+
+                    panelCanvas.Invalidate();
+                    panelOriginalImg.Invalidate();
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("이미지 로드 실패: " + ex.Message);
                 }
             }
-
         }
+        private Bitmap ResizeToFit(Bitmap src, int maxWidth, int maxHeight)
+        {
+            double scaleX = (double)maxWidth / src.Width;
+            double scaleY = (double)maxHeight / src.Height;
+            double scale = Math.Min(scaleX, scaleY);  // 비율 유지
+
+            int newW = (int)(src.Width * scale);
+            int newH = (int)(src.Height * scale);
+
+            Bitmap resized = new Bitmap(newW, newH);
+            using (Graphics g = Graphics.FromImage(resized))
+            {
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                g.DrawImage(src, 0, 0, newW, newH);
+            }
+
+            return resized;
+        }
+
         //색상 단순화
         private Color SimplifyColor(Color color, int level)
         {
@@ -555,52 +582,38 @@ namespace PixelColorling
 
         private void btnColorAll_Click(object sender, EventArgs e)
         {
-            if (blockColors == null || colorMap.Count == 0)
-            {
-                MessageBox.Show("먼저 도안을 생성해주세요.");
+            if (colorNumbers == null || colorMap == null || blockSize == 0)
                 return;
-            }
 
-            int hBlocks = blockColors.GetLength(0);
-            int wBlocks = blockColors.GetLength(1);
+            int height = colorNumbers.GetLength(0);
+            int width = colorNumbers.GetLength(1);
 
-            isFilled = new bool[hBlocks, wBlocks];
-            filledColors = new Color[hBlocks, wBlocks];
+            paintedResultBitmap = new Bitmap(width, height);
 
-            Dictionary<int, Color> numberToColor = colorMap.ToDictionary(kv => kv.Value, kv => kv.Key);
-
-            int imgWidth = wBlocks * blockSize;
-            int imgHeight = hBlocks * blockSize;
-            paintedResultBitmap = new Bitmap(imgWidth, imgHeight);
-
-            using (Graphics g = Graphics.FromImage(paintedResultBitmap))
+            foreach (var kv in colorMap)
             {
-                g.Clear(Color.White);
+                Color col = kv.Key;
+                int idx = kv.Value;
 
-                for (int y = 0; y < hBlocks; y++)
+                for (int y = 0; y < height; y++)
                 {
-                    for (int x = 0; x < wBlocks; x++)
+                    for (int x = 0; x < width; x++)
                     {
-                        int num = colorNumbers[y, x];
-
-                        if (numberToColor.TryGetValue(num, out Color color))
+                        if (colorNumbers[y, x] == idx)
                         {
                             isFilled[y, x] = true;
-                            filledColors[y, x] = color;
-
-                            // 💡 셀 위치에 전체 사각형 색칠
-                            Rectangle rect = new Rectangle(x * blockSize, y * blockSize, blockSize, blockSize);
-                            using (Brush brush = new SolidBrush(color))
-                            {
-                                g.FillRectangle(brush, rect);
-                            }
+                            filledColors[y, x] = col;
+                            paintedResultBitmap.SetPixel(x, y, col);
                         }
                     }
                 }
             }
 
-            panelCanvas.Invalidate();  // 다시 그리기
+            RepaintCanvas();           // panelCanvas.Invalidate()
+            panelCompare.Invalidate(); // 비교 패널 갱신
         }
+
+
 
 
 
@@ -901,8 +914,280 @@ namespace PixelColorling
             );
         }
 
+        private void tsmiImageLoad_Click(object sender, EventArgs e)
+        {
+            btnLoadImage.PerformClick();
+        }
+
+        private void tsmiImageSave_Click(object sender, EventArgs e)
+        {
+            btnSave.PerformClick();
+        }
+
+        private void tsmiPickPaletteColor_Click(object sender, EventArgs e)
+        {
+            btnColorSelect.PerformClick();  // 버튼 클릭 효과를 그대로 냄
+        }
+
+        private void tsmiGenerate_Click(object sender, EventArgs e)
+        {
+            btnGenerate.PerformClick();
+        }
+
+       
+
+        private void tsmiColorAll_Click(object sender, EventArgs e)
+        {
+            btnColorAll.PerformClick();
+        }
+
+        private void tsmiThick1x1_Click(object sender, EventArgs e)
+        {
+            colorPartitionMode = false;
+            penThickness = 1;
+            panel1.Visible = false;
+        }
+
+        private void tsmiThick3x3_Click(object sender, EventArgs e)
+        {
+            colorPartitionMode = false;
+            penThickness = 3;
+            panel1.Visible = false;
+        }
+
+        private void tsmiThick5x5_Click(object sender, EventArgs e)
+        {
+            colorPartitionMode = false;
+            penThickness = 5;
+            panel1.Visible = false;
+        }
+
+        private void tsmiThickPartition_Click(object sender, EventArgs e)
+        {
+            colorPartitionMode = true;
+            penThickness = 1; // 부분 색칠 모드에서는 기본 굵기 사용
+            MessageBox.Show("번호 기준 색칠 모드: 색칠할 셀을 클릭하세요.");
+            panel1.Visible = false;
+        }
+
+        private void tsmiSaveGrid_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog
+            {
+                Filter = "Grid Coloring Save (*.gcsave)|*.gcsave",
+                Title = "Save Coloring Project"
+            };
+
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                FileStream fs = null;
+                BinaryWriter writer = null;
+
+                try
+                {
+                    fs = File.Open(sfd.FileName, FileMode.Create);
+                    writer = new BinaryWriter(fs);
+
+                    // 1. originalImage 저장
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        originalImage.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                        byte[] bytes = ms.ToArray();
+                        writer.Write(bytes.Length);
+                        writer.Write(bytes);
+                    }
+
+                    // 2. paintedResultBitmap 저장
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        paintedResultBitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                        byte[] bytes = ms.ToArray();
+                        writer.Write(bytes.Length);
+                        writer.Write(bytes);
+                    }
+
+                    // 3. 도안 정보 저장
+                    int height = colorNumbers.GetLength(0);
+                    int width = colorNumbers.GetLength(1);
+
+                    writer.Write(width);
+                    writer.Write(height);
+                    writer.Write(blockSize);
+                    writer.Write(colorMap.Count);
+                    writer.Write((int)currentBinningMode);
+                    writer.Write((int)currentDifficulty);
+
+                    for (int y = 0; y < height; y++)
+                        for (int x = 0; x < width; x++)
+                            writer.Write(colorNumbers[y, x]);
+
+                    for (int y = 0; y < height; y++)
+                        for (int x = 0; x < width; x++)
+                        {
+                            writer.Write(isFilled[y, x]);
+                            writer.Write(filledColors[y, x].ToArgb());
+                        }
+
+                    foreach (var kvp in colorMap.OrderBy(k => k.Value))
+                    {
+                        writer.Write(kvp.Key.ToArgb());
+                    }
+
+                    MessageBox.Show("저장 완료되었습니다.");
+                }
+                finally
+                {
+                    writer?.Close();
+                    fs?.Close();
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+        private void tsmiLoadGrid_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog
+            {
+                Filter = "Grid Coloring Save (*.gcsave)|*.gcsave",
+                Title = "Load Coloring Project"
+            };
+
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                FileStream fs = null;
+                BinaryReader reader = null;
+
+                try
+                {
+                    fs = File.Open(ofd.FileName, FileMode.Open);
+                    reader = new BinaryReader(fs);
+
+                    // 1. originalImage 복원
+                    int origLen = reader.ReadInt32();
+                    byte[] origBytes = reader.ReadBytes(origLen);
+                    using (MemoryStream ms = new MemoryStream(origBytes))
+                    {
+                        originalImage = new Bitmap(ms);
+                    }
+
+                    // 2. paintedResultBitmap 복원
+                    int paintLen = reader.ReadInt32();
+                    byte[] paintBytes = reader.ReadBytes(paintLen);
+                    using (MemoryStream ms = new MemoryStream(paintBytes))
+                    {
+                        paintedResultBitmap = new Bitmap(ms);
+                    }
+
+                    // 3. 도안 정보 복원
+                    int width = reader.ReadInt32();
+                    int height = reader.ReadInt32();
+                    blockSize = reader.ReadInt32();
+                    colorCount = reader.ReadInt32();
+                    currentBinningMode = (BinningMode)reader.ReadInt32();
+                    currentDifficulty = (DifficultyLevel)reader.ReadInt32();
+
+                    // ComboBox Index 유효성 검사
+                    cbxColorType.SelectedIndex = Math.Max(0, Math.Min((int)currentBinningMode, cbxColorType.Items.Count - 1));
+                    cbxDifficulty.SelectedIndex = Math.Max(0, Math.Min((int)currentDifficulty, cbxDifficulty.Items.Count - 1));
+
+                    colorNumbers = new int[height, width];
+                    isFilled = new bool[height, width];
+                    filledColors = new Color[height, width];
+
+                    for (int y = 0; y < height; y++)
+                        for (int x = 0; x < width; x++)
+                            colorNumbers[y, x] = reader.ReadInt32();
+
+                    for (int y = 0; y < height; y++)
+                        for (int x = 0; x < width; x++)
+                        {
+                            isFilled[y, x] = reader.ReadBoolean();
+                            filledColors[y, x] = Color.FromArgb(reader.ReadInt32());
+                        }
+
+                    // 색상 매핑 복원
+                    colorMap = new Dictionary<Color, int>();
+                    for (int i = 0; i < colorCount; i++)
+                    {
+                        Color col = Color.FromArgb(reader.ReadInt32());
+                        colorMap[col] = i;
+                    }
+
+                    // 팔레트 갱신
+                    CreateColorPalette();
+
+                    // UI 반영
+                    panelOriginalImg.BackgroundImage = ResizeToFit(originalImage, panelOriginalImg.Width, panelOriginalImg.Height);
+                    panelOriginalImg.BackgroundImageLayout = ImageLayout.Center;
+
+                    panelCanvas.BackgroundImage = ResizeToFit(paintedResultBitmap, panelCanvas.Width, panelCanvas.Height);
+                    panelCanvas.BackgroundImageLayout = ImageLayout.Center;
+
+                    panelCanvas.Invalidate();
+                    panelCompare.Invalidate();
+
+                    MessageBox.Show("도안 불러오기 완료!");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("불러오기 실패: " + ex.Message);
+                }
+                finally
+                {
+                    reader?.Close();
+                    fs?.Close();
+                }
+            }
+        }
+
+
+
+
+        private int Clamp(int val, int min, int max)
+        {
+            return Math.Max(min, Math.Min(val, max));
+        }
+
+
+        
+
+        private void RepaintCanvas()
+        {
+            panelCanvas.Invalidate();
+        }
+
+
+
+
+
+
+
+
 
 
 
     }
+
+
+    //그리드 저장하기용 클래스
+    public class GridSaveData
+    {
+        public string FormType;
+        public int BlockSize;
+        public int GridWidth;
+        public string BinningMode;
+        public string Difficulty;
+
+        public Color[,] FilledColors;
+        public bool[,] IsFilled;
+        public int[,] ColorNumbers;
+        public Bitmap OriginalImage;
+    }
+
 }

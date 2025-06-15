@@ -53,15 +53,19 @@
             this.cbxColorType = new System.Windows.Forms.ComboBox();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.파일ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.새로불러오기ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.도안불러오기ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.저장ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.도안저장ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiImageLoad = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiImageSave = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiLoadGrid = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiSaveGrid = new System.Windows.Forms.ToolStripMenuItem();
             this.저장ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.팔레트선택하기ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.색선택하기ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiGenerate = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiPickPaletteColor = new System.Windows.Forms.ToolStripMenuItem();
             this.펜굵기선택하기ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.도안전체색칠하기ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiThick1x1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiThick3x3 = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiThick5x5 = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiThickPartition = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiColorAll = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.numPixelSize)).BeginInit();
             this.toolStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -313,72 +317,112 @@
             // 파일ToolStripMenuItem
             // 
             this.파일ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.새로불러오기ToolStripMenuItem,
-            this.저장ToolStripMenuItem,
-            this.도안불러오기ToolStripMenuItem,
-            this.도안저장ToolStripMenuItem,
-            this.팔레트선택하기ToolStripMenuItem});
+            this.tsmiImageLoad,
+            this.tsmiImageSave,
+            this.tsmiLoadGrid,
+            this.tsmiSaveGrid});
             this.파일ToolStripMenuItem.Name = "파일ToolStripMenuItem";
             this.파일ToolStripMenuItem.Size = new System.Drawing.Size(43, 20);
             this.파일ToolStripMenuItem.Text = "파일";
             // 
-            // 새로불러오기ToolStripMenuItem
+            // tsmiImageLoad
             // 
-            this.새로불러오기ToolStripMenuItem.Name = "새로불러오기ToolStripMenuItem";
-            this.새로불러오기ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.새로불러오기ToolStripMenuItem.Text = "이미지 불러오기";
+            this.tsmiImageLoad.Name = "tsmiImageLoad";
+            this.tsmiImageLoad.Size = new System.Drawing.Size(180, 22);
+            this.tsmiImageLoad.Text = "이미지 불러오기";
+            this.tsmiImageLoad.Click += new System.EventHandler(this.tsmiImageLoad_Click);
             // 
-            // 도안불러오기ToolStripMenuItem
+            // tsmiImageSave
             // 
-            this.도안불러오기ToolStripMenuItem.Name = "도안불러오기ToolStripMenuItem";
-            this.도안불러오기ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.도안불러오기ToolStripMenuItem.Text = "도안 불러오기";
+            this.tsmiImageSave.Name = "tsmiImageSave";
+            this.tsmiImageSave.Size = new System.Drawing.Size(180, 22);
+            this.tsmiImageSave.Text = "이미지 저장";
+            this.tsmiImageSave.Click += new System.EventHandler(this.tsmiImageSave_Click);
             // 
-            // 저장ToolStripMenuItem
+            // tsmiLoadGrid
             // 
-            this.저장ToolStripMenuItem.Name = "저장ToolStripMenuItem";
-            this.저장ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.저장ToolStripMenuItem.Text = "이미지 저장";
+            this.tsmiLoadGrid.Name = "tsmiLoadGrid";
+            this.tsmiLoadGrid.Size = new System.Drawing.Size(180, 22);
+            this.tsmiLoadGrid.Text = "도안 불러오기";
+            this.tsmiLoadGrid.Click += new System.EventHandler(this.tsmiLoadGrid_Click);
             // 
-            // 도안저장ToolStripMenuItem
+            // tsmiSaveGrid
             // 
-            this.도안저장ToolStripMenuItem.Name = "도안저장ToolStripMenuItem";
-            this.도안저장ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.도안저장ToolStripMenuItem.Text = "도안 저장";
+            this.tsmiSaveGrid.Name = "tsmiSaveGrid";
+            this.tsmiSaveGrid.Size = new System.Drawing.Size(180, 22);
+            this.tsmiSaveGrid.Text = "도안 저장";
+            this.tsmiSaveGrid.Click += new System.EventHandler(this.tsmiSaveGrid_Click);
             // 
             // 저장ToolStripMenuItem1
             // 
             this.저장ToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.색선택하기ToolStripMenuItem,
+            this.tsmiGenerate,
+            this.tsmiPickPaletteColor,
             this.펜굵기선택하기ToolStripMenuItem,
-            this.도안전체색칠하기ToolStripMenuItem});
+            this.tsmiColorAll});
             this.저장ToolStripMenuItem1.Name = "저장ToolStripMenuItem1";
             this.저장ToolStripMenuItem1.Size = new System.Drawing.Size(43, 20);
             this.저장ToolStripMenuItem1.Text = "실행";
             // 
-            // 팔레트선택하기ToolStripMenuItem
+            // tsmiGenerate
             // 
-            this.팔레트선택하기ToolStripMenuItem.Name = "팔레트선택하기ToolStripMenuItem";
-            this.팔레트선택하기ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.팔레트선택하기ToolStripMenuItem.Text = "팔레트 선택하기";
+            this.tsmiGenerate.Name = "tsmiGenerate";
+            this.tsmiGenerate.Size = new System.Drawing.Size(178, 22);
+            this.tsmiGenerate.Text = "도안 생성하기";
+            this.tsmiGenerate.Click += new System.EventHandler(this.tsmiGenerate_Click);
             // 
-            // 색선택하기ToolStripMenuItem
+            // tsmiPickPaletteColor
             // 
-            this.색선택하기ToolStripMenuItem.Name = "색선택하기ToolStripMenuItem";
-            this.색선택하기ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.색선택하기ToolStripMenuItem.Text = "색 선택하기";
+            this.tsmiPickPaletteColor.Name = "tsmiPickPaletteColor";
+            this.tsmiPickPaletteColor.Size = new System.Drawing.Size(178, 22);
+            this.tsmiPickPaletteColor.Text = "색 선택하기";
+            this.tsmiPickPaletteColor.Click += new System.EventHandler(this.tsmiPickPaletteColor_Click);
             // 
             // 펜굵기선택하기ToolStripMenuItem
             // 
+            this.펜굵기선택하기ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsmiThick1x1,
+            this.tsmiThick3x3,
+            this.tsmiThick5x5,
+            this.tsmiThickPartition});
             this.펜굵기선택하기ToolStripMenuItem.Name = "펜굵기선택하기ToolStripMenuItem";
-            this.펜굵기선택하기ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.펜굵기선택하기ToolStripMenuItem.Text = "펜 굵기 선택하기";
+            this.펜굵기선택하기ToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
+            this.펜굵기선택하기ToolStripMenuItem.Text = "펜 굵기";
             // 
-            // 도안전체색칠하기ToolStripMenuItem
+            // tsmiThick1x1
             // 
-            this.도안전체색칠하기ToolStripMenuItem.Name = "도안전체색칠하기ToolStripMenuItem";
-            this.도안전체색칠하기ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.도안전체색칠하기ToolStripMenuItem.Text = "도안 전체 색칠하기";
+            this.tsmiThick1x1.Name = "tsmiThick1x1";
+            this.tsmiThick1x1.Size = new System.Drawing.Size(150, 22);
+            this.tsmiThick1x1.Text = "1X1";
+            this.tsmiThick1x1.Click += new System.EventHandler(this.tsmiThick1x1_Click);
+            // 
+            // tsmiThick3x3
+            // 
+            this.tsmiThick3x3.Name = "tsmiThick3x3";
+            this.tsmiThick3x3.Size = new System.Drawing.Size(150, 22);
+            this.tsmiThick3x3.Text = "3X3";
+            this.tsmiThick3x3.Click += new System.EventHandler(this.tsmiThick3x3_Click);
+            // 
+            // tsmiThick5x5
+            // 
+            this.tsmiThick5x5.Name = "tsmiThick5x5";
+            this.tsmiThick5x5.Size = new System.Drawing.Size(150, 22);
+            this.tsmiThick5x5.Text = "5X5";
+            this.tsmiThick5x5.Click += new System.EventHandler(this.tsmiThick5x5_Click);
+            // 
+            // tsmiThickPartition
+            // 
+            this.tsmiThickPartition.Name = "tsmiThickPartition";
+            this.tsmiThickPartition.Size = new System.Drawing.Size(150, 22);
+            this.tsmiThickPartition.Text = "부분 색칠하기";
+            this.tsmiThickPartition.Click += new System.EventHandler(this.tsmiThickPartition_Click);
+            // 
+            // tsmiColorAll
+            // 
+            this.tsmiColorAll.Name = "tsmiColorAll";
+            this.tsmiColorAll.Size = new System.Drawing.Size(178, 22);
+            this.tsmiColorAll.Text = "도안 전체 색칠하기";
+            this.tsmiColorAll.Click += new System.EventHandler(this.tsmiColorAll_Click);
             // 
             // Coloring
             // 
@@ -445,14 +489,18 @@
         private System.Windows.Forms.ComboBox cbxColorType;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem 파일ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem 새로불러오기ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem 도안불러오기ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem 저장ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem 도안저장ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem 팔레트선택하기ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem tsmiImageLoad;
+        private System.Windows.Forms.ToolStripMenuItem tsmiLoadGrid;
+        private System.Windows.Forms.ToolStripMenuItem tsmiImageSave;
+        private System.Windows.Forms.ToolStripMenuItem tsmiSaveGrid;
         private System.Windows.Forms.ToolStripMenuItem 저장ToolStripMenuItem1;
-        private System.Windows.Forms.ToolStripMenuItem 색선택하기ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem tsmiPickPaletteColor;
         private System.Windows.Forms.ToolStripMenuItem 펜굵기선택하기ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem 도안전체색칠하기ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem tsmiColorAll;
+        private System.Windows.Forms.ToolStripMenuItem tsmiGenerate;
+        private System.Windows.Forms.ToolStripMenuItem tsmiThick1x1;
+        private System.Windows.Forms.ToolStripMenuItem tsmiThick3x3;
+        private System.Windows.Forms.ToolStripMenuItem tsmiThick5x5;
+        private System.Windows.Forms.ToolStripMenuItem tsmiThickPartition;
     }
 }
