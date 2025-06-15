@@ -33,7 +33,8 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.btnMain = new System.Windows.Forms.Button();
-            this.btnColor = new System.Windows.Forms.Button();
+            this.btnColorLevel = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -82,21 +83,33 @@
             this.btnMain.UseVisualStyleBackColor = true;
             this.btnMain.Click += new System.EventHandler(this.btnMain_Click);
             // 
-            // btnColor
+            // btnColorLevel
             // 
-            this.btnColor.Location = new System.Drawing.Point(623, 381);
-            this.btnColor.Name = "btnColor";
-            this.btnColor.Size = new System.Drawing.Size(116, 31);
-            this.btnColor.TabIndex = 5;
-            this.btnColor.Text = "색칠하기";
-            this.btnColor.UseVisualStyleBackColor = true;
+            this.btnColorLevel.Location = new System.Drawing.Point(634, 313);
+            this.btnColorLevel.Name = "btnColorLevel";
+            this.btnColorLevel.Size = new System.Drawing.Size(142, 31);
+            this.btnColorLevel.TabIndex = 5;
+            this.btnColorLevel.Text = "색상 단계로 색칠하기";
+            this.btnColorLevel.UseVisualStyleBackColor = true;
+            this.btnColorLevel.Click += new System.EventHandler(this.btnColorLevel_Click);
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(634, 381);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(142, 31);
+            this.button1.TabIndex = 6;
+            this.button1.Text = "KMeans로 색칠하기";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // explanation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.btnColor);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.btnColorLevel);
             this.Controls.Add(this.btnMain);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
@@ -116,6 +129,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button btnMain;
-        private System.Windows.Forms.Button btnColor;
+        private System.Windows.Forms.Button btnColorLevel;
+        private System.Windows.Forms.Button button1;
     }
 }

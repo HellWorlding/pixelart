@@ -42,10 +42,11 @@
             this.btnSize = new System.Windows.Forms.ToolStripButton();
             this.panelCompare = new System.Windows.Forms.Panel();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.btnColorPartition = new System.Windows.Forms.Button();
             this.btnSize5 = new System.Windows.Forms.Button();
             this.btnSize3 = new System.Windows.Forms.Button();
             this.btnSize1 = new System.Windows.Forms.Button();
-            this.btnColorPartition = new System.Windows.Forms.Button();
+            this.panelOriginalImg = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.numPixelSize)).BeginInit();
             this.toolStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -54,10 +55,10 @@
             // panelPalette
             // 
             this.panelPalette.AutoScroll = true;
-            this.panelPalette.Location = new System.Drawing.Point(34, 172);
+            this.panelPalette.Location = new System.Drawing.Point(34, 163);
             this.panelPalette.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panelPalette.Name = "panelPalette";
-            this.panelPalette.Size = new System.Drawing.Size(215, 103);
+            this.panelPalette.Size = new System.Drawing.Size(215, 112);
             this.panelPalette.TabIndex = 15;
             // 
             // label1
@@ -86,7 +87,7 @@
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(94, 21);
             this.btnSave.TabIndex = 12;
-            this.btnSave.Text = "결과 저장";
+            this.btnSave.Text = "이미지 저장";
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
@@ -166,7 +167,7 @@
             // 
             // panelCompare
             // 
-            this.panelCompare.Location = new System.Drawing.Point(34, 297);
+            this.panelCompare.Location = new System.Drawing.Point(34, 280);
             this.panelCompare.Name = "panelCompare";
             this.panelCompare.Size = new System.Drawing.Size(215, 130);
             this.panelCompare.TabIndex = 18;
@@ -183,6 +184,17 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(147, 26);
             this.panel1.TabIndex = 19;
+            // 
+            // btnColorPartition
+            // 
+            this.btnColorPartition.Location = new System.Drawing.Point(102, 2);
+            this.btnColorPartition.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnColorPartition.Name = "btnColorPartition";
+            this.btnColorPartition.Size = new System.Drawing.Size(42, 21);
+            this.btnColorPartition.TabIndex = 3;
+            this.btnColorPartition.Text = "부분";
+            this.btnColorPartition.UseVisualStyleBackColor = true;
+            this.btnColorPartition.Click += new System.EventHandler(this.btnColorPartition_Click);
             // 
             // btnSize5
             // 
@@ -217,16 +229,12 @@
             this.btnSize1.UseVisualStyleBackColor = true;
             this.btnSize1.Click += new System.EventHandler(this.btnSize1_Click);
             // 
-            // btnColorPartition
+            // panelOriginalImg
             // 
-            this.btnColorPartition.Location = new System.Drawing.Point(102, 2);
-            this.btnColorPartition.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.btnColorPartition.Name = "btnColorPartition";
-            this.btnColorPartition.Size = new System.Drawing.Size(42, 21);
-            this.btnColorPartition.TabIndex = 3;
-            this.btnColorPartition.Text = "부분";
-            this.btnColorPartition.UseVisualStyleBackColor = true;
-            this.btnColorPartition.Click += new System.EventHandler(this.btnColorPartition_Click);
+            this.panelOriginalImg.Location = new System.Drawing.Point(34, 416);
+            this.panelOriginalImg.Name = "panelOriginalImg";
+            this.panelOriginalImg.Size = new System.Drawing.Size(215, 130);
+            this.panelOriginalImg.TabIndex = 19;
             // 
             // Coloring
             // 
@@ -235,6 +243,7 @@
             this.AutoScroll = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(1184, 661);
+            this.Controls.Add(this.panelOriginalImg);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.panelCompare);
             this.Controls.Add(this.toolStrip1);
@@ -277,5 +286,6 @@
         private System.Windows.Forms.Button btnSize3;
         private System.Windows.Forms.Button btnSize1;
         private System.Windows.Forms.Button btnColorPartition;
+        private System.Windows.Forms.Panel panelOriginalImg;
     }
 }
