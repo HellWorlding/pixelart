@@ -15,6 +15,13 @@ namespace PixelColorling
 {
     public partial class Coloring : Form
     {
+        public enum BinningMode { RGB, HSV, OKLAB, YCbCr } // 도안 생성 색상 종류
+        public enum DifficultyLevel { Easy, Medium, Hard, VeryHard} // 도안 생성 색상 난이도
+
+        private BinningMode currentBinningMode = BinningMode.RGB; //현재 도안 생성 색상 종류
+        private DifficultyLevel currentDifficulty = DifficultyLevel.Medium; // 현재 도안 생성 난이도
+
+
         private Bitmap originalImage; // 원본 이미지 저장용
         private int blockSize = 10;          // 난이도별 블럭 크기
         private int colorCount = 12;         // 난이도별 색상 수
@@ -50,14 +57,18 @@ namespace PixelColorling
 
         private void Coloring_Load(object sender, EventArgs e)
         {
-            // 난이도 설정 제거, 가로 픽셀 수로 조정
-
-            // 가로 셀 수 기본 설정 (예: 30)
+            // 픽셀 수 기본값 설정
             numPixelSize.Value = 30;
             numPixelSize.Minimum = 5;
             numPixelSize.Maximum = 100;
+
+            // 콤보박스 기본값 설정
+            cbxColorType.SelectedIndex = 0; // RGB
+            cbxDifficulty.SelectedIndex = 1; // Medium
+
             panel1.Visible = !panel1.Visible;
         }
+
 
 
         private void btnGenerate_Click(object sender, EventArgs e)
@@ -128,8 +139,12 @@ namespace PixelColorling
 
                     Color avg = Color.FromArgb(rSum / count, gSum / count, bSum / count);
                     blockColors[by, bx] = avg;
+                    //int step = (currentBinningMode == BinningMode.YCbCr) ? 1 : GetStepCountPerMode(currentBinningMode, currentDifficulty);
 
-                    Color simplified = SimplifyColor(avg, colorCount);
+                    int step = GetStepCountPerMode(currentBinningMode, currentDifficulty);
+
+                    Color simplified = SimplifyColor(avg, step);
+
                     simplifiedColors[by, bx] = simplified;
 
                     int key = SimplifiedColorKey(simplified);
@@ -245,7 +260,89 @@ namespace PixelColorling
 
         }
         //색상 단순화
-        private Color SimplifyColor(Color color, int levels)
+        private Color SimplifyColor(Color color, int level)
+        {
+            switch (currentBinningMode)
+            {
+                case BinningMode.RGB:
+                    return SimplifyRGB(color, level);
+                case BinningMode.HSV:
+                    return SimplifyHSV(color, level);
+                case BinningMode.OKLAB:
+                    return SimplifyOklab(color, level);
+                case BinningMode.YCbCr:
+            return SimplifyYCbCr(color, level);  
+                default:
+                    return color;
+            }
+        }
+
+
+
+
+        private Color SimplifyHSV(Color color, int level)
+        {
+            // RGB → HSV
+            double r = color.R / 255.0;
+            double g = color.G / 255.0;
+            double b = color.B / 255.0;
+
+            double max = Math.Max(r, Math.Max(g, b));
+            double min = Math.Min(r, Math.Min(g, b));
+            double delta = max - min;
+
+            double h = 0;
+            if (delta > 0)
+            {
+                if (max == r)
+                    h = 60 * (((g - b) / delta) % 6);
+                else if (max == g)
+                    h = 60 * (((b - r) / delta) + 2);
+                else
+                    h = 60 * (((r - g) / delta) + 4);
+            }
+            if (h < 0) h += 360;
+
+            double s = (max == 0) ? 0 : delta / max;
+            double v = max;
+
+            // HSV 양자화
+            int step = level;
+            h = Math.Round(h / (360.0 / step)) * (360.0 / step);
+            s = Math.Round(s * step) / step;
+            v = Math.Round(v * step) / step;
+
+            // HSV → RGB
+            double c = v * s;
+            double x = c * (1 - Math.Abs((h / 60) % 2 - 1));
+            double m = v - c;
+
+            double r1 = 0, g1 = 0, b1 = 0;
+
+            if (h >= 0 && h < 60) { r1 = c; g1 = x; b1 = 0; }
+            else if (h >= 60 && h < 120) { r1 = x; g1 = c; b1 = 0; }
+            else if (h >= 120 && h < 180) { r1 = 0; g1 = c; b1 = x; }
+            else if (h >= 180 && h < 240) { r1 = 0; g1 = x; b1 = c; }
+            else if (h >= 240 && h < 300) { r1 = x; g1 = 0; b1 = c; }
+            else { r1 = c; g1 = 0; b1 = x; }
+
+            int R = Clamp((int)Math.Round((r1 + m) * 255));
+            int G = Clamp((int)Math.Round((g1 + m) * 255));
+            int B = Clamp((int)Math.Round((b1 + m) * 255));
+
+            return Color.FromArgb(R, G, B);
+        }
+
+        
+
+        public static int Clamp(int val)
+        {
+            return Math.Min(255, Math.Max(0, val));
+        }
+
+
+
+        private Color SimplifyRGB(Color color, int levels)
         {
             int step = 256 / levels;
             int r = (color.R / step) * step;
@@ -253,6 +350,7 @@ namespace PixelColorling
             int b = (color.B / step) * step;
             return Color.FromArgb(r, g, b);
         }
+
 
         private void panelCanvas_Paint(object sender, PaintEventArgs e)
         {
@@ -355,63 +453,7 @@ namespace PixelColorling
         }
 
 
-        //private void panelCanvas_MouseClick(object sender, MouseEventArgs e)
-        //{
-        //    try
-        //    {
-        //        if (blockColors == null) return;
-
-        //        int hBlocks = blockColors.GetLength(0);
-        //        int wBlocks = blockColors.GetLength(1);
-
-        //        float scaleX = (float)panelCanvas.Width / wBlocks;
-        //        float scaleY = (float)panelCanvas.Height / hBlocks;
-        //        float cellSize = Math.Min(scaleX, scaleY);
-        //        int totalW = (int)(cellSize * wBlocks);
-        //        int totalH = (int)(cellSize * hBlocks);
-        //        int offsetX = (panelCanvas.Width - totalW) / 2;
-        //        int offsetY = (panelCanvas.Height - totalH) / 2;
-
-        //        int x = (int)((e.X - offsetX) / cellSize);
-        //        int y = (int)((e.Y - offsetY) / cellSize);
-
-        //        if (x >= 0 && x < wBlocks && y >= 0 && y < hBlocks)
-        //        {
-        //            isFilled[y, x] = true;
-        //            filledColors[y, x] = selectedColor;
-        //            selectedPoint = new Point(x, y);
-
-        //            // ✅ paintedResultBitmap에 블록 단위 색 반영
-        //            if (paintedResultBitmap != null)
-        //            {
-        //                for (int dy = 0; dy < blockSize; dy++)
-        //                {
-        //                    int py = y * blockSize + dy;
-        //                    if (py >= paintedResultBitmap.Height) continue;
-
-        //                    for (int dx = 0; dx < blockSize; dx++)
-        //                    {
-        //                        int px = x * blockSize + dx;
-        //                        if (px >= paintedResultBitmap.Width) continue;
-
-        //                        paintedResultBitmap.SetPixel(px, py, selectedColor);
-        //                    }
-        //                }
-        //            }
-
-        //            // ✅ 셀만 리프레시
-        //            RectangleF rect = new RectangleF(offsetX + x * cellSize, offsetY + y * cellSize, cellSize, cellSize);
-        //            panelCanvas.Invalidate(Rectangle.Ceiling(rect));
-        //        }
-        //        paintedResultBitmap.SetPixel(x, y, selectedColor);
-
-        //        panelCompare.Invalidate();
-        //    }
-        //    catch (Exception ex)
-        //    {
-
-        //    }
-        //}
+        
         private void panelCanvas_MouseClick(object sender, MouseEventArgs e)
         {
             try
@@ -696,7 +738,170 @@ namespace PixelColorling
             colorPartitionMode = true;
             penThickness=1; // 부분 색칠 모드에서는 기본 굵기 사용
             MessageBox.Show("번호 기준 색칠 모드: 색칠할 셀을 클릭하세요.");
+            panel1.Visible = !panel1.Visible;
         }
+
+
+        private int GetStepCountPerMode(BinningMode mode, DifficultyLevel level)
+        {
+            if (mode == BinningMode.RGB)
+            {
+                if (level == DifficultyLevel.Easy) return 6;
+                else if (level == DifficultyLevel.Medium) return 12;
+                else if (level == DifficultyLevel.Hard) return 24;
+                else if (level == DifficultyLevel.VeryHard) return 64; // 거의 원본
+                else return 12;
+            }
+            else if (mode == BinningMode.HSV)
+            {
+                if (level == DifficultyLevel.Easy) return 4;
+                else if (level == DifficultyLevel.Medium) return 8;
+                else if (level == DifficultyLevel.Hard) return 16;
+                else if (level == DifficultyLevel.VeryHard) return 64;
+                else return 8;
+            }
+            else if (mode == BinningMode.OKLAB)
+            {
+                if (level == DifficultyLevel.Easy) return 8;
+                else if (level == DifficultyLevel.Medium) return 24;
+                else if (level == DifficultyLevel.Hard) return 48;
+                else if (level == DifficultyLevel.VeryHard) return 96;
+                else return 24;
+            }
+            else if (mode == BinningMode.YCbCr)
+            {
+                if (level == DifficultyLevel.Easy) return 12;        // 낮은 정밀도
+                else if (level == DifficultyLevel.Medium) return 24;
+                else if (level == DifficultyLevel.Hard) return 48;
+                else if (level == DifficultyLevel.VeryHard) return 96;  // 높은 정밀도
+                else return 24;
+            }
+
+            return 4; // fallback
+        }
+
+
+
+
+
+        private void cbxColorType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            currentBinningMode = (BinningMode)cbxColorType.SelectedIndex;
+        }
+
+
+        private void cbxDifficulty_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            currentDifficulty = (DifficultyLevel)cbxDifficulty.SelectedIndex;
+        }
+
+        // RGB → Linear
+        private static double SrgbToLinear(double c)
+        {
+            return (c <= 0.04045) ? (c / 12.92) : Math.Pow((c + 0.055) / 1.055, 2.4);
+        }
+
+        // Linear → sRGB
+        private static double LinearToSrgb(double c)
+        {
+            return (c <= 0.0031308) ? (12.92 * c) : (1.055 * Math.Pow(c, 1.0 / 2.4) - 0.055);
+        }
+        private static double Cbrt(double x)
+        {
+            return Math.Sign(x) * Math.Pow(Math.Abs(x), 1.0 / 3.0);
+        }
+
+        // RGB → Oklab
+        public static (double L, double a, double b) RgbToOklab(Color color)
+        {
+            double r = SrgbToLinear(color.R / 255.0);
+            double g = SrgbToLinear(color.G / 255.0);
+            double b = SrgbToLinear(color.B / 255.0);
+
+            double l = 0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b;
+            double m = 0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b;
+            double s = 0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b;
+
+            double l_ = Math.Pow(l, 1.0 / 3.0);
+            double m_ = Math.Pow(m, 1.0 / 3.0);
+            double s_ = Math.Pow(s, 1.0 / 3.0);
+
+            return (
+                L: 0.2104542553 * l_ + 0.7936177850 * m_ - 0.0040720468 * s_,
+                a: 1.9779984951 * l_ - 2.4285922050 * m_ + 0.4505937099 * s_,
+                b: 0.0259040371 * l_ + 0.7827717662 * m_ - 0.8086757660 * s_
+            );
+        }
+
+
+        // Oklab → RGB
+        public static Color OklabToRgb(double L, double a, double b)
+        {
+            double l_ = L + 0.3963377774 * a + 0.2158037573 * b;
+            double m_ = L - 0.1055613458 * a - 0.0638541728 * b;
+            double s_ = L - 0.0894841775 * a - 1.2914855480 * b;
+
+            double l = l_ * l_ * l_;
+            double m = m_ * m_ * m_;
+            double s = s_ * s_ * s_;
+
+            double r = 4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s;
+            double g = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;
+            double b_ = -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s;
+
+            return Color.FromArgb(
+                Clamp((int)(LinearToSrgb(r) * 255)),
+                Clamp((int)(LinearToSrgb(g) * 255)),
+                Clamp((int)(LinearToSrgb(b_) * 255))
+            );
+        }
+
+        private Color SimplifyOklab(Color color, int level)
+        {
+            var (L, a, b) = RgbToOklab(color);
+
+            double stepL = 1.0 / level;
+            double stepa = 1.0 / level;
+            double stepb = 1.0 / level;
+
+            L = Math.Round(L / stepL) * stepL;
+            a = Math.Round(a / stepa) * stepa;
+            b = Math.Round(b / stepb) * stepb;
+
+            return OklabToRgb(L, a, b);
+        }
+        private Color SimplifyYCbCr(Color color, int level)
+        {
+            // 채널별 스텝 계산
+            int stepY = 256 / level;     // 밝기
+            int stepCb = 256 / (level / 2);  // 색차
+            int stepCr = 256 / (level / 2);  // 색차
+
+            double r = color.R, g = color.G, b = color.B;
+
+            // RGB -> YCbCr
+            double y = 0.299 * r + 0.587 * g + 0.114 * b;
+            double cb = -0.168736 * r - 0.331264 * g + 0.5 * b + 128;
+            double cr = 0.5 * r - 0.418688 * g - 0.081312 * b + 128;
+
+            // Quantize
+            y = Math.Round(y / stepY) * stepY;
+            cb = Math.Round(cb / stepCb) * stepCb;
+            cr = Math.Round(cr / stepCr) * stepCr;
+
+            // YCbCr -> RGB
+            double rOut = y + 1.402 * (cr - 128);
+            double gOut = y - 0.344136 * (cb - 128) - 0.714136 * (cr - 128);
+            double bOut = y + 1.772 * (cb - 128);
+
+            return Color.FromArgb(
+                Clamp((int)Math.Round(rOut)),
+                Clamp((int)Math.Round(gOut)),
+                Clamp((int)Math.Round(bOut))
+            );
+        }
+
+
 
 
     }

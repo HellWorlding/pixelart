@@ -47,15 +47,31 @@
             this.btnSize3 = new System.Windows.Forms.Button();
             this.btnSize1 = new System.Windows.Forms.Button();
             this.panelOriginalImg = new System.Windows.Forms.Panel();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.cbxDifficulty = new System.Windows.Forms.ComboBox();
+            this.cbxColorType = new System.Windows.Forms.ComboBox();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.파일ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.새로불러오기ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.도안불러오기ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.저장ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.도안저장ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.저장ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.팔레트선택하기ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.색선택하기ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.펜굵기선택하기ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.도안전체색칠하기ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.numPixelSize)).BeginInit();
             this.toolStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // panelPalette
             // 
             this.panelPalette.AutoScroll = true;
-            this.panelPalette.Location = new System.Drawing.Point(34, 163);
+            this.panelPalette.Location = new System.Drawing.Point(34, 272);
             this.panelPalette.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panelPalette.Name = "panelPalette";
             this.panelPalette.Size = new System.Drawing.Size(215, 112);
@@ -64,7 +80,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(58, 89);
+            this.label1.Location = new System.Drawing.Point(53, 88);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(69, 12);
             this.label1.TabIndex = 14;
@@ -82,7 +98,7 @@
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(156, 109);
+            this.btnSave.Location = new System.Drawing.Point(154, 179);
             this.btnSave.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(94, 21);
@@ -93,10 +109,10 @@
             // 
             // btnGenerate
             // 
-            this.btnGenerate.Location = new System.Drawing.Point(57, 109);
+            this.btnGenerate.Location = new System.Drawing.Point(57, 179);
             this.btnGenerate.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnGenerate.Name = "btnGenerate";
-            this.btnGenerate.Size = new System.Drawing.Size(94, 21);
+            this.btnGenerate.Size = new System.Drawing.Size(83, 44);
             this.btnGenerate.TabIndex = 11;
             this.btnGenerate.Text = "도안 생성";
             this.btnGenerate.UseVisualStyleBackColor = true;
@@ -115,7 +131,7 @@
             // 
             // numPixelSize
             // 
-            this.numPixelSize.Location = new System.Drawing.Point(133, 87);
+            this.numPixelSize.Location = new System.Drawing.Point(128, 86);
             this.numPixelSize.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.numPixelSize.Name = "numPixelSize";
             this.numPixelSize.Size = new System.Drawing.Size(116, 21);
@@ -123,9 +139,9 @@
             // 
             // btnColorAll
             // 
-            this.btnColorAll.Location = new System.Drawing.Point(174, 135);
+            this.btnColorAll.Location = new System.Drawing.Point(154, 205);
             this.btnColorAll.Name = "btnColorAll";
-            this.btnColorAll.Size = new System.Drawing.Size(75, 23);
+            this.btnColorAll.Size = new System.Drawing.Size(95, 23);
             this.btnColorAll.TabIndex = 11;
             this.btnColorAll.Text = "전체 색칠";
             this.btnColorAll.UseVisualStyleBackColor = true;
@@ -133,20 +149,21 @@
             // 
             // toolStrip1
             // 
+            this.toolStrip1.Dock = System.Windows.Forms.DockStyle.Left;
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.btnColorSelect,
             this.btnSize});
-            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
+            this.toolStrip1.Location = new System.Drawing.Point(0, 24);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.toolStrip1.Size = new System.Drawing.Size(1184, 33);
+            this.toolStrip1.Size = new System.Drawing.Size(31, 637);
             this.toolStrip1.TabIndex = 17;
             this.toolStrip1.Text = "toolStrip1";
             // 
             // btnColorSelect
             // 
             this.btnColorSelect.AutoSize = false;
-            this.btnColorSelect.BackColor = System.Drawing.Color.Black;
+            this.btnColorSelect.BackColor = System.Drawing.Color.White;
             this.btnColorSelect.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.btnColorSelect.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnColorSelect.Name = "btnColorSelect";
@@ -161,13 +178,13 @@
             this.btnSize.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnSize.Name = "btnSize";
             this.btnSize.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.btnSize.Size = new System.Drawing.Size(23, 30);
+            this.btnSize.Size = new System.Drawing.Size(28, 20);
             this.btnSize.Text = "toolStripButton7";
             this.btnSize.Click += new System.EventHandler(this.btnSize_Click);
             // 
             // panelCompare
             // 
-            this.panelCompare.Location = new System.Drawing.Point(34, 280);
+            this.panelCompare.Location = new System.Drawing.Point(34, 389);
             this.panelCompare.Name = "panelCompare";
             this.panelCompare.Size = new System.Drawing.Size(215, 130);
             this.panelCompare.TabIndex = 18;
@@ -179,7 +196,7 @@
             this.panel1.Controls.Add(this.btnSize5);
             this.panel1.Controls.Add(this.btnSize3);
             this.panel1.Controls.Add(this.btnSize1);
-            this.panel1.Location = new System.Drawing.Point(34, 35);
+            this.panel1.Location = new System.Drawing.Point(34, 63);
             this.panel1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(147, 26);
@@ -231,10 +248,137 @@
             // 
             // panelOriginalImg
             // 
-            this.panelOriginalImg.Location = new System.Drawing.Point(34, 416);
+            this.panelOriginalImg.Location = new System.Drawing.Point(34, 525);
             this.panelOriginalImg.Name = "panelOriginalImg";
             this.panelOriginalImg.Size = new System.Drawing.Size(215, 130);
             this.panelOriginalImg.TabIndex = 19;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(53, 114);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(57, 12);
+            this.label2.TabIndex = 20;
+            this.label2.Text = "컬러 종류";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(53, 148);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(41, 12);
+            this.label3.TabIndex = 22;
+            this.label3.Text = "난이도";
+            // 
+            // cbxDifficulty
+            // 
+            this.cbxDifficulty.FormattingEnabled = true;
+            this.cbxDifficulty.Items.AddRange(new object[] {
+            "쉬움",
+            "중간",
+            "어려움",
+            "매우 어려움"});
+            this.cbxDifficulty.Location = new System.Drawing.Point(128, 145);
+            this.cbxDifficulty.Name = "cbxDifficulty";
+            this.cbxDifficulty.Size = new System.Drawing.Size(116, 20);
+            this.cbxDifficulty.TabIndex = 24;
+            this.cbxDifficulty.SelectedIndexChanged += new System.EventHandler(this.cbxDifficulty_SelectedIndexChanged);
+            // 
+            // cbxColorType
+            // 
+            this.cbxColorType.FormattingEnabled = true;
+            this.cbxColorType.Items.AddRange(new object[] {
+            "RGB",
+            "HSV",
+            "OKLAB",
+            "YCbCr"});
+            this.cbxColorType.Location = new System.Drawing.Point(128, 112);
+            this.cbxColorType.Name = "cbxColorType";
+            this.cbxColorType.Size = new System.Drawing.Size(116, 20);
+            this.cbxColorType.TabIndex = 25;
+            this.cbxColorType.SelectedIndexChanged += new System.EventHandler(this.cbxColorType_SelectedIndexChanged);
+            // 
+            // menuStrip1
+            // 
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.파일ToolStripMenuItem,
+            this.저장ToolStripMenuItem1});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(1184, 24);
+            this.menuStrip1.TabIndex = 26;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // 파일ToolStripMenuItem
+            // 
+            this.파일ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.새로불러오기ToolStripMenuItem,
+            this.저장ToolStripMenuItem,
+            this.도안불러오기ToolStripMenuItem,
+            this.도안저장ToolStripMenuItem,
+            this.팔레트선택하기ToolStripMenuItem});
+            this.파일ToolStripMenuItem.Name = "파일ToolStripMenuItem";
+            this.파일ToolStripMenuItem.Size = new System.Drawing.Size(43, 20);
+            this.파일ToolStripMenuItem.Text = "파일";
+            // 
+            // 새로불러오기ToolStripMenuItem
+            // 
+            this.새로불러오기ToolStripMenuItem.Name = "새로불러오기ToolStripMenuItem";
+            this.새로불러오기ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.새로불러오기ToolStripMenuItem.Text = "이미지 불러오기";
+            // 
+            // 도안불러오기ToolStripMenuItem
+            // 
+            this.도안불러오기ToolStripMenuItem.Name = "도안불러오기ToolStripMenuItem";
+            this.도안불러오기ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.도안불러오기ToolStripMenuItem.Text = "도안 불러오기";
+            // 
+            // 저장ToolStripMenuItem
+            // 
+            this.저장ToolStripMenuItem.Name = "저장ToolStripMenuItem";
+            this.저장ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.저장ToolStripMenuItem.Text = "이미지 저장";
+            // 
+            // 도안저장ToolStripMenuItem
+            // 
+            this.도안저장ToolStripMenuItem.Name = "도안저장ToolStripMenuItem";
+            this.도안저장ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.도안저장ToolStripMenuItem.Text = "도안 저장";
+            // 
+            // 저장ToolStripMenuItem1
+            // 
+            this.저장ToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.색선택하기ToolStripMenuItem,
+            this.펜굵기선택하기ToolStripMenuItem,
+            this.도안전체색칠하기ToolStripMenuItem});
+            this.저장ToolStripMenuItem1.Name = "저장ToolStripMenuItem1";
+            this.저장ToolStripMenuItem1.Size = new System.Drawing.Size(43, 20);
+            this.저장ToolStripMenuItem1.Text = "실행";
+            // 
+            // 팔레트선택하기ToolStripMenuItem
+            // 
+            this.팔레트선택하기ToolStripMenuItem.Name = "팔레트선택하기ToolStripMenuItem";
+            this.팔레트선택하기ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.팔레트선택하기ToolStripMenuItem.Text = "팔레트 선택하기";
+            // 
+            // 색선택하기ToolStripMenuItem
+            // 
+            this.색선택하기ToolStripMenuItem.Name = "색선택하기ToolStripMenuItem";
+            this.색선택하기ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.색선택하기ToolStripMenuItem.Text = "색 선택하기";
+            // 
+            // 펜굵기선택하기ToolStripMenuItem
+            // 
+            this.펜굵기선택하기ToolStripMenuItem.Name = "펜굵기선택하기ToolStripMenuItem";
+            this.펜굵기선택하기ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.펜굵기선택하기ToolStripMenuItem.Text = "펜 굵기 선택하기";
+            // 
+            // 도안전체색칠하기ToolStripMenuItem
+            // 
+            this.도안전체색칠하기ToolStripMenuItem.Name = "도안전체색칠하기ToolStripMenuItem";
+            this.도안전체색칠하기ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.도안전체색칠하기ToolStripMenuItem.Text = "도안 전체 색칠하기";
             // 
             // Coloring
             // 
@@ -243,10 +387,15 @@
             this.AutoScroll = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(1184, 661);
+            this.Controls.Add(this.cbxColorType);
+            this.Controls.Add(this.cbxDifficulty);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.panelOriginalImg);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.panelCompare);
             this.Controls.Add(this.toolStrip1);
+            this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.numPixelSize);
             this.Controls.Add(this.btnColorAll);
             this.Controls.Add(this.panelPalette);
@@ -255,6 +404,7 @@
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.btnGenerate);
             this.Controls.Add(this.btnLoadImage);
+            this.MainMenuStrip = this.menuStrip1;
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "Coloring";
             this.Text = "Coloring";
@@ -262,6 +412,8 @@
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.panel1.ResumeLayout(false);
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -287,5 +439,20 @@
         private System.Windows.Forms.Button btnSize1;
         private System.Windows.Forms.Button btnColorPartition;
         private System.Windows.Forms.Panel panelOriginalImg;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.ComboBox cbxDifficulty;
+        private System.Windows.Forms.ComboBox cbxColorType;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem 파일ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 새로불러오기ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 도안불러오기ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 저장ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 도안저장ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 팔레트선택하기ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 저장ToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem 색선택하기ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 펜굵기선택하기ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 도안전체색칠하기ToolStripMenuItem;
     }
 }

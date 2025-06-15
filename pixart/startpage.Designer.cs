@@ -54,11 +54,11 @@
             // 
             // btnKmeansColor
             // 
-            this.btnKmeansColor.Location = new System.Drawing.Point(218, 226);
+            this.btnKmeansColor.Location = new System.Drawing.Point(395, 226);
             this.btnKmeansColor.Name = "btnKmeansColor";
             this.btnKmeansColor.Size = new System.Drawing.Size(169, 85);
             this.btnKmeansColor.TabIndex = 1;
-            this.btnKmeansColor.Text = "KMeans로 색칠하기";
+            this.btnKmeansColor.Text = "색상 단계로 색칠하기";
             this.btnKmeansColor.UseVisualStyleBackColor = true;
             this.btnKmeansColor.Click += new System.EventHandler(this.btnColor_Click);
             // 
@@ -74,11 +74,11 @@
             // 
             // btnColorLevel
             // 
-            this.btnColorLevel.Location = new System.Drawing.Point(393, 226);
+            this.btnColorLevel.Location = new System.Drawing.Point(220, 226);
             this.btnColorLevel.Name = "btnColorLevel";
             this.btnColorLevel.Size = new System.Drawing.Size(169, 85);
             this.btnColorLevel.TabIndex = 3;
-            this.btnColorLevel.Text = "색상 단계로 색칠하기";
+            this.btnColorLevel.Text = "Kmeans로 색칠하기";
             this.btnColorLevel.UseVisualStyleBackColor = true;
             this.btnColorLevel.Click += new System.EventHandler(this.btnColorLevel_Click);
             // 
