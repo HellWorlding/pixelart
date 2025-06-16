@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -1182,148 +1183,95 @@ namespace pixel
 
         private void tsmiSaveGrid_Click(object sender, EventArgs e)
         {
-            if (originalImage == null || numberGrid == null || numberToColor == null)
+            SaveFileDialog sfd = new SaveFileDialog
             {
-                MessageBox.Show("저장할 도안이 없습니다.");
-                return;
-            }
-
-            SaveFileDialog sfd = new SaveFileDialog();
-            sfd.Filter = "Grid Coloring Save File (*.gcsave)|*.gcsave";
+                Filter = "Grid Coloring Save File (*.gcsave)|*.gcsave"
+            };
             if (sfd.ShowDialog() != DialogResult.OK) return;
 
-            using (BinaryWriter writer = new BinaryWriter(File.Open(sfd.FileName, FileMode.Create)))
+            using (MemoryStream ms = new MemoryStream())
             {
-                // 1. 원본 이미지 저장
-                using (MemoryStream ms = new MemoryStream())
+                originalImage.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                byte[] imageBytes = ms.ToArray();
+
+                var saveData = new GridSaveDataSimple
                 {
-                    originalImage.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
-                    byte[] imageBytes = ms.ToArray();
-                    writer.Write(imageBytes.Length);
-                    writer.Write(imageBytes);
-                }
+                    ImageBytes = imageBytes,
+                    PixelSize = pixelSize,
+                    K = k,
+                    Width = numberGrid.GetLength(1),
+                    Height = numberGrid.GetLength(0),
+                    FlatNumberGrid = numberGrid.Cast<int>().ToList(),
+                    NumberToColor = numberToColor.Select(kv => ColorEntry.From(kv.Key, kv.Value)).ToList(),
+                    PixelColors = pixelColors.Select(kv => CellEntry.From(kv.Key, kv.Value)).ToList()
+                };
 
-                // 2. 대표 색상 수 (K)
-                writer.Write(numberToColor.Count);
-
-                // 3. 색상 번호와 RGB 저장
-                foreach (var pair in numberToColor.OrderBy(p => p.Key))
+                using (FileStream fs = new FileStream(sfd.FileName, FileMode.Create))
                 {
-                    writer.Write(pair.Key);
-                    writer.Write(pair.Value.R);
-                    writer.Write(pair.Value.G);
-                    writer.Write(pair.Value.B);
-                }
-
-                // 4. numberGrid (행, 열, 데이터)
-                int h = numberGrid.GetLength(0);
-                int w = numberGrid.GetLength(1);
-                writer.Write(h);
-                writer.Write(w);
-                for (int y = 0; y < h; y++)
-                    for (int x = 0; x < w; x++)
-                        writer.Write(numberGrid[y, x]);
-
-                // 5. 사용자 색칠 데이터
-                writer.Write(pixelColors.Count);
-                foreach (var pair in pixelColors)
-                {
-                    writer.Write(pair.Key.X);
-                    writer.Write(pair.Key.Y);
-                    writer.Write(pair.Value.R);
-                    writer.Write(pair.Value.G);
-                    writer.Write(pair.Value.B);
+                    BinaryFormatter bf = new BinaryFormatter();
+                    bf.Serialize(fs, saveData);
                 }
             }
         }
 
 
+
+
+
         private void tsmiLoadGrid_Click(object sender, EventArgs e)
         {
-            // 🌟 기존 상태 안전 초기화
-            originalImage?.Dispose();
-            pixelatedImage?.Dispose();
-            numberGrid = null;
-            pixelColors.Clear();
-            selectedPoint = null;
-            compareCenter = null;
-            numberToColor.Clear();
-            panelLegend.Controls.Clear();
-            picOriginalThumb.Image = null;
-            picPreview.Image = null;
-
-            // 기존처럼 파일 열기
             OpenFileDialog ofd = new OpenFileDialog
             {
                 Filter = "Grid Coloring Save File (*.gcsave)|*.gcsave"
             };
             if (ofd.ShowDialog() != DialogResult.OK) return;
 
-            using (BinaryReader reader = new BinaryReader(File.Open(ofd.FileName, FileMode.Open)))
+            try
             {
-                // 1. 이미지 복원
-                int imageLength = reader.ReadInt32();
-                byte[] imageBytes = reader.ReadBytes(imageLength);
-                using (MemoryStream ms = new MemoryStream(imageBytes))
+                using (FileStream fs = new FileStream(ofd.FileName, FileMode.Open))
                 {
-                    originalImage = new Bitmap(ms);
+                    BinaryFormatter bf = new BinaryFormatter();
+                    var loaded = (GridSaveDataSimple)bf.Deserialize(fs);
+
+                    using (MemoryStream ms = new MemoryStream(loaded.ImageBytes))
+                    {
+                        originalImage = new Bitmap(ms);
+                    }
+
+                    pixelSize = loaded.PixelSize;
+                    k = loaded.K;
+
+                    numberGrid = new int[loaded.Height, loaded.Width];
+                    for (int y = 0; y < loaded.Height; y++)
+                        for (int x = 0; x < loaded.Width; x++)
+                            numberGrid[y, x] = loaded.FlatNumberGrid[y * loaded.Width + x];
+
+                    numberToColor = loaded.NumberToColor.ToDictionary(
+                        entry => entry.Number, entry => entry.ToColor());
+
+                    pixelColors = loaded.PixelColors.ToDictionary(
+                        entry => entry.ToPoint(), entry => entry.ToColor());
+
+                    // 이미지 초기화
+                    pixelatedImage = new Bitmap(loaded.Width, loaded.Height);
+                    foreach (var pair in pixelColors)
+                    {
+                        pixelatedImage.SetPixel(pair.Key.X, pair.Key.Y, pair.Value);
+                    }
+
+                    // UI 갱신
+                    picOriginalThumb.Image = new Bitmap(originalImage, picOriginalThumb.Size);
+                    DrawLegend();
+                    picPreview.Invalidate();
+                    UpdatePanelCompare(0, 0);
                 }
-
-                // 2. 픽셀 크기, 색상 수 복원
-                pixelSize = reader.ReadInt32();
-                k = reader.ReadInt32();
-
-                // 3. 색상 매핑 복원
-                int colorCount = reader.ReadInt32();
-                numberToColor = new Dictionary<int, Color>();
-                for (int i = 0; i < colorCount; i++)
-                {
-                    int key = reader.ReadInt32();
-                    int r = reader.ReadByte();
-                    int g = reader.ReadByte();
-                    int b = reader.ReadByte();
-                    numberToColor[key] = Color.FromArgb(r, g, b);
-                }
-
-                // 4. 그리드 복원
-                int h = reader.ReadInt32();
-                int w = reader.ReadInt32();
-                numberGrid = new int[h, w];
-                for (int y = 0; y < h; y++)
-                    for (int x = 0; x < w; x++)
-                        numberGrid[y, x] = reader.ReadInt32();
-
-                // 5. 사용자 색칠 복원
-                int filledCount = reader.ReadInt32();
-                pixelColors = new Dictionary<Point, Color>();
-                for (int i = 0; i < filledCount; i++)
-                {
-                    int x = reader.ReadInt32();
-                    int y = reader.ReadInt32();
-                    int r = reader.ReadByte();
-                    int g = reader.ReadByte();
-                    int b = reader.ReadByte();
-                    pixelColors[new Point(x, y)] = Color.FromArgb(r, g, b);
-                }
-
-                // 6. 미리보기 이미지 재생성
-                pixelatedImage = new Bitmap(w, h);
-                foreach (var pair in pixelColors)
-                {
-                    pixelatedImage.SetPixel(pair.Key.X, pair.Key.Y, pair.Value);
-                }
-
-                // 7. 썸네일 이미지 표시
-                picOriginalThumb.Image = new Bitmap(originalImage, picOriginalThumb.Size);
-
-                // 8. 색상 범례 다시 생성
-                DrawLegend();
-
-                // 9. 그리드와 비교 화면 갱신
-                picPreview.Invalidate();
-                UpdatePanelCompare(0, 0);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("불러오기 중 오류 발생: " + ex.Message);
             }
         }
+
 
         private void DrawLegend()
         {
@@ -1376,8 +1324,35 @@ public class GridSaveDataSimple
     public byte[] ImageBytes;
     public int PixelSize;
     public int K;
-    public Dictionary<int, Color> NumberToColor;
-    public int[,] NumberGrid;
-    public Dictionary<Point, Color> PixelColors;
+    public List<ColorEntry> NumberToColor;
+    public int Width;
+    public int Height;
+    public List<int> FlatNumberGrid;
+    public List<CellEntry> PixelColors;
 }
+
+[Serializable]
+public class ColorEntry
+{
+    public int Number;
+    public int R, G, B;
+
+    public Color ToColor() => Color.FromArgb(R, G, B);
+    public static ColorEntry From(int number, Color c) =>
+        new ColorEntry { Number = number, R = c.R, G = c.G, B = c.B };
+}
+
+[Serializable]
+public class CellEntry
+{
+    public int X, Y;
+    public int R, G, B;
+
+    public Point ToPoint() => new Point(X, Y);
+    public Color ToColor() => Color.FromArgb(R, G, B);
+    public static CellEntry From(Point pt, Color c) =>
+        new CellEntry { X = pt.X, Y = pt.Y, R = c.R, G = c.G, B = c.B };
+}
+
+
 
