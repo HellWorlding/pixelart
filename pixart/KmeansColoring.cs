@@ -7,11 +7,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using pixart;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace pixel
 {
-    public partial class Form1 : Form
+    public partial class KmeansColoring : Form
     {
 
 
@@ -36,7 +37,7 @@ namespace pixel
 
 
 
-        public Form1()
+        public KmeansColoring()
         {
             InitializeComponent();
         }
@@ -557,7 +558,8 @@ namespace pixel
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            var saveForm = new SaveKMeansForm(originalImage, pixelatedImage, pixelSize);
+            //var saveForm = new SaveKMeansForm(originalImage, pixelatedImage, pixelSize);
+            var saveForm = new SaveForm(pixelatedImage, originalImage.Size);
             saveForm.Show();
 
 
@@ -574,5 +576,12 @@ namespace pixel
 
             //saveForm.Show();
         }
+
+        private void toolStripComboBox1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+
     }
 }

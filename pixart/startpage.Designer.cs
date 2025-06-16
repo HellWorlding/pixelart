@@ -31,8 +31,9 @@
             this.components = new System.ComponentModel.Container();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.btnExplanation = new System.Windows.Forms.Button();
-            this.btnColor = new System.Windows.Forms.Button();
+            this.btnKmeansColor = new System.Windows.Forms.Button();
             this.btnDualMode = new System.Windows.Forms.Button();
+            this.btnColorLevel = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // imageList1
@@ -43,46 +44,53 @@
             // 
             // btnExplanation
             // 
-            this.btnExplanation.Location = new System.Drawing.Point(71, 355);
-            this.btnExplanation.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnExplanation.Location = new System.Drawing.Point(12, 226);
             this.btnExplanation.Name = "btnExplanation";
-            this.btnExplanation.Size = new System.Drawing.Size(193, 106);
+            this.btnExplanation.Size = new System.Drawing.Size(169, 85);
             this.btnExplanation.TabIndex = 0;
             this.btnExplanation.Text = "설명하기";
             this.btnExplanation.UseVisualStyleBackColor = true;
             this.btnExplanation.Click += new System.EventHandler(this.btnExplanation_Click);
             // 
-            // btnColor
+            // btnKmeansColor
             // 
-            this.btnColor.Location = new System.Drawing.Point(361, 355);
-            this.btnColor.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.btnColor.Name = "btnColor";
-            this.btnColor.Size = new System.Drawing.Size(193, 106);
-            this.btnColor.TabIndex = 1;
-            this.btnColor.Text = "색칠하기";
-            this.btnColor.UseVisualStyleBackColor = true;
-            this.btnColor.Click += new System.EventHandler(this.btnColor_Click);
+            this.btnKmeansColor.Location = new System.Drawing.Point(395, 226);
+            this.btnKmeansColor.Name = "btnKmeansColor";
+            this.btnKmeansColor.Size = new System.Drawing.Size(169, 85);
+            this.btnKmeansColor.TabIndex = 1;
+            this.btnKmeansColor.Text = "색상 단계로 색칠하기";
+            this.btnKmeansColor.UseVisualStyleBackColor = true;
+            this.btnKmeansColor.Click += new System.EventHandler(this.btnColor_Click);
             // 
             // btnDualMode
             // 
-            this.btnDualMode.Location = new System.Drawing.Point(638, 355);
-            this.btnDualMode.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnDualMode.Location = new System.Drawing.Point(595, 226);
             this.btnDualMode.Name = "btnDualMode";
-            this.btnDualMode.Size = new System.Drawing.Size(193, 106);
+            this.btnDualMode.Size = new System.Drawing.Size(169, 85);
             this.btnDualMode.TabIndex = 2;
             this.btnDualMode.Text = "듀얼모드";
             this.btnDualMode.UseVisualStyleBackColor = true;
             this.btnDualMode.Click += new System.EventHandler(this.btnDualMode_Click);
             // 
+            // btnColorLevel
+            // 
+            this.btnColorLevel.Location = new System.Drawing.Point(220, 226);
+            this.btnColorLevel.Name = "btnColorLevel";
+            this.btnColorLevel.Size = new System.Drawing.Size(169, 85);
+            this.btnColorLevel.TabIndex = 3;
+            this.btnColorLevel.Text = "Kmeans로 색칠하기";
+            this.btnColorLevel.UseVisualStyleBackColor = true;
+            this.btnColorLevel.Click += new System.EventHandler(this.btnColorLevel_Click);
+            // 
             // startpage
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(914, 562);
+            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.btnColorLevel);
             this.Controls.Add(this.btnDualMode);
-            this.Controls.Add(this.btnColor);
+            this.Controls.Add(this.btnKmeansColor);
             this.Controls.Add(this.btnExplanation);
-            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "startpage";
             this.Text = "Form1";
             this.ResumeLayout(false);
@@ -93,8 +101,9 @@
 
         private System.Windows.Forms.ImageList imageList1;
         private System.Windows.Forms.Button btnExplanation;
-        private System.Windows.Forms.Button btnColor;
+        private System.Windows.Forms.Button btnKmeansColor;
         private System.Windows.Forms.Button btnDualMode;
+        private System.Windows.Forms.Button btnColorLevel;
     }
 }
 

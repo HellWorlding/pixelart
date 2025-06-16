@@ -92,6 +92,8 @@ namespace pixel
 
         //    UpdatePreview();
         //}
+        private Bitmap paintedBitmap;
+
         public SaveKMeansForm(Bitmap original, Bitmap pixelated, int pixelSize)
         {
             InitializeComponent();
@@ -100,6 +102,17 @@ namespace pixel
             this.pixelatedImage = pixelated;
             this.pixelSize = pixelSize;
 
+            //resizedImage = new Bitmap(paintedBitmap);
+            if (paintedBitmap != null)
+            {
+                // 원본 비트맵을 픽셀 느낌 그대로 리사이즈해서 저장 (딱 한 번만 생성!)
+                resizedImage = new Bitmap(paintedBitmap.Width, paintedBitmap.Height);
+                using (Graphics g = Graphics.FromImage(resizedImage))
+                {
+                    g.InterpolationMode = InterpolationMode.NearestNeighbor;
+                    g.DrawImage(paintedBitmap, 0, 0, resizedImage.Width, resizedImage.Height);
+                }
+            }
             GenerateGridsFromPixelatedImage();  // 👈 핵심 기능
             this.k = numberToColor.Count;
 
@@ -367,10 +380,9 @@ namespace pixel
 
 
         }
-
         private void btnImgSave_Click(object sender, EventArgs e)
         {
-            if (resizedImage == null)
+            if (paintedBitmap == null)
             {
                 MessageBox.Show("저장할 이미지가 없습니다.");
                 return;
@@ -378,30 +390,50 @@ namespace pixel
 
             using (SaveFileDialog sfd = new SaveFileDialog())
             {
-                sfd.Filter = "PNG 파일 (*.png)|*.png|JPEG 파일 (*.jpg)|*.jpg|Bitmap 파일 (*.bmp)|*.bmp";
+                sfd.Filter = "PNG 파일 (*.png)|*.png";
                 sfd.Title = "이미지 저장";
-                string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HHmmss");
-                sfd.FileName = $"pixel_output_{timestamp}.png";
-
                 if (sfd.ShowDialog() == DialogResult.OK)
                 {
-                    ImageFormat format = ImageFormat.Png;
-                    if (sfd.FileName.EndsWith(".jpg")) format = ImageFormat.Jpeg;
-                    else if (sfd.FileName.EndsWith(".bmp")) format = ImageFormat.Bmp;
-                    resizedImage.Save(sfd.FileName, format);
-                    MessageBox.Show("저장 완료");
+                    paintedBitmap.Save(sfd.FileName, ImageFormat.Png);
+                    MessageBox.Show("저장 완료!");
                 }
             }
         }
+
+        //private void btnImgSave_Click(object sender, EventArgs e)
+        //{
+        //    if (resizedImage == null)
+        //    {
+        //        MessageBox.Show("저장할 이미지가 없습니다.");
+        //        return;
+        //    }
+
+        //    using (SaveFileDialog sfd = new SaveFileDialog())
+        //    {
+        //        sfd.Filter = "PNG 파일 (*.png)|*.png|JPEG 파일 (*.jpg)|*.jpg|Bitmap 파일 (*.bmp)|*.bmp";
+        //        sfd.Title = "이미지 저장";
+        //        string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HHmmss");
+        //        sfd.FileName = $"pixel_output_{timestamp}.png";
+
+        //        if (sfd.ShowDialog() == DialogResult.OK)
+        //        {
+        //            ImageFormat format = ImageFormat.Png;
+        //            if (sfd.FileName.EndsWith(".jpg")) format = ImageFormat.Jpeg;
+        //            else if (sfd.FileName.EndsWith(".bmp")) format = ImageFormat.Bmp;
+        //            resizedImage.Save(sfd.FileName, format);
+        //            MessageBox.Show("저장 완료");
+        //        }
+        //    }
+        //}
         private void picSavePreview_Paint(object sender, PaintEventArgs e)
         {
-            if (pixelatedImage == null) return;
+            if (resizedImage == null) return;
 
             Graphics g = e.Graphics;
             g.Clear(Color.White);
 
-            int imgW = pixelatedImage.Width;
-            int imgH = pixelatedImage.Height;
+            int imgW = resizedImage.Width;
+            int imgH = resizedImage.Height;
             int boxW = picSavePreview.Width;
             int boxH = picSavePreview.Height;
 
@@ -411,9 +443,7 @@ namespace pixel
             int offsetX = (boxW - drawW) / 2;
             int offsetY = (boxH - drawH) / 2;
 
-            // 계단현상 없이 픽셀 느낌 유지
-            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-
+            g.InterpolationMode = InterpolationMode.NearestNeighbor;
             g.DrawImage(resizedImage, new Rectangle(offsetX, offsetY, drawW, drawH));
         }
         private Dictionary<int, char> GenerateRandomSymbolMap(int k)

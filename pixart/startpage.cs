@@ -26,13 +26,16 @@ namespace pixart
             explanationForm.Show();
         }
 
+        
         private void btnColor_Click(object sender, EventArgs e)
         {
+            
             Coloring mainForm = new Coloring();
-            this.Hide(); // 현재 startpage를 숨깁니다
-            mainForm.FormClosed += (s, args) => this.Close(); // mainPage 닫히면 startpage도 함께 종료
+            this.Hide();
+            mainForm.FormClosed += (s, args) => this.Close();
             mainForm.Show();
         }
+
 
         private void btnDualMode_Click(object sender, EventArgs e)
         {
@@ -40,6 +43,14 @@ namespace pixart
             this.Hide(); // startpage 숨기고
             dualForm.FormClosed += (s, args) => this.Close(); // 닫히면 종료
             dualForm.Show();
+        }
+
+        private void btnColorLevel_Click(object sender, EventArgs e)
+        {
+            pixel.KmeansColoring form1 = new pixel.KmeansColoring(); // Fully qualify the namespace
+            this.Hide();
+            form1.FormClosed += (s, args) => this.Close();
+            form1.Show();
         }
     }
 }
