@@ -52,6 +52,8 @@ namespace PixelColorling
 
         private bool isPatternGenerated = false;  // 도안 생성 여부 체크용
 
+        private Stack<ColoringAction> undoStack = new Stack<ColoringAction>();
+        private Stack<ColoringAction> redoStack = new Stack<ColoringAction>();
 
 
 
@@ -88,7 +90,7 @@ namespace PixelColorling
                 return;
             }
 
-            // ✅ 이미 도안이 있다면 사용자 확인
+            // 이미 도안이 있다면 사용자 확인
             if (isPatternGenerated)
             {
                 DialogResult overwrite = MessageBox.Show(
@@ -551,6 +553,10 @@ namespace PixelColorling
                             {
                                 isFilled[y, x] = true;
                                 filledColors[y, x] = selectedColor;
+
+                                Color prevColor = filledColors[y, x];  // 기존 색 저장
+                                undoStack.Push(new ColoringAction(x, y, prevColor, selectedColor));  // 행동 기록
+                                redoStack.Clear();  // 새 행동 시 Redo 초기화
 
                                 if (paintedResultBitmap != null &&
                                     x >= 0 && x < paintedResultBitmap.Width &&
@@ -1393,6 +1399,23 @@ namespace PixelColorling
         private void tsButtonGridLoad_Click(object sender, EventArgs e)
         {
             tsmiLoadGrid.PerformClick();
+        }
+    }
+
+    // 색칠된 좌표, 원래 색상 기억
+    public class ColoringAction
+    {
+        public int X { get; set; }
+        public int Y { get; set; }
+        public Color PreviousColor { get; set; }
+        public Color NewColor { get; set; }
+
+        public ColoringAction(int x, int y, Color prev, Color curr)
+        {
+            X = x;
+            Y = y;
+            PreviousColor = prev;
+            NewColor = curr;
         }
     }
 
