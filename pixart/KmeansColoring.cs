@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
 using pixart;
+using PixelColorling;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace pixel
@@ -57,6 +58,11 @@ namespace pixel
 
         // 비교용 비트맵
         private Bitmap compareBitmap = null;
+
+        // 스택 선언
+        private Stack<CompoundAction> undoStack = new Stack<CompoundAction>();
+        private Stack<CompoundAction> redoStack = new Stack<CompoundAction>();
+
 
 
         public KmeansColoring()
@@ -597,12 +603,20 @@ namespace pixel
                     Point pt = new Point(x, y);
 
                     // 색칠된 셀은 색만 표시, 숫자는 생략
-                    if (pixelColors.ContainsKey(pt))
+                    /* if (pixelColors.ContainsKey(pt))
                     {
                         using (Brush b = new SolidBrush(pixelColors[pt]))
                         {
                             g.FillRectangle(b, cellRect);
                         }
+                    }*/
+                    if (pixelColors.TryGetValue(pt, out Color userColor))
+                    {
+                        using (Brush b = new SolidBrush(userColor))
+                        {
+                            g.FillRectangle(b, cellRect);
+                        }
+
                     }
                     else
                     {
@@ -673,6 +687,12 @@ namespace pixel
             // ✅ 고정된 사용자 색상 사용
             Color newColor = selectedCustomColor;
 
+            // 새로운 작업을 시작하기 전에 redo 스택을 비움
+            redoStack.Clear();
+
+            // 마우스 클릭으로 발생하는 모든 변경을 담을 '작업 그룹'을 생성
+            var compoundAction = new CompoundAction();
+
             if (paintPartition) // 전체 색칠 모드
             {
                 for (int i = 0; i < gridH; i++)
@@ -682,8 +702,20 @@ namespace pixel
                         if (numberGrid[i, j] == targetNumber)
                         {
                             Point pt = new Point(j, i);
+                            Color prevColor = pixelColors.TryGetValue(pt, out var c) ? c : Color.Transparent;
+
+                            // 같은 색으로 칠하는 것은 작업으로 기록하지 않음
+                            if (prevColor == newColor) continue;
+
+                            // 개별 변경을 생성하여 작업 그룹에 추가합니다.
+                            compoundAction.AddChange(new ColoringAction(j, i, prevColor, newColor));
                             pixelColors[pt] = newColor;
                             pixelatedImage.SetPixel(j, i, newColor);
+
+                            /*
+                            pixelColors[pt] = newColor;
+                            pixelatedImage.SetPixel(j, i, newColor);
+                            */
                         }
                     }
                 }
@@ -701,11 +733,27 @@ namespace pixel
                         if (nx >= 0 && nx < gridW && ny >= 0 && ny < gridH)
                         {
                             Point pt = new Point(nx, ny);
+                            Color prevColor = pixelColors.TryGetValue(pt, out var c) ? c : Color.Transparent;
+
+                            if (prevColor == newColor) continue;
+
+                            // 개별 변경을 생성하여 작업 그룹에 추가
+                            compoundAction.AddChange(new ColoringAction(nx, ny, prevColor, newColor));
                             pixelColors[pt] = newColor;
                             pixelatedImage.SetPixel(nx, ny, newColor);
+
+                            /*
+                            pixelColors[pt] = newColor;
+                            pixelatedImage.SetPixel(nx, ny, newColor);
+                            */
                         }
                     }
                 }
+            }
+
+            if (compoundAction.Changes.Any())
+            {
+                undoStack.Push(compoundAction);
             }
 
             picPreview.Invalidate();
@@ -1390,8 +1438,87 @@ namespace pixel
                 // 아니오 선택 시 그냥 닫힘
             }
         }
+
+        private void tsbtnUndo_Click(object sender, EventArgs e)
+        {
+            if (undoStack.Count > 0)
+            {
+                // 1. 마지막 '작업 그룹'을 undo 스택에서 꺼냄
+                var compoundActionToUndo = undoStack.Pop();
+
+                // 2. 이 작업 그룹을 redo 스택에 넣음
+                redoStack.Push(compoundActionToUndo);
+
+                // 3. 작업 그룹에 포함된 모든 픽셀 변경을 되돌림
+                foreach (var action in compoundActionToUndo.Changes)
+                {
+                    Point pt = new Point(action.X, action.Y);
+                    if (action.PreviousColor == Color.Transparent)
+                    {
+                        pixelColors.Remove(pt);
+                    }
+                    else
+                    {
+                        pixelColors[pt] = action.PreviousColor;
+                    }
+                }
+
+                // 4. 모든 변경이 끝난 후 화면을 한 번만 새로 고침
+                if (compoundActionToUndo.Changes.Any())
+                {
+                    var lastAction = compoundActionToUndo.Changes.First();
+                    selectedPoint = new Point(lastAction.X, lastAction.Y);
+                    UpdatePanelCompare(lastAction.X, lastAction.Y);
+                }
+                picPreview.Invalidate();
+            }
+        }
+
+        private void tsbtnRedo_Click(object sender, EventArgs e)
+        {
+            if (redoStack.Count > 0)
+            {
+                // 1. 취소했던 '작업 그룹'을 redo 스택에서 꺼냄
+                var compoundActionToRedo = redoStack.Pop();
+
+                // 2. 이 작업 그룹을 다시 undo 스택에 넣음
+                undoStack.Push(compoundActionToRedo);
+
+                // 3. 작업 그룹에 포함된 모든 픽셀 변경을 다시 실행함
+                foreach (var action in compoundActionToRedo.Changes)
+                {
+                    Point pt = new Point(action.X, action.Y);
+                    pixelColors[pt] = action.NewColor;
+                    pixelatedImage.SetPixel(action.X, action.Y, action.NewColor);
+                }
+
+                // 4. 모든 변경이 끝난 후 화면을 한 번만 새로 고침
+                if (compoundActionToRedo.Changes.Any())
+                {
+                    var lastAction = compoundActionToRedo.Changes.First();
+                    selectedPoint = new Point(lastAction.X, lastAction.Y);
+                    UpdatePanelCompare(lastAction.X, lastAction.Y);
+                }
+                picPreview.Invalidate();
+            }
+        }
     }
 }
+
+public class ColoringAction
+{
+    public int X, Y;
+    public Color PreviousColor, NewColor;
+
+    public ColoringAction(int x, int y, Color previousColor, Color newColor)
+    {
+        X = x;
+        Y = y;
+        PreviousColor = previousColor;
+        NewColor = newColor;
+    }
+}
+
 
 [Serializable]
 public class GridSaveDataSimple
@@ -1429,5 +1556,19 @@ public class CellEntry
         new CellEntry { X = pt.X, Y = pt.Y, R = c.R, G = c.G, B = c.B };
 }
 
+public class CompoundAction
+{
+    public List<ColoringAction> Changes { get; private set; }
+
+    public CompoundAction()
+    {
+        Changes = new List<ColoringAction>();
+    }
+
+    public void AddChange(ColoringAction change)
+    {
+        Changes.Add(change);
+    }
+}
 
 
