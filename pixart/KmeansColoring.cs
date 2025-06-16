@@ -14,7 +14,13 @@ namespace pixel
 {
     public partial class KmeansColoring : Form
     {
-
+        public enum ColorMode
+        {
+            RGB,
+            HSV,
+            OKLAB,
+            YCbCr
+        }
 
         // 원본 이미지 비트맵
         Bitmap originalImage;
@@ -35,7 +41,8 @@ namespace pixel
         // 색상 번호와 색상 매핑
         private Dictionary<int, Color> numberToColor = new Dictionary<int, Color>();
 
-
+        // 색상 모드 (RGB, HSV 등)
+        private ColorMode currentMode = ColorMode.RGB;
 
         public KmeansColoring()
         {
@@ -81,6 +88,124 @@ namespace pixel
             }
         }
 
+        //private void btnPixelate_Click(object sender, EventArgs e)
+        //{
+        //    if (originalImage == null)
+        //    {
+        //        MessageBox.Show("이미지를 먼저 불러오세요.");
+        //        return;
+        //    }
+
+        //    // 픽셀 메시지 박스 확인(하던 작업 초기화 방지)
+        //    DialogResult result = MessageBox.Show("픽셀화 하시겠습니까?", "확인", MessageBoxButtons.YesNo);
+        //    if (result == DialogResult.No)
+        //        return;
+
+        //    // 이전 색칠 정보 초기화
+        //    pixelColors.Clear();
+        //    selectedPoint = null;
+
+        //    // 이미지 축소
+        //    int desiredGridW = (int)numPixelSize.Value;       // 사용자가 지정한 가로 셀 수
+        //    pixelSize = originalImage.Width / desiredGridW;   // 자동 계산된 셀 크기
+        //    int smallW = desiredGridW;                        // 줄일 이미지의 너비 = 셀 개수
+        //    int smallH = originalImage.Height / pixelSize;    // 셀 크기로 나눈 줄일 이미지의 높이
+
+        //    //pixelSize = (int)numPixelSize.Value;
+        //    //int smallW = originalImage.Width / pixelSize;
+        //    //int smallH = originalImage.Height / pixelSize;
+
+
+        //    // 줄인 이미지
+        //    Bitmap smallImage = new Bitmap(originalImage, new Size(smallW, smallH));
+        //    pixelatedImage = new Bitmap(smallW, smallH);  // 새 비트맵 초기화
+
+        //    int gridW = smallImage.Width;
+        //    int gridH = smallImage.Height;
+        //    // 색 번호 도안
+        //    numberGrid = new int[gridH, gridW];
+        //    // 축소 이미지 저장용
+        //    Color[,] colorGrid = new Color[gridH, gridW];
+
+        //    // K means 위한 픽셀 리스트
+        //    List<double[]> pixels = new List<double[]>();
+
+        //    for (int y = 0; y < gridH; y++)
+        //    {
+        //        for (int x = 0; x < gridW; x++)
+        //        {
+        //            Color c = smallImage.GetPixel(x, y); //x, y 색 추출
+        //            colorGrid[y, x] = c; //축소 이미지 색 저장
+        //            pixels.Add(new double[] { c.R, c.G, c.B }); //rgb 리스트에 추가
+        //        }
+        //    }
+
+        //    // k means 클러스터링 색상들
+        //    k = (int)numKsize.Value;
+        //    List<double[]> centroids = RunKMeans(pixels, k);
+
+        //    // 대표 색상 리스트
+        //    List<Color> representativeColors = centroids
+        //        .Select(c => Color.FromArgb((int)c[0], (int)c[1], (int)c[2]))
+        //        .ToList();
+        //    // k means로 구한 대표 색상으로 색상 번호 매핑 (도안 숫자)
+        //    Dictionary<Color, int> colorToNumber = new Dictionary<Color, int>();
+        //    for (int i = 0; i < representativeColors.Count; i++)
+        //        colorToNumber[representativeColors[i]] = i + 1;
+
+        //    // 색상 번호와 색상 매핑
+        //    numberToColor = colorToNumber.ToDictionary(kv => kv.Value, kv => kv.Key);
+
+        //    // 축소 이미지 클러스터링 번호 매핑
+        //    for (int y = 0; y < gridH; y++)
+        //    {
+        //        for (int x = 0; x < gridW; x++)
+        //        {
+        //            Color original = colorGrid[y, x];
+        //            Color closest = FindClosestColor(original, representativeColors);
+        //            numberGrid[y, x] = colorToNumber[closest];
+        //        }
+        //    }
+
+        //    // 썸네일 표시
+        //    int thumbWidth = picOriginalThumb.Width;
+        //    int thumbHeight = picOriginalThumb.Height;
+        //    Bitmap thumbImage = new Bitmap(originalImage, new Size(thumbWidth, thumbHeight));
+        //    picOriginalThumb.Image = thumbImage;
+
+        //    // 색상 가이드 표시 
+        //    panelLegend.Controls.Clear();
+
+
+        //    foreach (var pair in colorToNumber.OrderBy(p => p.Value))
+        //    {
+        //        // 색상과 번호 쌍을 패널에 추가
+        //        Panel swatch = new Panel();
+        //        swatch.BackColor = pair.Key;
+        //        swatch.Size = new Size(20, 20);
+        //        swatch.Margin = new Padding(2);
+
+        //        Label label = new Label();
+        //        label.Text = pair.Value.ToString();
+        //        label.AutoSize = true;
+        //        label.TextAlign = ContentAlignment.MiddleCenter;
+        //        label.Padding = new Padding(0);
+
+        //        FlowLayoutPanel itemPanel = new FlowLayoutPanel();
+        //        itemPanel.FlowDirection = FlowDirection.TopDown;  //  세로 정렬
+        //        itemPanel.WrapContents = false;
+        //        itemPanel.Size = new Size(40, 40);  // 너비 제한
+
+        //        itemPanel.Controls.Add(swatch);
+        //        itemPanel.Controls.Add(label);
+
+        //        panelLegend.Controls.Add(itemPanel);
+        //    }
+
+        //    // 이미지 새로고침
+        //    picPreview.Image = null;
+        //    picPreview.Invalidate();
+        //}
         private void btnPixelate_Click(object sender, EventArgs e)
         {
             if (originalImage == null)
@@ -89,73 +214,56 @@ namespace pixel
                 return;
             }
 
-            // 픽셀 메시지 박스 확인(하던 작업 초기화 방지)
             DialogResult result = MessageBox.Show("픽셀화 하시겠습니까?", "확인", MessageBoxButtons.YesNo);
             if (result == DialogResult.No)
                 return;
 
-            // 이전 색칠 정보 초기화
             pixelColors.Clear();
             selectedPoint = null;
 
-            // 이미지 축소
-            int desiredGridW = (int)numPixelSize.Value;       // 사용자가 지정한 가로 셀 수
-            pixelSize = originalImage.Width / desiredGridW;   // 자동 계산된 셀 크기
-            int smallW = desiredGridW;                        // 줄일 이미지의 너비 = 셀 개수
-            int smallH = originalImage.Height / pixelSize;    // 셀 크기로 나눈 줄일 이미지의 높이
+            int desiredGridW = (int)numPixelSize.Value;
+            pixelSize = originalImage.Width / desiredGridW;
+            int smallW = desiredGridW;
+            int smallH = originalImage.Height / pixelSize;
 
-            //pixelSize = (int)numPixelSize.Value;
-            //int smallW = originalImage.Width / pixelSize;
-            //int smallH = originalImage.Height / pixelSize;
-
-
-            // 줄인 이미지
             Bitmap smallImage = new Bitmap(originalImage, new Size(smallW, smallH));
-            pixelatedImage = new Bitmap(smallW, smallH);  // 새 비트맵 초기화
-
+            pixelatedImage = new Bitmap(smallW, smallH);
             int gridW = smallImage.Width;
             int gridH = smallImage.Height;
-            // 색 번호 도안
-            numberGrid = new int[gridH, gridW];
-            // 축소 이미지 저장용
-            Color[,] colorGrid = new Color[gridH, gridW];
 
-            // K means 위한 픽셀 리스트
-            List<double[]> pixels = new List<double[]>();
+            numberGrid = new int[gridH, gridW];
+            Color[,] colorGrid = new Color[gridH, gridW];
+            List<Color> colorList = new List<Color>();
 
             for (int y = 0; y < gridH; y++)
             {
                 for (int x = 0; x < gridW; x++)
                 {
-                    Color c = smallImage.GetPixel(x, y); //x, y 색 추출
-                    colorGrid[y, x] = c; //축소 이미지 색 저장
-                    pixels.Add(new double[] { c.R, c.G, c.B }); //rgb 리스트에 추가
+                    Color c = smallImage.GetPixel(x, y);
+                    colorGrid[y, x] = c;
+                    colorList.Add(c);
                 }
             }
 
-            // k means 클러스터링 색상들
             k = (int)numKsize.Value;
-            List<double[]> centroids = RunKMeans(pixels, k);
+            int maxIter = (int)numKmeansIter.Value;
 
-            // 대표 색상 리스트
-            List<Color> representativeColors = centroids
-                .Select(c => Color.FromArgb((int)c[0], (int)c[1], (int)c[2]))
-                .ToList();
-            // k means로 구한 대표 색상으로 색상 번호 매핑 (도안 숫자)
+            List<Color> representativeColors = RunKMeans(colorList, k, currentMode, maxIter);
+
             Dictionary<Color, int> colorToNumber = new Dictionary<Color, int>();
             for (int i = 0; i < representativeColors.Count; i++)
                 colorToNumber[representativeColors[i]] = i + 1;
 
-            // 색상 번호와 색상 매핑
             numberToColor = colorToNumber.ToDictionary(kv => kv.Value, kv => kv.Key);
 
-            // 축소 이미지 클러스터링 번호 매핑
             for (int y = 0; y < gridH; y++)
             {
                 for (int x = 0; x < gridW; x++)
                 {
                     Color original = colorGrid[y, x];
-                    Color closest = FindClosestColor(original, representativeColors);
+                    //Color closest = FindClosestColor(original, representativeColors);
+                    Color closest = FindClosestColor(original, representativeColors, currentMode); // ✅ 수정된 호출
+
                     numberGrid[y, x] = colorToNumber[closest];
                 }
             }
@@ -166,13 +274,10 @@ namespace pixel
             Bitmap thumbImage = new Bitmap(originalImage, new Size(thumbWidth, thumbHeight));
             picOriginalThumb.Image = thumbImage;
 
-            // 색상 가이드 표시 
             panelLegend.Controls.Clear();
-
 
             foreach (var pair in colorToNumber.OrderBy(p => p.Value))
             {
-                // 색상과 번호 쌍을 패널에 추가
                 Panel swatch = new Panel();
                 swatch.BackColor = pair.Key;
                 swatch.Size = new Size(20, 20);
@@ -185,9 +290,9 @@ namespace pixel
                 label.Padding = new Padding(0);
 
                 FlowLayoutPanel itemPanel = new FlowLayoutPanel();
-                itemPanel.FlowDirection = FlowDirection.TopDown;  //  세로 정렬
+                itemPanel.FlowDirection = FlowDirection.TopDown;
                 itemPanel.WrapContents = false;
-                itemPanel.Size = new Size(40, 40);  // 너비 제한
+                itemPanel.Size = new Size(40, 40);
 
                 itemPanel.Controls.Add(swatch);
                 itemPanel.Controls.Add(label);
@@ -195,9 +300,43 @@ namespace pixel
                 panelLegend.Controls.Add(itemPanel);
             }
 
-            // 이미지 새로고침
             picPreview.Image = null;
             picPreview.Invalidate();
+        }
+        double ColorDistanceSquared(Color a, Color b, ColorMode mode)
+        {
+            switch (mode)
+            {
+                case ColorMode.RGB:
+                    return
+                        Math.Pow((a.R - b.R) / 255.0, 2) +
+                        Math.Pow((a.G - b.G) / 255.0, 2) +
+                        Math.Pow((a.B - b.B) / 255.0, 2);
+
+                case ColorMode.HSV:
+                    var hsv1 = RGBtoHSV(a);
+                    var hsv2 = RGBtoHSV(b);
+                    double dh = (hsv1[0] - hsv2[0]) / 360.0;
+                    double ds = hsv1[1] - hsv2[1]; // already 0–1
+                    double dv = hsv1[2] - hsv2[2];
+                    return dh * dh + ds * ds + dv * dv;
+
+                case ColorMode.OKLAB:
+                    var lab1 = RgbToOklab(a);
+                    var lab2 = RgbToOklab(b);
+                    return Math.Pow(lab1[0] - lab2[0], 2) + Math.Pow(lab1[1] - lab2[1], 2) + Math.Pow(lab1[2] - lab2[2], 2);
+
+                case ColorMode.YCbCr:
+                    var ycc1 = RGBtoYCbCr(a);
+                    var ycc2 = RGBtoYCbCr(b);
+                    double dy = (ycc1[0] - ycc2[0]) / 219.0; // 235-16
+                    double dcb = (ycc1[1] - ycc2[1]) / 224.0; // 240-16
+                    double dcr = (ycc1[2] - ycc2[2]) / 224.0;
+                    return dy * dy + dcb * dcb + dcr * dcr;
+
+                default:
+                    throw new ArgumentException("Unknown color mode");
+            }
         }
 
 
@@ -209,14 +348,14 @@ namespace pixel
                 Math.Pow((int)a.B - b.B, 2);
         }
 
-        Color FindClosestColor(Color input, List<Color> palette)
+        Color FindClosestColor(Color input, List<Color> palette, ColorMode mode)
         {
             Color closest = palette[0];
-            double minDist = ColorDistanceSquared(input, closest);
+            double minDist = ColorDistanceSquared(input, closest, mode);
 
             foreach (var color in palette)
             {
-                double dist = ColorDistanceSquared(input, color);
+                double dist = ColorDistanceSquared(input, color, mode);
                 if (dist < minDist)
                 {
                     minDist = dist;
@@ -287,6 +426,81 @@ namespace pixel
             // 최종 클러스터 색상 반환
             return centroids;
         }
+
+        private List<Color> RunKMeans(List<Color> colors, int k, ColorMode mode, int maxIterations = 40)
+        {
+            // 1. 색상 벡터로 변환 (선택한 색상 모드에 따라)
+            List<double[]> vectors = new List<double[]>();
+
+            foreach (var c in colors)
+            {
+                double[] vec;
+                if (mode == ColorMode.RGB)
+                {
+                    vec = new double[] { c.R, c.G, c.B };
+                }
+                else if (mode == ColorMode.HSV)
+                {
+                    vec = RGBtoHSV(c);
+                }
+                else if (mode == ColorMode.OKLAB)
+                {
+                    vec = RgbToOklab(c);
+                }
+                else if (mode == ColorMode.YCbCr)
+                {
+                    vec = RGBtoYCbCr(c);
+                }
+                else
+                {
+                    throw new ArgumentException("Unknown color mode");
+                }
+
+                vectors.Add(vec);
+            }
+
+
+            // 2. 클러스터링
+            List<double[]> centroids = RunKMeans(vectors, k, maxIterations);
+
+            // 3. 결과를 RGB로 다시 변환
+            List<Color> result = new List<Color>();
+
+            foreach (var centroid in centroids)
+            {
+                Color c;
+
+                if (mode == ColorMode.RGB)
+                {
+                    c = Color.FromArgb(
+                        ClampColorComponent((int)centroid[0]),
+                        ClampColorComponent((int)centroid[1]),
+                        ClampColorComponent((int)centroid[2]));
+                }
+                else if (mode == ColorMode.HSV)
+                {
+                    c = HSVtoRGB(centroid);
+                }
+                else if (mode == ColorMode.OKLAB)
+                {
+                    c = OklabToRGB(centroid);
+                }
+                else if (mode == ColorMode.YCbCr)
+                {
+                    c = YCbCrToRGB(centroid);
+                }
+                else
+                {
+                    c = Color.Black;
+                }
+
+                result.Add(c);
+            }
+
+
+            return result;
+        }
+
 
         private void picPreview_Paint(object sender, PaintEventArgs e)
         {
@@ -450,6 +664,8 @@ namespace pixel
         }
 
 
+
+        // 마우스가 그리드 위에 있을 때 번호 표시
         // 마우스가 그리드 위에 있을 때 번호 표시
         private void picPreview_MouseMove(object sender, MouseEventArgs e)
         {
@@ -513,6 +729,7 @@ namespace pixel
             toolTip1.SetToolTip(picPreview, tip);
         }
 
+
         // 버튼 클릭 시 K-Means 색상으로 전체 셀 자동 색칠
         private void btnColoringKmeans_Click(object sender, EventArgs e)
         {
@@ -549,6 +766,10 @@ namespace pixel
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            //cbxMode.Items.AddRange(new string[] { "RGB", "HSV", "OKLAB", "YCbCr" });
+            cbxMode.SelectedIndex = 0; // 기본 RGB
+            currentMode = ColorMode.RGB;
+
             numKsize.Value = 8;
             numPixelSize.Value = 30;
             numKmeansIter.Value = 40;
@@ -558,23 +779,9 @@ namespace pixel
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            //var saveForm = new SaveKMeansForm(originalImage, pixelatedImage, pixelSize);
             var saveForm = new SaveForm(pixelatedImage, originalImage.Size);
             saveForm.Show();
 
-
-            //새 폼 생성
-            //var saveForm = new SaveKMeansForm(
-            //    originalImage,
-            //    pixelatedImage,
-            //    pixelSize
-            //    //numberGrid,
-            //    //numberToColor,
-            //    //pixelColors,
-            //    //k
-            //);
-
-            //saveForm.Show();
         }
 
         private void toolStripComboBox1_Click(object sender, EventArgs e)
@@ -582,6 +789,152 @@ namespace pixel
 
         }
 
+        private void cbxMode_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            currentMode = (ColorMode)cbxMode.SelectedIndex;
+        }
+
+        // 변환 유틸리티 함수들 추가
+        private double[] RGBtoHSV(Color color)
+        {
+            double r = color.R / 255.0;
+            double g = color.G / 255.0;
+            double b = color.B / 255.0;
+            double max = Math.Max(r, Math.Max(g, b));
+            double min = Math.Min(r, Math.Min(g, b));
+            double h, s, v = max;
+
+            double delta = max - min;
+            s = max == 0 ? 0 : delta / max;
+
+            if (delta == 0) h = 0;
+            else if (max == r) h = (g - b) / delta % 6;
+            else if (max == g) h = (b - r) / delta + 2;
+            else h = (r - g) / delta + 4;
+
+            h *= 60;
+            if (h < 0) h += 360;
+
+            return new double[] { h, s, v };
+        }
+
+        private Color HSVtoRGB(double[] hsv)
+        {
+            double h = hsv[0], s = hsv[1], v = hsv[2];
+            double c = v * s;
+            double x = c * (1 - Math.Abs(h / 60 % 2 - 1));
+            double m = v - c;
+
+            double r = 0, g = 0, b = 0;
+            if (h < 60) { r = c; g = x; }
+            else if (h < 120) { r = x; g = c; }
+            else if (h < 180) { g = c; b = x; }
+            else if (h < 240) { g = x; b = c; }
+            else if (h < 300) { r = x; b = c; }
+            else { r = c; b = x; }
+
+            return Color.FromArgb(
+                ClampColorComponent((int)((r + m) * 255)),
+                ClampColorComponent((int)((g + m) * 255)),
+                ClampColorComponent((int)((b + m) * 255))
+            );
+        }
+
+        private double[] RGBtoYCbCr(Color c)
+        {
+            double r = c.R, g = c.G, b = c.B;
+            double y = 0.299 * r + 0.587 * g + 0.114 * b;
+            double cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
+            double cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
+            return new double[] { y, cb, cr };
+        }
+
+        private Color YCbCrToRGB(double[] ycbcr)
+        {
+            double y = ycbcr[0], cb = ycbcr[1] - 128, cr = ycbcr[2] - 128;
+            double r = y + 1.402 * cr;
+            double g = y - 0.344136 * cb - 0.714136 * cr;
+            double b = y + 1.772 * cb;
+            return Color.FromArgb(
+                ClampColorComponent((int)r),
+                ClampColorComponent((int)g),
+                ClampColorComponent((int)b)
+            );
+        }
+
+        public static double[] RgbToOklab(Color color)
+        {
+            // 1. sRGB → linear RGB
+            double r = SrgbToLinear(color.R / 255.0);
+            double g = SrgbToLinear(color.G / 255.0);
+            double b = SrgbToLinear(color.B / 255.0);
+
+            // 2. linear RGB → LMS
+            double l = 0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b;
+            double m = 0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b;
+            double s = 0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b;
+
+            // 3. LMS → cube root
+            double l_ = Math.Pow(l, 1.0 / 3);
+            double m_ = Math.Pow(m, 1.0 / 3);
+            double s_ = Math.Pow(s, 1.0 / 3);
+
+            // 4. LMS → OKLAB
+            double L = 0.2104542553 * l_ + 0.7936177850 * m_ - 0.0040720468 * s_;
+            double a = 1.9779984951 * l_ - 2.4285922050 * m_ + 0.4505937099 * s_;
+            double b_ = 0.0259040371 * l_ + 0.7827717662 * m_ - 0.8086757660 * s_;
+
+            return new double[] { L, a, b_ };
+        }
+
+        private static double SrgbToLinear(double c)
+        {
+            return c <= 0.04045 ? c / 12.92 : Math.Pow((c + 0.055) / 1.055, 2.4);
+        }
+
+
+        public static Color OklabToRGB(double[] lab)
+        {
+            double L = lab[0];
+            double a = lab[1];
+            double b = lab[2];
+
+            // 1. OKLAB → LMS cube roots
+            double l_ = L + 0.3963377774 * a + 0.2158037573 * b;
+            double m_ = L - 0.1055613458 * a - 0.0638541728 * b;
+            double s_ = L - 0.0894841775 * a - 1.2914855480 * b;
+
+            // 2. LMS → linear RGB
+            double l = l_ * l_ * l_;
+            double m = m_ * m_ * m_;
+            double s = s_ * s_ * s_;
+
+            double r = +4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s;
+            double g = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;
+            double b_ = -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s;
+
+            return Color.FromArgb(
+                ClampToByte(LinearToSrgb(r)),
+                ClampToByte(LinearToSrgb(g)),
+                ClampToByte(LinearToSrgb(b_))
+            );
+        }
+
+        private static double LinearToSrgb(double c)
+        {
+            return c <= 0.0031308 ? c * 12.92 : 1.055 * Math.Pow(c, 1.0 / 2.4) - 0.055;
+        }
+
+        private static int ClampToByte(double value)
+        {
+            return Math.Min(255, Math.Max(0, (int)Math.Round(value * 255.0)));
+        }
+
+
+        public static double CubeRoot(double x)
+        {
+            return Math.Pow(x, 1.0 / 3.0);
+        }
 
     }
 }

@@ -45,6 +45,8 @@
             this.btnSave = new System.Windows.Forms.Button();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.panelCompare = new System.Windows.Forms.Panel();
+            this.label1 = new System.Windows.Forms.Label();
+            this.cbxMode = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.picPreview)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numPixelSize)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picOriginalThumb)).BeginInit();
@@ -88,7 +90,7 @@
             // 
             // numPixelSize
             // 
-            this.numPixelSize.Location = new System.Drawing.Point(1235, 76);
+            this.numPixelSize.Location = new System.Drawing.Point(1235, 90);
             this.numPixelSize.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.numPixelSize.Name = "numPixelSize";
             this.numPixelSize.Size = new System.Drawing.Size(130, 21);
@@ -118,7 +120,7 @@
             // lblFixelCount
             // 
             this.lblFixelCount.AutoSize = true;
-            this.lblFixelCount.Location = new System.Drawing.Point(1233, 62);
+            this.lblFixelCount.Location = new System.Drawing.Point(1233, 76);
             this.lblFixelCount.Name = "lblFixelCount";
             this.lblFixelCount.Size = new System.Drawing.Size(73, 12);
             this.lblFixelCount.TabIndex = 7;
@@ -193,11 +195,36 @@
             this.panelCompare.Size = new System.Drawing.Size(170, 111);
             this.panelCompare.TabIndex = 14;
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(1230, 39);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(73, 12);
+            this.label1.TabIndex = 16;
+            this.label1.Text = "가로 픽셀 수";
+            // 
+            // cbxMode
+            // 
+            this.cbxMode.FormattingEnabled = true;
+            this.cbxMode.Items.AddRange(new object[] {
+            "RGB",
+            "HSV",
+            "OKLab",
+            "YCbCr"});
+            this.cbxMode.Location = new System.Drawing.Point(1232, 57);
+            this.cbxMode.Name = "cbxMode";
+            this.cbxMode.Size = new System.Drawing.Size(133, 20);
+            this.cbxMode.TabIndex = 17;
+            this.cbxMode.SelectedIndexChanged += new System.EventHandler(this.cbxMode_SelectedIndexChanged);
+            // 
             // KmeansColoring
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1377, 614);
+            this.Controls.Add(this.cbxMode);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.panelCompare);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.lblKmeansiter);
@@ -246,6 +273,8 @@
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.Panel panelCompare;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ComboBox cbxMode;
     }
 }
 

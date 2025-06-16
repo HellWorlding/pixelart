@@ -17,7 +17,7 @@ namespace PixelColorling
     public partial class Coloring : Form
     {
         public enum BinningMode { RGB, HSV, OKLAB, YCbCr } // 도안 생성 색상 종류
-        public enum DifficultyLevel { Easy, Medium, Hard, VeryHard} // 도안 생성 색상 난이도
+        public enum DifficultyLevel { Easy, Medium, Hard, VeryHard } // 도안 생성 색상 난이도
 
         private BinningMode currentBinningMode = BinningMode.RGB; //현재 도안 생성 색상 종류
         private DifficultyLevel currentDifficulty = DifficultyLevel.Medium; // 현재 도안 생성 난이도
@@ -29,12 +29,12 @@ namespace PixelColorling
         private Color[,] blockColors;        // 각 블럭의 색상
         private int[,] colorNumbers;         // 색상에 대한 번호 매핑
         private Dictionary<Color, int> colorMap = new Dictionary<Color, int>();// 색상 → 번호
-        
+
         private Color selectedColor = Color.Transparent;
         private bool[,] isFilled;           // 셀이 색칠되었는지 여부
         private Color[,] filledColors;      // 셀에 실제 색칠한 색상
 
-        
+
 
         private Color selectedCustomColor = Color.Black;
         private Bitmap quantizedBitmap;  // 양자화된 원본 비트맵 저장
@@ -50,13 +50,15 @@ namespace PixelColorling
 
         private Bitmap paintedResultBitmap; // 도안 결과 저장용
 
+        private bool isPatternGenerated = false;  // 도안 생성 여부 체크용
+
 
 
 
         public Coloring()
         {
-            InitializeComponent(); 
-            this.Load += Coloring_Load; 
+            InitializeComponent();
+            this.Load += Coloring_Load;
         }
 
         private void Coloring_Load(object sender, EventArgs e)
@@ -70,7 +72,7 @@ namespace PixelColorling
             cbxColorType.SelectedIndex = 0; // RGB
             cbxDifficulty.SelectedIndex = 1; // Medium
 
-            
+
 
             panel1.Visible = !panel1.Visible;
 
@@ -79,11 +81,33 @@ namespace PixelColorling
 
         private void btnGenerate_Click(object sender, EventArgs e)
         {
+
             if (originalImage == null)
             {
                 MessageBox.Show("먼저 이미지를 불러와주세요.");
                 return;
             }
+
+            // ✅ 이미 도안이 있다면 사용자 확인
+            if (isPatternGenerated)
+            {
+                DialogResult overwrite = MessageBox.Show(
+                    "기존 도안을 새로 생성하시겠습니까?", "도안 생성 확인",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (overwrite == DialogResult.No)
+                    return;
+
+                DialogResult save = MessageBox.Show(
+                    "기존 도안을 저장하시겠습니까?", "도안 저장",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (save == DialogResult.Yes)
+                {
+                    tsmiSaveGrid_Click(null, null);
+                }
+            }
+            isPatternGenerated = false;
 
             int desiredGridW = (int)numPixelSize.Value;
             blockSize = originalImage.Width / desiredGridW;
@@ -303,7 +327,7 @@ namespace PixelColorling
                 case BinningMode.OKLAB:
                     return SimplifyOklab(color, level);
                 case BinningMode.YCbCr:
-            return SimplifyYCbCr(color, level);  
+                    return SimplifyYCbCr(color, level);
                 default:
                     return color;
             }
@@ -365,7 +389,7 @@ namespace PixelColorling
             return Color.FromArgb(R, G, B);
         }
 
-        
+
 
         public static int Clamp(int val)
         {
@@ -387,7 +411,7 @@ namespace PixelColorling
         private void panelCanvas_Paint(object sender, PaintEventArgs e)
         {
             if (blockColors == null) return;
-
+            isPatternGenerated = true; // 도안이 생성되었음을 표시
             Graphics g = e.Graphics;
             g.Clear(Color.White);
 
@@ -480,7 +504,7 @@ namespace PixelColorling
             if (btn != null && btn.Tag is Color)
             {
                 selectedColor = (Color)btn.Tag;
-                
+
 
                 MessageBox.Show($"색상 {btn.Text}번 선택됨");
                 btnColorSelect.BackColor = selectedColor;
@@ -489,7 +513,7 @@ namespace PixelColorling
         }
 
 
-        
+
         private void panelCanvas_MouseClick(object sender, MouseEventArgs e)
         {
             try
@@ -758,7 +782,7 @@ namespace PixelColorling
         private void btnColorPartition_Click(object sender, EventArgs e)
         {
             colorPartitionMode = true;
-            penThickness=1; // 부분 색칠 모드에서는 기본 굵기 사용
+            penThickness = 1; // 부분 색칠 모드에서는 기본 굵기 사용
             MessageBox.Show("번호 기준 색칠 모드: 색칠할 셀을 클릭하세요.");
             panel1.Visible = !panel1.Visible;
         }
@@ -943,7 +967,7 @@ namespace PixelColorling
             btnGenerate.PerformClick();
         }
 
-       
+
 
         private void tsmiColorAll_Click(object sender, EventArgs e)
         {
@@ -1070,7 +1094,7 @@ namespace PixelColorling
                 Filter = "Grid Coloring Save (*.gcsave)|*.gcsave",
                 Title = "Load Coloring Project"
             };
-
+            isPatternGenerated = false; // 패턴이 새로 생성되지 않았음을 표시
             if (ofd.ShowDialog() == DialogResult.OK)
             {
                 FileStream fs = null;
@@ -1173,7 +1197,7 @@ namespace PixelColorling
         }
 
 
-        
+
 
         private void RepaintCanvas()
         {
@@ -1235,12 +1259,10 @@ namespace PixelColorling
             toolTip1.SetToolTip(panelCanvas, sb.ToString());
         }
 
+        private void Coloring_Load_1(object sender, EventArgs e)
+        {
 
-
-
-
-
-
+        }
     }
 
 
