@@ -32,7 +32,7 @@
             this.btnClientConnect = new System.Windows.Forms.Button();
             this.btnBack = new System.Windows.Forms.Button();
             this.lblIP = new System.Windows.Forms.Label();
-            this.txtIPAddress = new System.Windows.Forms.TextBox();
+            this.txtIpAddress = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // btnHostStart
@@ -43,6 +43,7 @@
             this.btnHostStart.TabIndex = 0;
             this.btnHostStart.Text = "호스트로 시작하기";
             this.btnHostStart.UseVisualStyleBackColor = true;
+            this.btnHostStart.Click += new System.EventHandler(this.btnHostStart_Click);
             // 
             // btnClientConnect
             // 
@@ -52,6 +53,7 @@
             this.btnClientConnect.TabIndex = 1;
             this.btnClientConnect.Text = "게스트로 접속하기";
             this.btnClientConnect.UseVisualStyleBackColor = true;
+            this.btnClientConnect.Click += new System.EventHandler(this.btnClientConnect_Click);
             // 
             // btnBack
             // 
@@ -72,19 +74,19 @@
             this.lblIP.TabIndex = 3;
             this.lblIP.Text = "서버 IP 주소";
             // 
-            // txtIPAddress
+            // txtIpAddress
             // 
-            this.txtIPAddress.Location = new System.Drawing.Point(82, 142);
-            this.txtIPAddress.Name = "txtIPAddress";
-            this.txtIPAddress.Size = new System.Drawing.Size(608, 25);
-            this.txtIPAddress.TabIndex = 4;
+            this.txtIpAddress.Location = new System.Drawing.Point(82, 142);
+            this.txtIpAddress.Name = "txtIpAddress";
+            this.txtIpAddress.Size = new System.Drawing.Size(608, 25);
+            this.txtIpAddress.TabIndex = 4;
             // 
             // dualMode
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.txtIPAddress);
+            this.Controls.Add(this.txtIpAddress);
             this.Controls.Add(this.lblIP);
             this.Controls.Add(this.btnBack);
             this.Controls.Add(this.btnClientConnect);
@@ -102,6 +104,6 @@
         private System.Windows.Forms.Button btnClientConnect;
         private System.Windows.Forms.Button btnBack;
         private System.Windows.Forms.Label lblIP;
-        private System.Windows.Forms.TextBox txtIPAddress;
+        private System.Windows.Forms.TextBox txtIpAddress;
     }
 }
