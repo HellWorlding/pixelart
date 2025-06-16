@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Coloring));
             this.panelPalette = new System.Windows.Forms.FlowLayoutPanel();
             this.label1 = new System.Windows.Forms.Label();
@@ -66,6 +67,7 @@
             this.tsmiThick5x5 = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiThickPartition = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiColorAll = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.numPixelSize)).BeginInit();
             this.toolStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -80,6 +82,7 @@
             this.panelPalette.Name = "panelPalette";
             this.panelPalette.Size = new System.Drawing.Size(215, 112);
             this.panelPalette.TabIndex = 15;
+            this.panelPalette.Paint += new System.Windows.Forms.PaintEventHandler(this.panelPalette_Paint);
             // 
             // label1
             // 
@@ -99,6 +102,7 @@
             this.panelCanvas.TabIndex = 13;
             this.panelCanvas.Paint += new System.Windows.Forms.PaintEventHandler(this.panelCanvas_Paint);
             this.panelCanvas.MouseClick += new System.Windows.Forms.MouseEventHandler(this.panelCanvas_MouseClick);
+            this.panelCanvas.MouseMove += new System.Windows.Forms.MouseEventHandler(this.panelCanvas_MouseMove);
             // 
             // btnSave
             // 
@@ -328,28 +332,28 @@
             // tsmiImageLoad
             // 
             this.tsmiImageLoad.Name = "tsmiImageLoad";
-            this.tsmiImageLoad.Size = new System.Drawing.Size(180, 22);
+            this.tsmiImageLoad.Size = new System.Drawing.Size(162, 22);
             this.tsmiImageLoad.Text = "이미지 불러오기";
             this.tsmiImageLoad.Click += new System.EventHandler(this.tsmiImageLoad_Click);
             // 
             // tsmiImageSave
             // 
             this.tsmiImageSave.Name = "tsmiImageSave";
-            this.tsmiImageSave.Size = new System.Drawing.Size(180, 22);
+            this.tsmiImageSave.Size = new System.Drawing.Size(162, 22);
             this.tsmiImageSave.Text = "이미지 저장";
             this.tsmiImageSave.Click += new System.EventHandler(this.tsmiImageSave_Click);
             // 
             // tsmiLoadGrid
             // 
             this.tsmiLoadGrid.Name = "tsmiLoadGrid";
-            this.tsmiLoadGrid.Size = new System.Drawing.Size(180, 22);
+            this.tsmiLoadGrid.Size = new System.Drawing.Size(162, 22);
             this.tsmiLoadGrid.Text = "도안 불러오기";
             this.tsmiLoadGrid.Click += new System.EventHandler(this.tsmiLoadGrid_Click);
             // 
             // tsmiSaveGrid
             // 
             this.tsmiSaveGrid.Name = "tsmiSaveGrid";
-            this.tsmiSaveGrid.Size = new System.Drawing.Size(180, 22);
+            this.tsmiSaveGrid.Size = new System.Drawing.Size(162, 22);
             this.tsmiSaveGrid.Text = "도안 저장";
             this.tsmiSaveGrid.Click += new System.EventHandler(this.tsmiSaveGrid_Click);
             // 
@@ -502,5 +506,6 @@
         private System.Windows.Forms.ToolStripMenuItem tsmiThick3x3;
         private System.Windows.Forms.ToolStripMenuItem tsmiThick5x5;
         private System.Windows.Forms.ToolStripMenuItem tsmiThickPartition;
+        private System.Windows.Forms.ToolTip toolTip1;
     }
 }

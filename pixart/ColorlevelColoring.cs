@@ -50,6 +50,9 @@ namespace PixelColorling
 
         private Bitmap paintedResultBitmap; // 도안 결과 저장용
 
+
+
+
         public Coloring()
         {
             InitializeComponent(); 
@@ -67,9 +70,11 @@ namespace PixelColorling
             cbxColorType.SelectedIndex = 0; // RGB
             cbxDifficulty.SelectedIndex = 1; // Medium
 
-            panel1.Visible = !panel1.Visible;
-        }
+            
 
+            panel1.Visible = !panel1.Visible;
+
+        }
 
 
         private void btnGenerate_Click(object sender, EventArgs e)
@@ -475,7 +480,11 @@ namespace PixelColorling
             if (btn != null && btn.Tag is Color)
             {
                 selectedColor = (Color)btn.Tag;
+                
+
                 MessageBox.Show($"색상 {btn.Text}번 선택됨");
+                btnColorSelect.BackColor = selectedColor;
+                btnColorSelect.ForeColor = selectedColor;
             }
         }
 
@@ -1013,7 +1022,7 @@ namespace PixelColorling
                     writer.Write(width);
                     writer.Write(height);
                     writer.Write(blockSize);
-                    writer.Write(colorMap.Count);
+                    writer.Write(colorMap.Count); // colorCount
                     writer.Write((int)currentBinningMode);
                     writer.Write((int)currentDifficulty);
 
@@ -1028,9 +1037,12 @@ namespace PixelColorling
                             writer.Write(filledColors[y, x].ToArgb());
                         }
 
-                    foreach (var kvp in colorMap.OrderBy(k => k.Value))
+                    // ✅ 색상과 번호 함께 저장
+                    writer.Write(colorMap.Count);
+                    foreach (var kvp in colorMap)
                     {
-                        writer.Write(kvp.Key.ToArgb());
+                        writer.Write(kvp.Key.ToArgb()); // Color
+                        writer.Write(kvp.Value);        // Number
                     }
 
                     MessageBox.Show("저장 완료되었습니다.");
@@ -1042,6 +1054,7 @@ namespace PixelColorling
                 }
             }
         }
+
 
 
 
@@ -1111,12 +1124,16 @@ namespace PixelColorling
                             filledColors[y, x] = Color.FromArgb(reader.ReadInt32());
                         }
 
-                    // 색상 매핑 복원
+                    // ✅ 색상 매핑 복원 (Color + Number)
+                    int colorMapCount = reader.ReadInt32();
                     colorMap = new Dictionary<Color, int>();
-                    for (int i = 0; i < colorCount; i++)
+                    colorNumberToRGB = new Dictionary<int, Color>();
+                    for (int i = 0; i < colorMapCount; i++)
                     {
                         Color col = Color.FromArgb(reader.ReadInt32());
-                        colorMap[col] = i;
+                        int number = reader.ReadInt32();
+                        colorMap[col] = number;
+                        colorNumberToRGB[number] = col;
                     }
 
                     // 팔레트 갱신
@@ -1149,6 +1166,7 @@ namespace PixelColorling
 
 
 
+
         private int Clamp(int val, int min, int max)
         {
             return Math.Max(min, Math.Min(val, max));
@@ -1162,9 +1180,60 @@ namespace PixelColorling
             panelCanvas.Invalidate();
         }
 
+        private void panelPalette_Paint(object sender, PaintEventArgs e)
+        {
 
+        }
 
+        private void panelCanvas_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (colorNumbers == null || colorNumberToRGB == null) return;
 
+            int hBlocks = colorNumbers.GetLength(0);
+            int wBlocks = colorNumbers.GetLength(1);
+
+            float scaleX = (float)panelCanvas.Width / wBlocks;
+            float scaleY = (float)panelCanvas.Height / hBlocks;
+            float cellSize = Math.Min(scaleX, scaleY);
+            int totalW = (int)(cellSize * wBlocks);
+            int totalH = (int)(cellSize * hBlocks);
+            int offsetX = (panelCanvas.Width - totalW) / 2;
+            int offsetY = (panelCanvas.Height - totalH) / 2;
+
+            int cx = (int)((e.X - offsetX) / cellSize);
+            int cy = (int)((e.Y - offsetY) / cellSize);
+
+            if (cx < 0 || cx >= wBlocks || cy < 0 || cy >= hBlocks) return;
+
+            int colorNum = colorNumbers[cy, cx];
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"좌표: ({cx}, {cy})");
+            sb.AppendLine($"번호: {colorNum}");
+
+            if (colorNumberToRGB.TryGetValue(colorNum, out Color baseColor))
+            {
+                sb.AppendLine($"도안 색상: RGB({baseColor.R}, {baseColor.G}, {baseColor.B})");
+
+                if (isFilled != null && isFilled[cy, cx])
+                {
+                    Color userColor = filledColors[cy, cx];
+                    sb.AppendLine($"사용자 색상: RGB({userColor.R}, {userColor.G}, {userColor.B})");
+
+                    double dr = baseColor.R - userColor.R;
+                    double dg = baseColor.G - userColor.G;
+                    double db = baseColor.B - userColor.B;
+
+                    double distance = Math.Sqrt(dr * dr + dg * dg + db * db);
+                    double maxDistance = Math.Sqrt(3) * 255.0; // 255 * sqrt(3)
+                    double similarity = 100.0 - (distance / maxDistance * 100.0);
+
+                    sb.AppendLine($"색상 유사도 (RGB 거리 기반): {similarity:F1}%");
+
+                }
+            }
+
+            toolTip1.SetToolTip(panelCanvas, sb.ToString());
+        }
 
 
 
