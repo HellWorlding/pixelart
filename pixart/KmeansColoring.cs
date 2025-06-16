@@ -609,7 +609,20 @@ namespace pixel
                         // 색칠 안 된 셀은 숫자 표시
                         int number = numberGrid[y, x];
                         string text = number.ToString();
-                        g.DrawString(text, font, textBrush, left + 4, top + 4);
+
+                        // 번호에 해당하는 색상 얻기
+                        if (numberToColor.TryGetValue(number, out Color color))
+                        {
+                            using (Brush numberBrush = new SolidBrush(color))
+                            {
+                                g.DrawString(text, font, numberBrush, left + 4, top + 4);
+                            }
+                        }
+                        else
+                        {
+                            g.DrawString(text, font, Brushes.Black, left + 4, top + 4); // fallback
+                        }
+
                     }
 
                     // 테두리
@@ -627,12 +640,7 @@ namespace pixel
             }
         }
 
-        // 랜덤 색상 생성(색상 겹쳤을 시)
-        private int RandomOffset(Random rnd)
-        {
-            // -12 ~ +12 (2.5% of 255 ≈ 6)
-            return rnd.Next(-6, 7);
-        }
+        
         // byte 범위 내에서 색상 값 설정
         private int ClampColorComponent(int value)
         {
@@ -829,10 +837,6 @@ namespace pixel
 
         }
 
-        private void toolStripComboBox1_Click(object sender, EventArgs e)
-        {
-
-        }
 
         private void cbxMode_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -1220,6 +1224,32 @@ namespace pixel
 
         private void tsmiLoadGrid_Click(object sender, EventArgs e)
         {
+            // 1️⃣ 기존 도안이 있는 경우 경고
+            if (numberGrid != null)
+            {
+                DialogResult confirm = MessageBox.Show(
+                    "이미 도안이 있습니다.\n도안을 불러오시겠습니까?\n(기존 도안은 사라질 수 있습니다.)",
+                    "도안 덮어쓰기 확인",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning);
+
+                if (confirm == DialogResult.No)
+                    return;
+
+                // 2️⃣ 저장 여부 확인
+                DialogResult saveConfirm = MessageBox.Show(
+                    "기존 도안을 저장하시겠습니까?",
+                    "도안 저장",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+
+                if (saveConfirm == DialogResult.Yes)
+                {
+                    tsmiSaveGrid.PerformClick(); // 저장 메뉴 항목 실행
+                }
+            }
+
+            // 3️⃣ Load 다이얼로그
             OpenFileDialog ofd = new OpenFileDialog
             {
                 Filter = "Grid Coloring Save File (*.gcsave)|*.gcsave"
@@ -1273,6 +1303,7 @@ namespace pixel
         }
 
 
+
         private void DrawLegend()
         {
             panelLegend.Controls.Clear();
@@ -1313,8 +1344,52 @@ namespace pixel
             }
         }
 
+        private void tsbtnColorAll_Click(object sender, EventArgs e)
+        {
+            btnColoringKmeans.PerformClick();
+        }
 
+        private void tsButtonImageLoad_Click(object sender, EventArgs e)
+        {
+            btnLoad.PerformClick();
+        }
 
+        private void tsButtonGridDownload_Click(object sender, EventArgs e)
+        {
+            tsmiSaveGrid.PerformClick();
+        }
+
+        private void tsButtonGridLoad_Click(object sender, EventArgs e)
+        {
+            tsmiLoadGrid.PerformClick();
+        }
+
+        private void tsButtonImgSave_Click(object sender, EventArgs e)
+        {
+            btnSave.PerformClick();
+        }
+
+        private void KmeansColoring_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (numberGrid != null) // 도안이 있는 경우만 경고
+            {
+                DialogResult result = MessageBox.Show(
+                    "도안을 저장하시겠습니까?",
+                    "종료 전 저장",
+                    MessageBoxButtons.YesNoCancel,
+                    MessageBoxIcon.Question);
+
+                if (result == DialogResult.Yes)
+                {
+                    tsmiSaveGrid.PerformClick(); // 저장 호출
+                }
+                else if (result == DialogResult.Cancel)
+                {
+                    e.Cancel = true; // 닫기 취소
+                }
+                // 아니오 선택 시 그냥 닫힘
+            }
+        }
     }
 }
 

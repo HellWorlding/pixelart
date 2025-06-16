@@ -63,8 +63,13 @@
             this.label1 = new System.Windows.Forms.Label();
             this.cbxMode = new System.Windows.Forms.ComboBox();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.tsButtonImageLoad = new System.Windows.Forms.ToolStripButton();
             this.btnColorSelect = new System.Windows.Forms.ToolStripButton();
             this.btnSize = new System.Windows.Forms.ToolStripButton();
+            this.tsbtnColorAll = new System.Windows.Forms.ToolStripButton();
+            this.tsButtonImgSave = new System.Windows.Forms.ToolStripButton();
+            this.tsButtonGridDownload = new System.Windows.Forms.ToolStripButton();
+            this.tsButtonGridLoad = new System.Windows.Forms.ToolStripButton();
             this.panel1 = new System.Windows.Forms.Panel();
             this.btnColorPartition = new System.Windows.Forms.Button();
             this.btnSize5 = new System.Windows.Forms.Button();
@@ -105,10 +110,10 @@
             // 
             // btnPixelate
             // 
-            this.btnPixelate.Location = new System.Drawing.Point(188, 192);
+            this.btnPixelate.Location = new System.Drawing.Point(46, 211);
             this.btnPixelate.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnPixelate.Name = "btnPixelate";
-            this.btnPixelate.Size = new System.Drawing.Size(83, 18);
+            this.btnPixelate.Size = new System.Drawing.Size(83, 42);
             this.btnPixelate.TabIndex = 2;
             this.btnPixelate.Text = "픽셀화하기";
             this.btnPixelate.UseVisualStyleBackColor = true;
@@ -202,7 +207,7 @@
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(130, 24);
             this.btnSave.TabIndex = 12;
-            this.btnSave.Text = "저장하기";
+            this.btnSave.Text = "이미지 저장하기";
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
@@ -231,28 +236,28 @@
             // tsmiImageLoad
             // 
             this.tsmiImageLoad.Name = "tsmiImageLoad";
-            this.tsmiImageLoad.Size = new System.Drawing.Size(180, 22);
+            this.tsmiImageLoad.Size = new System.Drawing.Size(162, 22);
             this.tsmiImageLoad.Text = "이미지 불러오기";
             this.tsmiImageLoad.Click += new System.EventHandler(this.tsmiImageLoad_Click);
             // 
             // tsmiImgSave
             // 
             this.tsmiImgSave.Name = "tsmiImgSave";
-            this.tsmiImgSave.Size = new System.Drawing.Size(180, 22);
+            this.tsmiImgSave.Size = new System.Drawing.Size(162, 22);
             this.tsmiImgSave.Text = "이미지 저장";
             this.tsmiImgSave.Click += new System.EventHandler(this.tsmiImgSave_Click);
             // 
             // tsmiLoadGrid
             // 
             this.tsmiLoadGrid.Name = "tsmiLoadGrid";
-            this.tsmiLoadGrid.Size = new System.Drawing.Size(180, 22);
+            this.tsmiLoadGrid.Size = new System.Drawing.Size(162, 22);
             this.tsmiLoadGrid.Text = "도안 불러오기";
             this.tsmiLoadGrid.Click += new System.EventHandler(this.tsmiLoadGrid_Click);
             // 
             // tsmiSaveGrid
             // 
             this.tsmiSaveGrid.Name = "tsmiSaveGrid";
-            this.tsmiSaveGrid.Size = new System.Drawing.Size(180, 22);
+            this.tsmiSaveGrid.Size = new System.Drawing.Size(162, 22);
             this.tsmiSaveGrid.Text = "도안 저장";
             this.tsmiSaveGrid.Click += new System.EventHandler(this.tsmiSaveGrid_Click);
             // 
@@ -361,14 +366,29 @@
             // 
             this.toolStrip1.Dock = System.Windows.Forms.DockStyle.Left;
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsButtonImageLoad,
             this.btnColorSelect,
-            this.btnSize});
+            this.btnSize,
+            this.tsbtnColorAll,
+            this.tsButtonImgSave,
+            this.tsButtonGridDownload,
+            this.tsButtonGridLoad});
             this.toolStrip1.Location = new System.Drawing.Point(0, 24);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
             this.toolStrip1.Size = new System.Drawing.Size(31, 590);
             this.toolStrip1.TabIndex = 18;
             this.toolStrip1.Text = "toolStrip1";
+            // 
+            // tsButtonImageLoad
+            // 
+            this.tsButtonImageLoad.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonImageLoad.Image = ((System.Drawing.Image)(resources.GetObject("tsButtonImageLoad.Image")));
+            this.tsButtonImageLoad.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsButtonImageLoad.Name = "tsButtonImageLoad";
+            this.tsButtonImageLoad.Size = new System.Drawing.Size(28, 20);
+            this.tsButtonImageLoad.Text = "이미지 불러오기";
+            this.tsButtonImageLoad.Click += new System.EventHandler(this.tsButtonImageLoad_Click);
             // 
             // btnColorSelect
             // 
@@ -379,7 +399,7 @@
             this.btnColorSelect.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnColorSelect.Name = "btnColorSelect";
             this.btnColorSelect.Size = new System.Drawing.Size(30, 30);
-            this.btnColorSelect.Text = "toolStripButton1";
+            this.btnColorSelect.Text = "펜 색 설정하기";
             this.btnColorSelect.Click += new System.EventHandler(this.btnColorSelect_Click);
             // 
             // btnSize
@@ -390,8 +410,48 @@
             this.btnSize.Name = "btnSize";
             this.btnSize.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.btnSize.Size = new System.Drawing.Size(28, 20);
-            this.btnSize.Text = "toolStripButton7";
+            this.btnSize.Text = "펜 두께 설정하기";
             this.btnSize.Click += new System.EventHandler(this.btnSize_Click);
+            // 
+            // tsbtnColorAll
+            // 
+            this.tsbtnColorAll.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsbtnColorAll.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnColorAll.Image")));
+            this.tsbtnColorAll.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsbtnColorAll.Name = "tsbtnColorAll";
+            this.tsbtnColorAll.Size = new System.Drawing.Size(28, 20);
+            this.tsbtnColorAll.Text = "전체 색칠하기";
+            this.tsbtnColorAll.Click += new System.EventHandler(this.tsbtnColorAll_Click);
+            // 
+            // tsButtonImgSave
+            // 
+            this.tsButtonImgSave.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonImgSave.Image = ((System.Drawing.Image)(resources.GetObject("tsButtonImgSave.Image")));
+            this.tsButtonImgSave.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsButtonImgSave.Name = "tsButtonImgSave";
+            this.tsButtonImgSave.Size = new System.Drawing.Size(28, 20);
+            this.tsButtonImgSave.Text = "이미지 저장하기";
+            this.tsButtonImgSave.Click += new System.EventHandler(this.tsButtonImgSave_Click);
+            // 
+            // tsButtonGridDownload
+            // 
+            this.tsButtonGridDownload.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonGridDownload.Image = ((System.Drawing.Image)(resources.GetObject("tsButtonGridDownload.Image")));
+            this.tsButtonGridDownload.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsButtonGridDownload.Name = "tsButtonGridDownload";
+            this.tsButtonGridDownload.Size = new System.Drawing.Size(28, 20);
+            this.tsButtonGridDownload.Text = "도안 저장하기";
+            this.tsButtonGridDownload.Click += new System.EventHandler(this.tsButtonGridDownload_Click);
+            // 
+            // tsButtonGridLoad
+            // 
+            this.tsButtonGridLoad.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsButtonGridLoad.Image = ((System.Drawing.Image)(resources.GetObject("tsButtonGridLoad.Image")));
+            this.tsButtonGridLoad.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsButtonGridLoad.Name = "tsButtonGridLoad";
+            this.tsButtonGridLoad.Size = new System.Drawing.Size(28, 20);
+            this.tsButtonGridLoad.Text = "toolStripButton2";
+            this.tsButtonGridLoad.Click += new System.EventHandler(this.tsButtonGridLoad_Click);
             // 
             // panel1
             // 
@@ -399,7 +459,7 @@
             this.panel1.Controls.Add(this.btnSize5);
             this.panel1.Controls.Add(this.btnSize3);
             this.panel1.Controls.Add(this.btnSize1);
-            this.panel1.Location = new System.Drawing.Point(32, 63);
+            this.panel1.Location = new System.Drawing.Point(32, 88);
             this.panel1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(147, 26);
@@ -477,6 +537,7 @@
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "KmeansColoring";
             this.Text = "Form1";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.KmeansColoring_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.picPreview)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numPixelSize)).EndInit();
@@ -535,6 +596,11 @@
         private System.Windows.Forms.ToolStripMenuItem tsmiThick5x5;
         private System.Windows.Forms.ToolStripMenuItem tsmiThickPartition;
         private System.Windows.Forms.ToolStripMenuItem 도안전체색칠하기ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripButton tsButtonImageLoad;
+        private System.Windows.Forms.ToolStripButton tsbtnColorAll;
+        private System.Windows.Forms.ToolStripButton tsButtonGridDownload;
+        private System.Windows.Forms.ToolStripButton tsButtonImgSave;
+        private System.Windows.Forms.ToolStripButton tsButtonGridLoad;
     }
 }
 

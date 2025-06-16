@@ -276,13 +276,15 @@ namespace PixelColorling
                     originalImage = new Bitmap(loaded); // 원본 저장
                     loaded.Dispose();
 
+
                     // 패널 크기에 맞게 리사이즈된 이미지 생성
                     Bitmap resizedCanvas = ResizeToFit(originalImage, panelCanvas.Width, panelCanvas.Height);
                     Bitmap resizedOriginal = ResizeToFit(originalImage, panelOriginalImg.Width, panelOriginalImg.Height);
 
                     // 배경 이미지로 설정 (만약 panelOriginalImg가 PictureBox면 .Image 사용)
-                    panelCanvas.BackgroundImage = resizedCanvas;
-                    panelCanvas.BackgroundImageLayout = ImageLayout.Center;
+                    //panelCanvas.BackgroundImage = resizedCanvas;
+                    //panelCanvas.BackgroundImageLayout = ImageLayout.Center;
+                    panelCanvas.BackgroundImage = null;
 
                     panelOriginalImg.BackgroundImage = resizedOriginal;
                     panelOriginalImg.BackgroundImageLayout = ImageLayout.Center;
@@ -618,6 +620,16 @@ namespace PixelColorling
             if (colorNumbers == null || colorMap == null || blockSize == 0)
                 return;
 
+            DialogResult confirm = MessageBox.Show(
+                "전체를 자동으로 색칠하시겠습니까?",
+                "자동 색칠 확인",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question
+            );
+
+            if (confirm != DialogResult.Yes)
+                return; // 아니오 선택 시 취소
+
             int height = colorNumbers.GetLength(0);
             int width = colorNumbers.GetLength(1);
 
@@ -645,6 +657,7 @@ namespace PixelColorling
             RepaintCanvas();           // panelCanvas.Invalidate()
             panelCompare.Invalidate(); // 비교 패널 갱신
         }
+
 
 
 
@@ -1018,19 +1031,34 @@ namespace PixelColorling
 
                 try
                 {
+                    // 사전 유효성 검사
+                    if (originalImage == null || paintedResultBitmap == null)
+                    {
+                        MessageBox.Show("이미지 또는 결과가 없습니다. 먼저 도안을 생성하세요.");
+                        return;
+                    }
+
+                    int height = colorNumbers?.GetLength(0) ?? 0;
+                    int width = colorNumbers?.GetLength(1) ?? 0;
+                    if (height == 0 || width == 0)
+                    {
+                        MessageBox.Show("도안 정보가 유효하지 않습니다.");
+                        return;
+                    }
+
                     fs = File.Open(sfd.FileName, FileMode.Create);
                     writer = new BinaryWriter(fs);
 
-                    // 1. originalImage 저장
+                    // 1. originalImage 저장 (PNG 바이트)
                     using (MemoryStream ms = new MemoryStream())
                     {
                         originalImage.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
                         byte[] bytes = ms.ToArray();
-                        writer.Write(bytes.Length);
-                        writer.Write(bytes);
+                        writer.Write(bytes.Length);   // 먼저 길이 저장
+                        writer.Write(bytes);          // 다음에 내용 저장
                     }
 
-                    // 2. paintedResultBitmap 저장
+                    // 2. paintedResultBitmap 저장 (PNG 바이트)
                     using (MemoryStream ms = new MemoryStream())
                     {
                         paintedResultBitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
@@ -1039,21 +1067,20 @@ namespace PixelColorling
                         writer.Write(bytes);
                     }
 
-                    // 3. 도안 정보 저장
-                    int height = colorNumbers.GetLength(0);
-                    int width = colorNumbers.GetLength(1);
-
+                    // 3. 도안 메타데이터 저장
                     writer.Write(width);
                     writer.Write(height);
                     writer.Write(blockSize);
-                    writer.Write(colorMap.Count); // colorCount
+                    writer.Write(colorCount);
                     writer.Write((int)currentBinningMode);
                     writer.Write((int)currentDifficulty);
 
+                    // 4. colorNumbers 저장
                     for (int y = 0; y < height; y++)
                         for (int x = 0; x < width; x++)
                             writer.Write(colorNumbers[y, x]);
 
+                    // 5. 색칠 정보 저장
                     for (int y = 0; y < height; y++)
                         for (int x = 0; x < width; x++)
                         {
@@ -1061,15 +1088,19 @@ namespace PixelColorling
                             writer.Write(filledColors[y, x].ToArgb());
                         }
 
-                    // ✅ 색상과 번호 함께 저장
+                    // 6. 색상 매핑 저장 (색상→번호)
                     writer.Write(colorMap.Count);
                     foreach (var kvp in colorMap)
                     {
-                        writer.Write(kvp.Key.ToArgb()); // Color
-                        writer.Write(kvp.Value);        // Number
+                        writer.Write(kvp.Key.ToArgb());
+                        writer.Write(kvp.Value);
                     }
 
-                    MessageBox.Show("저장 완료되었습니다.");
+                    MessageBox.Show("도안 저장이 완료되었습니다.");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("저장 중 오류 발생: " + ex.Message);
                 }
                 finally
                 {
@@ -1087,14 +1118,42 @@ namespace PixelColorling
 
 
 
+
         private void tsmiLoadGrid_Click(object sender, EventArgs e)
         {
+            // ✅ 안전장치 추가: 기존 도안이 있을 경우 확인
+            if (isPatternGenerated)
+            {
+                DialogResult confirm = MessageBox.Show(
+                    "기존 도안을 불러오시겠습니까?\n현재 작업 내용은 사라질 수 있습니다.",
+                    "도안 불러오기 확인",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning
+                );
+
+                if (confirm == DialogResult.No)
+                    return;
+
+                DialogResult save = MessageBox.Show(
+                    "기존 도안을 저장하시겠습니까?",
+                    "도안 저장 확인",
+                    MessageBoxButtons.YesNoCancel,
+                    MessageBoxIcon.Question
+                );
+
+                if (save == DialogResult.Cancel)
+                    return;
+
+                if (save == DialogResult.Yes)
+                    tsmiSaveGrid_Click(null, null);
+            }
+
+            // 🟩 이후는 기존 LoadGrid 로직 동일
             OpenFileDialog ofd = new OpenFileDialog
             {
                 Filter = "Grid Coloring Save (*.gcsave)|*.gcsave",
                 Title = "Load Coloring Project"
             };
-            isPatternGenerated = false; // 패턴이 새로 생성되지 않았음을 표시
             if (ofd.ShowDialog() == DialogResult.OK)
             {
                 FileStream fs = null;
@@ -1105,21 +1164,32 @@ namespace PixelColorling
                     fs = File.Open(ofd.FileName, FileMode.Open);
                     reader = new BinaryReader(fs);
 
+                    // ✅ 초기화
+                    originalImage?.Dispose();
+                    paintedResultBitmap?.Dispose();
+
+                    originalImage = null;
+                    paintedResultBitmap = null;
+                    blockColors = null;
+                    simplifiedColors = null;
+                    colorNumbers = null;
+                    isFilled = null;
+                    filledColors = null;
+                    colorMap.Clear();
+                    colorNumberToRGB.Clear();
+                    selectedPoint = null;
+
                     // 1. originalImage 복원
                     int origLen = reader.ReadInt32();
                     byte[] origBytes = reader.ReadBytes(origLen);
                     using (MemoryStream ms = new MemoryStream(origBytes))
-                    {
                         originalImage = new Bitmap(ms);
-                    }
 
                     // 2. paintedResultBitmap 복원
                     int paintLen = reader.ReadInt32();
                     byte[] paintBytes = reader.ReadBytes(paintLen);
                     using (MemoryStream ms = new MemoryStream(paintBytes))
-                    {
                         paintedResultBitmap = new Bitmap(ms);
-                    }
 
                     // 3. 도안 정보 복원
                     int width = reader.ReadInt32();
@@ -1129,7 +1199,6 @@ namespace PixelColorling
                     currentBinningMode = (BinningMode)reader.ReadInt32();
                     currentDifficulty = (DifficultyLevel)reader.ReadInt32();
 
-                    // ComboBox Index 유효성 검사
                     cbxColorType.SelectedIndex = Math.Max(0, Math.Min((int)currentBinningMode, cbxColorType.Items.Count - 1));
                     cbxDifficulty.SelectedIndex = Math.Max(0, Math.Min((int)currentDifficulty, cbxDifficulty.Items.Count - 1));
 
@@ -1148,27 +1217,42 @@ namespace PixelColorling
                             filledColors[y, x] = Color.FromArgb(reader.ReadInt32());
                         }
 
-                    // ✅ 색상 매핑 복원 (Color + Number)
                     int colorMapCount = reader.ReadInt32();
-                    colorMap = new Dictionary<Color, int>();
-                    colorNumberToRGB = new Dictionary<int, Color>();
                     for (int i = 0; i < colorMapCount; i++)
                     {
-                        Color col = Color.FromArgb(reader.ReadInt32());
+                        Color color = Color.FromArgb(reader.ReadInt32());
                         int number = reader.ReadInt32();
-                        colorMap[col] = number;
-                        colorNumberToRGB[number] = col;
+                        colorMap[color] = number;
+                        colorNumberToRGB[number] = color;
                     }
 
-                    // 팔레트 갱신
-                    CreateColorPalette();
+                    blockColors = new Color[height, width];
+                    simplifiedColors = new Color[height, width];
+                    for (int y = 0; y < height; y++)
+                        for (int x = 0; x < width; x++)
+                        {
+                            int colorNum = colorNumbers[y, x];
+                            if (colorNumberToRGB.TryGetValue(colorNum, out Color color))
+                            {
+                                blockColors[y, x] = color;
+                                simplifiedColors[y, x] = color;
+                            }
+                            else
+                            {
+                                blockColors[y, x] = Color.Gray;
+                                simplifiedColors[y, x] = Color.Gray;
+                            }
+                        }
 
-                    // UI 반영
+                    isPatternGenerated = true;
+
+                    panelCanvas.BackgroundImage = null;
+                    panelCanvas.BackgroundImageLayout = ImageLayout.None;
+
                     panelOriginalImg.BackgroundImage = ResizeToFit(originalImage, panelOriginalImg.Width, panelOriginalImg.Height);
                     panelOriginalImg.BackgroundImageLayout = ImageLayout.Center;
 
-                    panelCanvas.BackgroundImage = ResizeToFit(paintedResultBitmap, panelCanvas.Width, panelCanvas.Height);
-                    panelCanvas.BackgroundImageLayout = ImageLayout.Center;
+                    CreateColorPalette();
 
                     panelCanvas.Invalidate();
                     panelCompare.Invalidate();
@@ -1189,12 +1273,6 @@ namespace PixelColorling
 
 
 
-
-
-        private int Clamp(int val, int min, int max)
-        {
-            return Math.Max(min, Math.Min(val, max));
-        }
 
 
 
@@ -1267,6 +1345,54 @@ namespace PixelColorling
         private void 펜굵기선택하기ToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void Coloring_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (!isPatternGenerated)
+                return; // 도안 없으면 그냥 종료
+
+            DialogResult result = MessageBox.Show(
+                "도안을 저장하시겠습니까?",
+                "종료 확인",
+                MessageBoxButtons.YesNoCancel,
+                MessageBoxIcon.Question
+            );
+
+            if (result == DialogResult.Yes)
+            {
+                tsmiSaveGrid_Click(null, null); // 저장
+            }
+            else if (result == DialogResult.Cancel)
+            {
+                e.Cancel = true; // 종료 취소
+            }
+            // 아니오 → 그냥 종료
+        }
+
+        private void tsbtnColorAll_Click(object sender, EventArgs e)
+        {
+            btnColorAll.PerformClick();
+        }
+
+        private void tsButtonImageLoad_Click(object sender, EventArgs e)
+        {
+            btnLoadImage.PerformClick();
+        }
+
+        private void tsImgSave_Click(object sender, EventArgs e)
+        {
+            btnSave.PerformClick();
+        }
+
+        private void tsButtonGridDownload_Click(object sender, EventArgs e)
+        {
+            tsmiSaveGrid.PerformClick();
+        }
+
+        private void tsButtonGridLoad_Click(object sender, EventArgs e)
+        {
+            tsmiLoadGrid.PerformClick();
         }
     }
 
