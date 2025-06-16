@@ -332,28 +332,28 @@
             // tsmiImageLoad
             // 
             this.tsmiImageLoad.Name = "tsmiImageLoad";
-            this.tsmiImageLoad.Size = new System.Drawing.Size(162, 22);
+            this.tsmiImageLoad.Size = new System.Drawing.Size(180, 22);
             this.tsmiImageLoad.Text = "이미지 불러오기";
             this.tsmiImageLoad.Click += new System.EventHandler(this.tsmiImageLoad_Click);
             // 
             // tsmiImageSave
             // 
             this.tsmiImageSave.Name = "tsmiImageSave";
-            this.tsmiImageSave.Size = new System.Drawing.Size(162, 22);
+            this.tsmiImageSave.Size = new System.Drawing.Size(180, 22);
             this.tsmiImageSave.Text = "이미지 저장";
             this.tsmiImageSave.Click += new System.EventHandler(this.tsmiImageSave_Click);
             // 
             // tsmiLoadGrid
             // 
             this.tsmiLoadGrid.Name = "tsmiLoadGrid";
-            this.tsmiLoadGrid.Size = new System.Drawing.Size(162, 22);
+            this.tsmiLoadGrid.Size = new System.Drawing.Size(180, 22);
             this.tsmiLoadGrid.Text = "도안 불러오기";
             this.tsmiLoadGrid.Click += new System.EventHandler(this.tsmiLoadGrid_Click);
             // 
             // tsmiSaveGrid
             // 
             this.tsmiSaveGrid.Name = "tsmiSaveGrid";
-            this.tsmiSaveGrid.Size = new System.Drawing.Size(162, 22);
+            this.tsmiSaveGrid.Size = new System.Drawing.Size(180, 22);
             this.tsmiSaveGrid.Text = "도안 저장";
             this.tsmiSaveGrid.Click += new System.EventHandler(this.tsmiSaveGrid_Click);
             // 
@@ -371,14 +371,14 @@
             // tsmiGenerate
             // 
             this.tsmiGenerate.Name = "tsmiGenerate";
-            this.tsmiGenerate.Size = new System.Drawing.Size(178, 22);
+            this.tsmiGenerate.Size = new System.Drawing.Size(180, 22);
             this.tsmiGenerate.Text = "도안 생성하기";
             this.tsmiGenerate.Click += new System.EventHandler(this.tsmiGenerate_Click);
             // 
             // tsmiPickPaletteColor
             // 
             this.tsmiPickPaletteColor.Name = "tsmiPickPaletteColor";
-            this.tsmiPickPaletteColor.Size = new System.Drawing.Size(178, 22);
+            this.tsmiPickPaletteColor.Size = new System.Drawing.Size(180, 22);
             this.tsmiPickPaletteColor.Text = "색 선택하기";
             this.tsmiPickPaletteColor.Click += new System.EventHandler(this.tsmiPickPaletteColor_Click);
             // 
@@ -390,41 +390,42 @@
             this.tsmiThick5x5,
             this.tsmiThickPartition});
             this.펜굵기선택하기ToolStripMenuItem.Name = "펜굵기선택하기ToolStripMenuItem";
-            this.펜굵기선택하기ToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
+            this.펜굵기선택하기ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.펜굵기선택하기ToolStripMenuItem.Text = "펜 굵기";
+            this.펜굵기선택하기ToolStripMenuItem.Click += new System.EventHandler(this.펜굵기선택하기ToolStripMenuItem_Click);
             // 
             // tsmiThick1x1
             // 
             this.tsmiThick1x1.Name = "tsmiThick1x1";
-            this.tsmiThick1x1.Size = new System.Drawing.Size(150, 22);
+            this.tsmiThick1x1.Size = new System.Drawing.Size(180, 22);
             this.tsmiThick1x1.Text = "1X1";
             this.tsmiThick1x1.Click += new System.EventHandler(this.tsmiThick1x1_Click);
             // 
             // tsmiThick3x3
             // 
             this.tsmiThick3x3.Name = "tsmiThick3x3";
-            this.tsmiThick3x3.Size = new System.Drawing.Size(150, 22);
+            this.tsmiThick3x3.Size = new System.Drawing.Size(180, 22);
             this.tsmiThick3x3.Text = "3X3";
             this.tsmiThick3x3.Click += new System.EventHandler(this.tsmiThick3x3_Click);
             // 
             // tsmiThick5x5
             // 
             this.tsmiThick5x5.Name = "tsmiThick5x5";
-            this.tsmiThick5x5.Size = new System.Drawing.Size(150, 22);
+            this.tsmiThick5x5.Size = new System.Drawing.Size(180, 22);
             this.tsmiThick5x5.Text = "5X5";
             this.tsmiThick5x5.Click += new System.EventHandler(this.tsmiThick5x5_Click);
             // 
             // tsmiThickPartition
             // 
             this.tsmiThickPartition.Name = "tsmiThickPartition";
-            this.tsmiThickPartition.Size = new System.Drawing.Size(150, 22);
+            this.tsmiThickPartition.Size = new System.Drawing.Size(180, 22);
             this.tsmiThickPartition.Text = "부분 색칠하기";
             this.tsmiThickPartition.Click += new System.EventHandler(this.tsmiThickPartition_Click);
             // 
             // tsmiColorAll
             // 
             this.tsmiColorAll.Name = "tsmiColorAll";
-            this.tsmiColorAll.Size = new System.Drawing.Size(178, 22);
+            this.tsmiColorAll.Size = new System.Drawing.Size(180, 22);
             this.tsmiColorAll.Text = "도안 전체 색칠하기";
             this.tsmiColorAll.Click += new System.EventHandler(this.tsmiColorAll_Click);
             // 

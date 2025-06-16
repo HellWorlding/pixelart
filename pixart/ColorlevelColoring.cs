@@ -1263,6 +1263,11 @@ namespace PixelColorling
         {
 
         }
+
+        private void 펜굵기선택하기ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 
 
@@ -1282,3 +1287,4 @@ namespace PixelColorling
     }
 
 }
+

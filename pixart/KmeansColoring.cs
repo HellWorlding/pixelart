@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml;
 using pixart;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
@@ -21,6 +24,10 @@ namespace pixel
             OKLAB,
             YCbCr
         }
+
+        private int paintSize = 1; // 1, 3, 5 중 하나
+        private bool paintPartition = false; // 분할 칠하기 여부
+
 
         // 원본 이미지 비트맵
         Bitmap originalImage;
@@ -44,10 +51,21 @@ namespace pixel
         // 색상 모드 (RGB, HSV 등)
         private ColorMode currentMode = ColorMode.RGB;
 
+        //비교용 중심점 (픽셀화된 이미지의 중심)
+        private Point? compareCenter = null;
+
+        // 비교용 비트맵
+        private Bitmap compareBitmap = null;
+
+
         public KmeansColoring()
         {
             InitializeComponent();
         }
+
+        private Color selectedCustomColor = Color.Black;
+
+
 
         private void btnLoad_Click(object sender, EventArgs e)
         {
@@ -261,14 +279,11 @@ namespace pixel
                 for (int x = 0; x < gridW; x++)
                 {
                     Color original = colorGrid[y, x];
-                    //Color closest = FindClosestColor(original, representativeColors);
-                    Color closest = FindClosestColor(original, representativeColors, currentMode); // ✅ 수정된 호출
-
+                    Color closest = FindClosestColor(original, representativeColors, currentMode);
                     numberGrid[y, x] = colorToNumber[closest];
                 }
             }
 
-            // 썸네일 표시
             int thumbWidth = picOriginalThumb.Width;
             int thumbHeight = picOriginalThumb.Height;
             Bitmap thumbImage = new Bitmap(originalImage, new Size(thumbWidth, thumbHeight));
@@ -278,21 +293,33 @@ namespace pixel
 
             foreach (var pair in colorToNumber.OrderBy(p => p.Value))
             {
-                Panel swatch = new Panel();
-                swatch.BackColor = pair.Key;
-                swatch.Size = new Size(20, 20);
-                swatch.Margin = new Padding(2);
+                Color color = pair.Key;
+                int number = pair.Value;
 
-                Label label = new Label();
-                label.Text = pair.Value.ToString();
-                label.AutoSize = true;
-                label.TextAlign = ContentAlignment.MiddleCenter;
-                label.Padding = new Padding(0);
+                Panel swatch = new Panel
+                {
+                    BackColor = color,
+                    Size = new Size(20, 20),
+                    Margin = new Padding(2),
+                    Tag = color,
+                    Cursor = Cursors.Hand
+                };
+                swatch.Click += LegendColor_Click;
 
-                FlowLayoutPanel itemPanel = new FlowLayoutPanel();
-                itemPanel.FlowDirection = FlowDirection.TopDown;
-                itemPanel.WrapContents = false;
-                itemPanel.Size = new Size(40, 40);
+                Label label = new Label
+                {
+                    Text = number.ToString(),
+                    AutoSize = true,
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Padding = new Padding(0)
+                };
+
+                FlowLayoutPanel itemPanel = new FlowLayoutPanel
+                {
+                    FlowDirection = FlowDirection.TopDown,
+                    WrapContents = false,
+                    Size = new Size(40, 40)
+                };
 
                 itemPanel.Controls.Add(swatch);
                 itemPanel.Controls.Add(label);
@@ -303,6 +330,16 @@ namespace pixel
             picPreview.Image = null;
             picPreview.Invalidate();
         }
+
+        private void LegendColor_Click(object sender, EventArgs e)
+        {
+            if (sender is Panel panel && panel.Tag is Color color)
+            {
+                selectedCustomColor = color;
+                btnColorSelect.BackColor = color;
+            }
+        }
+
         double ColorDistanceSquared(Color a, Color b, ColorMode mode)
         {
             switch (mode)
@@ -621,51 +658,57 @@ namespace pixel
             if (x < 0 || y < 0 || x >= gridW || y >= gridH)
                 return;
 
-            Point clickedPoint = new Point(x, y);
-            selectedPoint = clickedPoint;  // 선택된 셀 저장
+            selectedPoint = new Point(x, y);
+            int targetNumber = numberGrid[y, x];
 
-            using (ColorDialog dlg = new ColorDialog())
+            // ✅ 고정된 사용자 색상 사용
+            Color newColor = selectedCustomColor;
+
+            if (paintPartition) // 전체 색칠 모드
             {
-                if (dlg.ShowDialog() == DialogResult.OK)
+                for (int i = 0; i < gridH; i++)
                 {
-                    int targetNumber = numberGrid[y, x];
-                    Color baseColor = dlg.Color;
-                    Color newColor = baseColor;
-                    Random rnd = new Random();
-
-                    // 같은 색이 이미 있으면 유사한 다른 색으로 변경 (±6 정도 범위)
-                    while (pixelColors.Values.Contains(newColor))
+                    for (int j = 0; j < gridW; j++)
                     {
-                        newColor = Color.FromArgb(
-                            ClampColorComponent(baseColor.R + RandomOffset(rnd)),
-                            ClampColorComponent(baseColor.G + RandomOffset(rnd)),
-                            ClampColorComponent(baseColor.B + RandomOffset(rnd))
-                        );
-                    }
-
-                    // 전체 셀 순회
-                    for (int i = 0; i < gridH; i++)
-                    {
-                        for (int j = 0; j < gridW; j++)
+                        if (numberGrid[i, j] == targetNumber)
                         {
                             Point pt = new Point(j, i);
-                            if (numberGrid[i, j] == targetNumber)
-                            {
-                                pixelColors[pt] = newColor;
-                                pixelatedImage.SetPixel(j, i, newColor);  // 색상 동기화
-                            }
+                            pixelColors[pt] = newColor;
+                            pixelatedImage.SetPixel(j, i, newColor);
                         }
                     }
+                }
+            }
+            else // paintSize 기반 칠하기
+            {
+                int half = paintSize / 2;
+                for (int dy = -half; dy <= half; dy++)
+                {
+                    for (int dx = -half; dx <= half; dx++)
+                    {
+                        int nx = x + dx;
+                        int ny = y + dy;
 
+                        if (nx >= 0 && nx < gridW && ny >= 0 && ny < gridH)
+                        {
+                            Point pt = new Point(nx, ny);
+                            pixelColors[pt] = newColor;
+                            pixelatedImage.SetPixel(nx, ny, newColor);
+                        }
+                    }
                 }
             }
 
             picPreview.Invalidate();
+            UpdatePanelCompare(x, y);
+
         }
 
 
 
-        // 마우스가 그리드 위에 있을 때 번호 표시
+
+
+
         // 마우스가 그리드 위에 있을 때 번호 표시
         private void picPreview_MouseMove(object sender, MouseEventArgs e)
         {
@@ -767,6 +810,7 @@ namespace pixel
         private void Form1_Load(object sender, EventArgs e)
         {
             //cbxMode.Items.AddRange(new string[] { "RGB", "HSV", "OKLAB", "YCbCr" });
+            panel1.Visible = false; // 시작 시 팬 두깨 숨김
             cbxMode.SelectedIndex = 0; // 기본 RGB
             currentMode = ColorMode.RGB;
 
@@ -936,5 +980,404 @@ namespace pixel
             return Math.Pow(x, 1.0 / 3.0);
         }
 
+        private void btnColorSelect_Click(object sender, EventArgs e)
+        {
+            using (ColorDialog dlg = new ColorDialog())
+            {
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    selectedCustomColor = dlg.Color;
+                    // 사용자에게 미리 보기로 선택 색상 보여주기 (선택사항)
+                    btnColorSelect.BackColor = selectedCustomColor;
+                }
+            }
+        }
+
+        private void btnSize_Click(object sender, EventArgs e)
+        {
+            panel1.Visible = !panel1.Visible;
+        }
+
+        private void btnSize1_Click(object sender, EventArgs e)
+        {
+            paintSize = 1;
+            paintPartition = false;
+            panel1.Visible = false;
+        }
+
+        private void btnSize3_Click(object sender, EventArgs e)
+        {
+            paintSize = 3;
+            paintPartition = false;
+            panel1.Visible = false;
+        }
+
+        private void btnSize5_Click(object sender, EventArgs e)
+        {
+            paintSize = 5;
+            paintPartition = false;
+            panel1.Visible = false;
+        }
+
+        private void btnColorPartition_Click(object sender, EventArgs e)
+        {
+            paintPartition = true;
+            paintSize = 1;
+            panel1.Visible = false;
+        }
+
+
+        private void UpdatePanelCompare(int centerX, int centerY)
+        {
+            compareCenter = new Point(centerX, centerY);
+            panelCompare.Invalidate();  // 다시 그리기 유도
+        }
+
+        private void panelCompare_Paint(object sender, PaintEventArgs e)
+        {
+            if (numberGrid == null || numberToColor == null || compareCenter == null)
+                return;
+
+            Graphics g = e.Graphics;
+            g.Clear(Color.White);
+
+            int gridW = numberGrid.GetLength(1);
+            int gridH = numberGrid.GetLength(0);
+            int radius = paintSize / 2;
+
+            int availableW = panelCompare.Width - 40;
+            int availableH = panelCompare.Height - 40;
+            int cellSize = Math.Min(availableW / (paintSize * 2 + 1), availableH / paintSize);
+
+            int totalWidth = (paintSize * 2 + 1) * cellSize;
+            int totalHeight = paintSize * cellSize;
+            int offsetX = (panelCompare.Width - totalWidth) / 2;
+            int offsetY = (panelCompare.Height - totalHeight) / 2;
+
+            Font font = new Font("Arial", 8);
+            Brush labelBrush = Brushes.Black;
+
+            Point pt = compareCenter.Value;
+
+            // ✅ Brush 캐싱
+            Dictionary<Color, SolidBrush> brushCache = new Dictionary<Color, SolidBrush>();
+            HatchBrush defaultHatchBrush = new HatchBrush(HatchStyle.LargeGrid, Color.LightGray, Color.White);
+
+            for (int dy = -radius; dy <= radius; dy++)
+            {
+                for (int dx = -radius; dx <= radius; dx++)
+                {
+                    int x = pt.X + dx;
+                    int y = pt.Y + dy;
+                    int lx = dx + radius;
+                    int ly = dy + radius;
+
+                    Rectangle rectOriginal = new Rectangle(
+                        offsetX + lx * cellSize,
+                        offsetY + ly * cellSize,
+                        cellSize, cellSize);
+
+                    Rectangle rectFilled = new Rectangle(
+                        offsetX + (paintSize + 1 + lx) * cellSize,
+                        offsetY + ly * cellSize,
+                        cellSize, cellSize);
+
+                    if (x >= 0 && x < gridW && y >= 0 && y < gridH)
+                    {
+                        int number = numberGrid[y, x];
+                        Color originalColor = numberToColor.TryGetValue(number, out var oc) ? oc : Color.Gray;
+
+                        // 🔄 브러시 캐시 재사용
+                        if (!brushCache.TryGetValue(originalColor, out var brushOriginal))
+                        {
+                            brushOriginal = new SolidBrush(originalColor);
+                            brushCache[originalColor] = brushOriginal;
+                        }
+
+                        g.FillRectangle(brushOriginal, rectOriginal);
+                        g.DrawRectangle(Pens.Black, rectOriginal);
+
+                        Point px = new Point(x, y);
+                        if (pixelColors.TryGetValue(px, out var userColor))
+                        {
+                            if (!brushCache.TryGetValue(userColor, out var brushUser))
+                            {
+                                brushUser = new SolidBrush(userColor);
+                                brushCache[userColor] = brushUser;
+                            }
+                            g.FillRectangle(brushUser, rectFilled);
+                        }
+                        else
+                        {
+                            g.FillRectangle(defaultHatchBrush, rectFilled);
+                        }
+
+                        g.DrawRectangle(Pens.Black, rectFilled);
+                    }
+                }
+            }
+
+            // 라벨
+            g.DrawString("Original", font, labelBrush,
+                offsetX + (paintSize * cellSize - 40) / 2,
+                offsetY + paintSize * cellSize + 5);
+            g.DrawString("Colored", font, labelBrush,
+                offsetX + ((paintSize + 1) * cellSize) + (paintSize * cellSize - 40) / 2,
+                offsetY + paintSize * cellSize + 5);
+
+            font.Dispose();
+
+            // 🧹 자원 해제
+            foreach (var b in brushCache.Values) b.Dispose();
+            defaultHatchBrush.Dispose();
+        }
+
+        private void tsmiImageLoad_Click(object sender, EventArgs e)
+        {
+            btnLoad.PerformClick();
+        }
+
+        private void tsmiImgSave_Click(object sender, EventArgs e)
+        {
+            btnSave.PerformClick();
+        }
+
+        private void tsmiGenerate_Click(object sender, EventArgs e)
+        {
+            btnPixelate.PerformClick();
+        }
+
+        private void tsmiPickPaletteColor_Click(object sender, EventArgs e)
+        {
+            btnColorSelect.PerformClick();
+        }
+
+        private void tsmiThick1x1_Click(object sender, EventArgs e)
+        {
+            paintPartition = false;
+            paintSize = 1;
+            panel1.Visible = false;
+        }
+
+        private void tsmiThick3x3_Click(object sender, EventArgs e)
+        {
+            paintPartition = false;
+            paintSize = 3;
+            panel1.Visible = false;
+        }
+
+        private void tsmiThick5x5_Click(object sender, EventArgs e)
+        {
+            paintPartition = false;
+            paintSize = 5;
+            panel1.Visible = false;
+        }
+
+        private void tsmiThickPartition_Click(object sender, EventArgs e)
+        {
+            paintPartition = true;
+            paintSize = 1; // 부분 색칠 모드에서는 기본 굵기 사용
+            panel1.Visible = false;
+        }
+
+        private void tsmiSaveGrid_Click(object sender, EventArgs e)
+        {
+            if (originalImage == null || numberGrid == null || numberToColor == null)
+            {
+                MessageBox.Show("저장할 도안이 없습니다.");
+                return;
+            }
+
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = "Grid Coloring Save File (*.gcsave)|*.gcsave";
+            if (sfd.ShowDialog() != DialogResult.OK) return;
+
+            using (BinaryWriter writer = new BinaryWriter(File.Open(sfd.FileName, FileMode.Create)))
+            {
+                // 1. 원본 이미지 저장
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    originalImage.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                    byte[] imageBytes = ms.ToArray();
+                    writer.Write(imageBytes.Length);
+                    writer.Write(imageBytes);
+                }
+
+                // 2. 대표 색상 수 (K)
+                writer.Write(numberToColor.Count);
+
+                // 3. 색상 번호와 RGB 저장
+                foreach (var pair in numberToColor.OrderBy(p => p.Key))
+                {
+                    writer.Write(pair.Key);
+                    writer.Write(pair.Value.R);
+                    writer.Write(pair.Value.G);
+                    writer.Write(pair.Value.B);
+                }
+
+                // 4. numberGrid (행, 열, 데이터)
+                int h = numberGrid.GetLength(0);
+                int w = numberGrid.GetLength(1);
+                writer.Write(h);
+                writer.Write(w);
+                for (int y = 0; y < h; y++)
+                    for (int x = 0; x < w; x++)
+                        writer.Write(numberGrid[y, x]);
+
+                // 5. 사용자 색칠 데이터
+                writer.Write(pixelColors.Count);
+                foreach (var pair in pixelColors)
+                {
+                    writer.Write(pair.Key.X);
+                    writer.Write(pair.Key.Y);
+                    writer.Write(pair.Value.R);
+                    writer.Write(pair.Value.G);
+                    writer.Write(pair.Value.B);
+                }
+            }
+        }
+
+
+        private void tsmiLoadGrid_Click(object sender, EventArgs e)
+        {
+            // 🌟 기존 상태 안전 초기화
+            originalImage?.Dispose();
+            pixelatedImage?.Dispose();
+            numberGrid = null;
+            pixelColors.Clear();
+            selectedPoint = null;
+            compareCenter = null;
+            numberToColor.Clear();
+            panelLegend.Controls.Clear();
+            picOriginalThumb.Image = null;
+            picPreview.Image = null;
+
+            // 기존처럼 파일 열기
+            OpenFileDialog ofd = new OpenFileDialog
+            {
+                Filter = "Grid Coloring Save File (*.gcsave)|*.gcsave"
+            };
+            if (ofd.ShowDialog() != DialogResult.OK) return;
+
+            using (BinaryReader reader = new BinaryReader(File.Open(ofd.FileName, FileMode.Open)))
+            {
+                // 1. 이미지 복원
+                int imageLength = reader.ReadInt32();
+                byte[] imageBytes = reader.ReadBytes(imageLength);
+                using (MemoryStream ms = new MemoryStream(imageBytes))
+                {
+                    originalImage = new Bitmap(ms);
+                }
+
+                // 2. 픽셀 크기, 색상 수 복원
+                pixelSize = reader.ReadInt32();
+                k = reader.ReadInt32();
+
+                // 3. 색상 매핑 복원
+                int colorCount = reader.ReadInt32();
+                numberToColor = new Dictionary<int, Color>();
+                for (int i = 0; i < colorCount; i++)
+                {
+                    int key = reader.ReadInt32();
+                    int r = reader.ReadByte();
+                    int g = reader.ReadByte();
+                    int b = reader.ReadByte();
+                    numberToColor[key] = Color.FromArgb(r, g, b);
+                }
+
+                // 4. 그리드 복원
+                int h = reader.ReadInt32();
+                int w = reader.ReadInt32();
+                numberGrid = new int[h, w];
+                for (int y = 0; y < h; y++)
+                    for (int x = 0; x < w; x++)
+                        numberGrid[y, x] = reader.ReadInt32();
+
+                // 5. 사용자 색칠 복원
+                int filledCount = reader.ReadInt32();
+                pixelColors = new Dictionary<Point, Color>();
+                for (int i = 0; i < filledCount; i++)
+                {
+                    int x = reader.ReadInt32();
+                    int y = reader.ReadInt32();
+                    int r = reader.ReadByte();
+                    int g = reader.ReadByte();
+                    int b = reader.ReadByte();
+                    pixelColors[new Point(x, y)] = Color.FromArgb(r, g, b);
+                }
+
+                // 6. 미리보기 이미지 재생성
+                pixelatedImage = new Bitmap(w, h);
+                foreach (var pair in pixelColors)
+                {
+                    pixelatedImage.SetPixel(pair.Key.X, pair.Key.Y, pair.Value);
+                }
+
+                // 7. 썸네일 이미지 표시
+                picOriginalThumb.Image = new Bitmap(originalImage, picOriginalThumb.Size);
+
+                // 8. 색상 범례 다시 생성
+                DrawLegend();
+
+                // 9. 그리드와 비교 화면 갱신
+                picPreview.Invalidate();
+                UpdatePanelCompare(0, 0);
+            }
+        }
+
+        private void DrawLegend()
+        {
+            panelLegend.Controls.Clear();
+
+            foreach (var pair in numberToColor.OrderBy(p => p.Key))
+            {
+                Color color = pair.Value;
+                int number = pair.Key;
+
+                Panel swatch = new Panel
+                {
+                    BackColor = color,
+                    Size = new Size(20, 20),
+                    Margin = new Padding(2),
+                    Tag = color,
+                    Cursor = Cursors.Hand
+                };
+                swatch.Click += LegendColor_Click;
+
+                Label label = new Label
+                {
+                    Text = number.ToString(),
+                    AutoSize = true,
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Padding = new Padding(0)
+                };
+
+                FlowLayoutPanel itemPanel = new FlowLayoutPanel
+                {
+                    FlowDirection = FlowDirection.TopDown,
+                    WrapContents = false,
+                    Size = new Size(40, 40)
+                };
+
+                itemPanel.Controls.Add(swatch);
+                itemPanel.Controls.Add(label);
+                panelLegend.Controls.Add(itemPanel);
+            }
+        }
+
+
+
     }
 }
+
+[Serializable]
+public class GridSaveDataSimple
+{
+    public byte[] ImageBytes;
+    public int PixelSize;
+    public int K;
+    public Dictionary<int, Color> NumberToColor;
+    public int[,] NumberGrid;
+    public Dictionary<Point, Color> PixelColors;
+}
+
