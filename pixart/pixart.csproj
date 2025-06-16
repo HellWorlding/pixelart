@@ -46,6 +46,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="dualModeColoring.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="dualModeColoring.Designer.cs">
+      <DependentUpon>dualModeColoring.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Packet.cs" />
     <Compile Include="dualMode.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -74,6 +81,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="dualMode.resx">
       <DependentUpon>dualMode.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="dualModeColoring.resx">
+      <DependentUpon>dualModeColoring.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="explanation.resx">
       <DependentUpon>explanation.cs</DependentUpon>

@@ -4,9 +4,12 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using pixart;
 
 namespace PixelColorling
 {
@@ -23,22 +26,12 @@ namespace PixelColorling
         private bool[,] isFilled;           // 셀이 색칠되었는지 여부
         private Color[,] filledColors;      // 셀에 실제 색칠한 색상
 
-
         public Coloring()
         {
-            InitializeComponent(); 
-            this.Load += Coloring_Load; 
+            InitializeComponent();
+
         }
 
-        private void Coloring_Load(object sender, EventArgs e)
-        {
-            // 난이도 설정 제거, 가로 픽셀 수로 조정
-
-            // 가로 셀 수 기본 설정 (예: 30)
-            numPixelSize.Value = 30;
-            numPixelSize.Minimum = 5;
-            numPixelSize.Maximum = 100;
-        }
 
 
         private void btnGenerate_Click(object sender, EventArgs e)
@@ -318,7 +311,6 @@ namespace PixelColorling
             float offsetX = (panelCanvas.Width - totalW) / 2;
             float offsetY = (panelCanvas.Height - totalH) / 2;
 
-            // 실제 클릭 좌표를 도안 셀 인덱스로 변환
             int x = (int)((e.X - offsetX) / cellSize);
             int y = (int)((e.Y - offsetY) / cellSize);
 
@@ -346,6 +338,7 @@ namespace PixelColorling
                 MessageBox.Show("선택한 색상과 셀의 색상 번호가 다릅니다!");
             }
         }
+
 
 
         private void btnColorAll_Click(object sender, EventArgs e)
