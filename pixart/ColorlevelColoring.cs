@@ -52,6 +52,20 @@ namespace PixelColorling
 
         private bool isPatternGenerated = false;  // 도안 생성 여부 체크용
 
+        public class ColoringAction
+        {
+            public Point Position { get; set; }
+            public Color PreviousColor { get; set; }
+            public bool WasFilled { get; set; }
+        }
+
+        public class CompoundAction
+        {
+            public List<ColoringAction> Changes { get; } = new List<ColoringAction>();
+        }
+
+        private Stack<CompoundAction> undoStack = new Stack<CompoundAction>();
+        private Stack<CompoundAction> redoStack = new Stack<CompoundAction>();
 
 
 
@@ -75,7 +89,7 @@ namespace PixelColorling
 
 
             panel1.Visible = !panel1.Visible;
-
+            this.KeyPreview = true;
         }
 
 
@@ -108,6 +122,9 @@ namespace PixelColorling
                 }
             }
             isPatternGenerated = false;
+            undoStack.Clear();
+            redoStack.Clear();
+
 
             int desiredGridW = (int)numPixelSize.Value;
             blockSize = originalImage.Width / desiredGridW;
@@ -539,6 +556,8 @@ namespace PixelColorling
 
                 selectedPoint = new Point(cx, cy);
 
+                CompoundAction action = new CompoundAction();  // ✅ 변경 기록용
+
                 if (colorPartitionMode)
                 {
                     int targetNumber = colorNumbers[cy, cx];
@@ -549,6 +568,17 @@ namespace PixelColorling
                         {
                             if (colorNumbers[y, x] == targetNumber)
                             {
+                                // 이전 상태 저장
+                                if (isFilled[y, x] && filledColors[y, x] == selectedColor)
+                                    continue; // 동일 색이면 기록 생략
+
+                                action.Changes.Add(new ColoringAction
+                                {
+                                    Position = new Point(x, y),
+                                    PreviousColor = filledColors[y, x],
+                                    WasFilled = isFilled[y, x]
+                                });
+
                                 isFilled[y, x] = true;
                                 filledColors[y, x] = selectedColor;
 
@@ -565,9 +595,13 @@ namespace PixelColorling
                         }
                     }
 
-                    panelCompare.Invalidate();
+                    if (action.Changes.Count > 0)
+                    {
+                        undoStack.Push(action);
+                        redoStack.Clear();
+                    }
 
-                    // ❌ Partition 모드 유지 (자동 해제 제거)
+                    panelCompare.Invalidate();
                     return;
                 }
 
@@ -582,6 +616,16 @@ namespace PixelColorling
 
                         if (x >= 0 && x < wBlocks && y >= 0 && y < hBlocks)
                         {
+                            if (isFilled[y, x] && filledColors[y, x] == selectedColor)
+                                continue;
+
+                            action.Changes.Add(new ColoringAction
+                            {
+                                Position = new Point(x, y),
+                                PreviousColor = filledColors[y, x],
+                                WasFilled = isFilled[y, x]
+                            });
+
                             isFilled[y, x] = true;
                             filledColors[y, x] = selectedColor;
 
@@ -598,6 +642,12 @@ namespace PixelColorling
                     }
                 }
 
+                if (action.Changes.Count > 0)
+                {
+                    undoStack.Push(action);
+                    redoStack.Clear();
+                }
+
                 panelCompare.Invalidate();
             }
             catch (Exception ex)
@@ -605,6 +655,7 @@ namespace PixelColorling
                 MessageBox.Show("에러: " + ex.Message);
             }
         }
+
 
 
 
@@ -635,28 +686,29 @@ namespace PixelColorling
 
             paintedResultBitmap = new Bitmap(width, height);
 
-            foreach (var kv in colorMap)
+            for (int y = 0; y < height; y++)
             {
-                Color col = kv.Key;
-                int idx = kv.Value;
-
-                for (int y = 0; y < height; y++)
+                for (int x = 0; x < width; x++)
                 {
-                    for (int x = 0; x < width; x++)
+                    int colorNum = colorNumbers[y, x];
+
+                    if (colorNumberToRGB.TryGetValue(colorNum, out Color col))
                     {
-                        if (colorNumbers[y, x] == idx)
-                        {
-                            isFilled[y, x] = true;
-                            filledColors[y, x] = col;
-                            paintedResultBitmap.SetPixel(x, y, col);
-                        }
+                        isFilled[y, x] = true;
+                        filledColors[y, x] = col;
+                        paintedResultBitmap.SetPixel(x, y, col);
                     }
                 }
             }
 
+            // ✅ Undo/Redo 스택 초기화
+            undoStack.Clear();
+            redoStack.Clear();
+
             RepaintCanvas();           // panelCanvas.Invalidate()
             panelCompare.Invalidate(); // 비교 패널 갱신
         }
+
 
 
 
@@ -1397,13 +1449,127 @@ namespace PixelColorling
 
         private void tsmiUndo_Click(object sender, EventArgs e)
         {
-            
+            tsbtnUndo.PerformClick();
         }
 
         private void tsmiRedo_Click(object sender, EventArgs e)
         {
-            
+            tsbtnRedo.PerformClick();
         }
+
+        private void tsbtnUndo_Click(object sender, EventArgs e)
+        {
+            if (undoStack.Count > 0)
+            {
+                CompoundAction last = undoStack.Pop();
+                CompoundAction reverse = new CompoundAction();
+
+                foreach (var change in last.Changes)
+                {
+                    int x = change.Position.X;
+                    int y = change.Position.Y;
+
+                    reverse.Changes.Add(new ColoringAction
+                    {
+                        Position = change.Position,
+                        PreviousColor = filledColors[y, x],
+                        WasFilled = isFilled[y, x]
+                    });
+                }
+
+                ApplyCompoundAction(last, isUndo: true);
+                redoStack.Push(reverse);
+            }
+        }
+
+        private void tsbtnRedo_Click(object sender, EventArgs e)
+        {
+            if (redoStack.Count > 0)
+            {
+                CompoundAction next = redoStack.Pop();
+                CompoundAction reverse = new CompoundAction();
+
+                foreach (var change in next.Changes)
+                {
+                    int x = change.Position.X;
+                    int y = change.Position.Y;
+
+                    reverse.Changes.Add(new ColoringAction
+                    {
+                        Position = change.Position,
+                        PreviousColor = filledColors[y, x],
+                        WasFilled = isFilled[y, x]
+                    });
+                }
+
+                ApplyCompoundAction(next, isUndo: false);
+                undoStack.Push(reverse);
+            }
+        }
+
+        private void ApplyCompoundAction(CompoundAction action, bool isUndo)
+        {
+            if (action == null || blockColors == null) return;
+
+            int hBlocks = blockColors.GetLength(0);
+            int wBlocks = blockColors.GetLength(1);
+            float scaleX = (float)panelCanvas.Width / wBlocks;
+            float scaleY = (float)panelCanvas.Height / hBlocks;
+            float cellSize = Math.Min(scaleX, scaleY);
+            int totalW = (int)(cellSize * wBlocks);
+            int totalH = (int)(cellSize * hBlocks);
+            int offsetX = (panelCanvas.Width - totalW) / 2;
+            int offsetY = (panelCanvas.Height - totalH) / 2;
+
+            foreach (var change in action.Changes)
+            {
+                int x = change.Position.X;
+                int y = change.Position.Y;
+
+                // 복원
+                if (isUndo)
+                {
+                    isFilled[y, x] = change.WasFilled;
+                    filledColors[y, x] = change.PreviousColor;
+                }
+                else
+                {
+                    isFilled[y, x] = true;
+                    filledColors[y, x] = change.PreviousColor;
+                }
+
+                if (paintedResultBitmap != null &&
+                    x >= 0 && x < paintedResultBitmap.Width &&
+                    y >= 0 && y < paintedResultBitmap.Height)
+                {
+                    paintedResultBitmap.SetPixel(x, y,
+                        isFilled[y, x] ? filledColors[y, x] : Color.White);
+                }
+
+                // ✅ 셀 하나만 다시 그리기
+                RectangleF rect = new RectangleF(offsetX + x * cellSize, offsetY + y * cellSize, cellSize, cellSize);
+                panelCanvas.Invalidate(Rectangle.Ceiling(rect));
+            }
+
+            panelCompare.Invalidate();
+        }
+
+        private void Coloring_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control && e.KeyCode == Keys.Z && !e.Shift)
+            {
+                // Ctrl + Z → Undo
+                tsbtnUndo.PerformClick(); // 또는 tsmiUndo.PerformClick();
+                e.Handled = true;
+            }
+            else if (e.Control && e.KeyCode == Keys.Z && e.Shift)
+            {
+                // Ctrl + Shift + Z → Redo
+                tsbtnRedo.PerformClick(); // 또는 tsmiRedo.PerformClick();
+                e.Handled = true;
+            }
+        }
+
     }
 
 
