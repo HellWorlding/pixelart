@@ -525,8 +525,9 @@
             this.Controls.Add(this.btnLoadImage);
             this.Controls.Add(this.panelOriginalImg);
             this.Controls.Add(this.panelCompare);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "dualModeLevelColor";
-            this.Text = "dualModeLevelColor";
+            this.Text = "듀얼 모드 색칠하기";
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.toolStrip1.ResumeLayout(false);

@@ -42,9 +42,10 @@
             this.btnExplanation.FlatAppearance.BorderSize = 2;
             this.btnExplanation.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnExplanation.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.btnExplanation.Location = new System.Drawing.Point(3, 3);
+            this.btnExplanation.Location = new System.Drawing.Point(2, 2);
+            this.btnExplanation.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnExplanation.Name = "btnExplanation";
-            this.btnExplanation.Size = new System.Drawing.Size(180, 44);
+            this.btnExplanation.Size = new System.Drawing.Size(126, 29);
             this.btnExplanation.TabIndex = 0;
             this.btnExplanation.Text = "설명하기";
             this.btnExplanation.UseVisualStyleBackColor = false;
@@ -58,9 +59,10 @@
             this.btnKmeansColor.FlatAppearance.BorderSize = 2;
             this.btnKmeansColor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnKmeansColor.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.btnKmeansColor.Location = new System.Drawing.Point(390, 3);
+            this.btnKmeansColor.Location = new System.Drawing.Point(272, 2);
+            this.btnKmeansColor.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnKmeansColor.Name = "btnKmeansColor";
-            this.btnKmeansColor.Size = new System.Drawing.Size(207, 44);
+            this.btnKmeansColor.Size = new System.Drawing.Size(145, 29);
             this.btnKmeansColor.TabIndex = 1;
             this.btnKmeansColor.Text = "색상 단계로 색칠하기";
             this.btnKmeansColor.UseVisualStyleBackColor = false;
@@ -74,9 +76,10 @@
             this.btnDualMode.FlatAppearance.BorderSize = 2;
             this.btnDualMode.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnDualMode.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.btnDualMode.Location = new System.Drawing.Point(603, 3);
+            this.btnDualMode.Location = new System.Drawing.Point(421, 2);
+            this.btnDualMode.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnDualMode.Name = "btnDualMode";
-            this.btnDualMode.Size = new System.Drawing.Size(172, 44);
+            this.btnDualMode.Size = new System.Drawing.Size(120, 29);
             this.btnDualMode.TabIndex = 2;
             this.btnDualMode.Text = "듀얼모드";
             this.btnDualMode.UseVisualStyleBackColor = false;
@@ -90,9 +93,10 @@
             this.btnColorLevel.FlatAppearance.BorderSize = 2;
             this.btnColorLevel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnColorLevel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.btnColorLevel.Location = new System.Drawing.Point(189, 3);
+            this.btnColorLevel.Location = new System.Drawing.Point(132, 2);
+            this.btnColorLevel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnColorLevel.Name = "btnColorLevel";
-            this.btnColorLevel.Size = new System.Drawing.Size(195, 44);
+            this.btnColorLevel.Size = new System.Drawing.Size(136, 29);
             this.btnColorLevel.TabIndex = 3;
             this.btnColorLevel.Text = "Kmeans로 색칠하기";
             this.btnColorLevel.UseVisualStyleBackColor = false;
@@ -106,23 +110,26 @@
             this.flowLayoutPanel1.Controls.Add(this.btnColorLevel);
             this.flowLayoutPanel1.Controls.Add(this.btnKmeansColor);
             this.flowLayoutPanel1.Controls.Add(this.btnDualMode);
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(191, 426);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(134, 284);
+            this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(779, 50);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(545, 33);
             this.flowLayoutPanel1.TabIndex = 4;
             this.flowLayoutPanel1.WrapContents = false;
             // 
             // startpage
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.ClientSize = new System.Drawing.Size(1143, 675);
+            this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.flowLayoutPanel1);
             this.DoubleBuffered = true;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "startpage";
-            this.Text = "FixCellArt 시작화면３";
+            this.Text = "FixCellArt 시작화면";
             this.flowLayoutPanel1.ResumeLayout(false);
             this.ResumeLayout(false);
 

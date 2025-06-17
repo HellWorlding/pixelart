@@ -283,14 +283,14 @@
             // tsmiGenerate
             // 
             this.tsmiGenerate.Name = "tsmiGenerate";
-            this.tsmiGenerate.Size = new System.Drawing.Size(178, 22);
+            this.tsmiGenerate.Size = new System.Drawing.Size(180, 22);
             this.tsmiGenerate.Text = "도안 생성하기";
             this.tsmiGenerate.Click += new System.EventHandler(this.tsmiGenerate_Click);
             // 
             // tsmiPickPaletteColor
             // 
             this.tsmiPickPaletteColor.Name = "tsmiPickPaletteColor";
-            this.tsmiPickPaletteColor.Size = new System.Drawing.Size(178, 22);
+            this.tsmiPickPaletteColor.Size = new System.Drawing.Size(180, 22);
             this.tsmiPickPaletteColor.Text = "색 선택하기";
             this.tsmiPickPaletteColor.Click += new System.EventHandler(this.tsmiPickPaletteColor_Click);
             // 
@@ -302,7 +302,7 @@
             this.tsmiThick5x5,
             this.tsmiThickPartition});
             this.펜굵기ToolStripMenuItem.Name = "펜굵기ToolStripMenuItem";
-            this.펜굵기ToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
+            this.펜굵기ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.펜굵기ToolStripMenuItem.Text = "펜 굵기";
             // 
             // tsmiThick1x1
@@ -336,21 +336,21 @@
             // tsmiColorAll
             // 
             this.tsmiColorAll.Name = "tsmiColorAll";
-            this.tsmiColorAll.Size = new System.Drawing.Size(178, 22);
+            this.tsmiColorAll.Size = new System.Drawing.Size(180, 22);
             this.tsmiColorAll.Text = "도안 전체 색칠하기";
             this.tsmiColorAll.Click += new System.EventHandler(this.tsmiColorAll_Click);
             // 
             // tsmiUndo
             // 
             this.tsmiUndo.Name = "tsmiUndo";
-            this.tsmiUndo.Size = new System.Drawing.Size(178, 22);
+            this.tsmiUndo.Size = new System.Drawing.Size(180, 22);
             this.tsmiUndo.Text = "되돌리기";
             this.tsmiUndo.Click += new System.EventHandler(this.tsmiUndo_Click);
             // 
             // tsmiRedo
             // 
             this.tsmiRedo.Name = "tsmiRedo";
-            this.tsmiRedo.Size = new System.Drawing.Size(178, 22);
+            this.tsmiRedo.Size = new System.Drawing.Size(180, 22);
             this.tsmiRedo.Text = "다시하기";
             this.tsmiRedo.Click += new System.EventHandler(this.tsmiRedo_Click);
             // 
@@ -436,7 +436,7 @@
             this.btnSize.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnSize.Name = "btnSize";
             this.btnSize.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.btnSize.Size = new System.Drawing.Size(27, 28);
+            this.btnSize.Size = new System.Drawing.Size(28, 28);
             this.btnSize.Text = "펜 두께 설정하기";
             this.btnSize.Click += new System.EventHandler(this.btnSize_Click);
             // 
@@ -446,7 +446,7 @@
             this.tsbtnColorAll.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnColorAll.Image")));
             this.tsbtnColorAll.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbtnColorAll.Name = "tsbtnColorAll";
-            this.tsbtnColorAll.Size = new System.Drawing.Size(27, 28);
+            this.tsbtnColorAll.Size = new System.Drawing.Size(28, 28);
             this.tsbtnColorAll.Text = "전체 색칠하기";
             this.tsbtnColorAll.Click += new System.EventHandler(this.tsbtnColorAll_Click);
             // 
@@ -456,7 +456,7 @@
             this.tsButtonImgSave.Image = ((System.Drawing.Image)(resources.GetObject("tsButtonImgSave.Image")));
             this.tsButtonImgSave.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsButtonImgSave.Name = "tsButtonImgSave";
-            this.tsButtonImgSave.Size = new System.Drawing.Size(27, 28);
+            this.tsButtonImgSave.Size = new System.Drawing.Size(28, 28);
             this.tsButtonImgSave.Text = "이미지 저장하기";
             this.tsButtonImgSave.Click += new System.EventHandler(this.tsButtonImgSave_Click);
             // 
@@ -466,7 +466,7 @@
             this.tsButtonGridDownload.Image = ((System.Drawing.Image)(resources.GetObject("tsButtonGridDownload.Image")));
             this.tsButtonGridDownload.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsButtonGridDownload.Name = "tsButtonGridDownload";
-            this.tsButtonGridDownload.Size = new System.Drawing.Size(27, 28);
+            this.tsButtonGridDownload.Size = new System.Drawing.Size(28, 28);
             this.tsButtonGridDownload.Text = "도안 저장하기";
             this.tsButtonGridDownload.Click += new System.EventHandler(this.tsButtonGridDownload_Click);
             // 
@@ -476,8 +476,8 @@
             this.tsButtonGridLoad.Image = ((System.Drawing.Image)(resources.GetObject("tsButtonGridLoad.Image")));
             this.tsButtonGridLoad.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsButtonGridLoad.Name = "tsButtonGridLoad";
-            this.tsButtonGridLoad.Size = new System.Drawing.Size(27, 28);
-            this.tsButtonGridLoad.Text = "toolStripButton2";
+            this.tsButtonGridLoad.Size = new System.Drawing.Size(28, 28);
+            this.tsButtonGridLoad.Text = "도안 불러오기";
             this.tsButtonGridLoad.Click += new System.EventHandler(this.tsButtonGridLoad_Click);
             // 
             // tsbtnUndo
@@ -486,7 +486,7 @@
             this.tsbtnUndo.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnUndo.Image")));
             this.tsbtnUndo.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbtnUndo.Name = "tsbtnUndo";
-            this.tsbtnUndo.Size = new System.Drawing.Size(27, 28);
+            this.tsbtnUndo.Size = new System.Drawing.Size(28, 28);
             this.tsbtnUndo.Text = "되돌리기";
             this.tsbtnUndo.Click += new System.EventHandler(this.tsbtnUndo_Click);
             // 
@@ -496,7 +496,7 @@
             this.tsbtnRedo.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnRedo.Image")));
             this.tsbtnRedo.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbtnRedo.Name = "tsbtnRedo";
-            this.tsbtnRedo.Size = new System.Drawing.Size(27, 28);
+            this.tsbtnRedo.Size = new System.Drawing.Size(28, 28);
             this.tsbtnRedo.Text = "다시하기";
             this.tsbtnRedo.Click += new System.EventHandler(this.tsbtnRedo_Click);
             // 
@@ -580,10 +580,11 @@
             this.Controls.Add(this.btnLoad);
             this.Controls.Add(this.picPreview);
             this.Controls.Add(this.menuStrip1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "KmeansColoring";
-            this.Text = "Form1";
+            this.Text = "Kmeans 픽셀 색칠";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.KmeansColoring_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KmeansColoring_KeyDown);

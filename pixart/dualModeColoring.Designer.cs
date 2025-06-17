@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(dualModeColoring));
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.panelPeer = new System.Windows.Forms.Panel();
             this.panelCanvas = new System.Windows.Forms.Panel();
@@ -56,46 +57,48 @@
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.5F));
             this.tableLayoutPanel1.Controls.Add(this.panelPeer, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.panelCanvas, 0, 0);
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(267, 20);
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(234, 16);
+            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 1;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(1240, 639);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(1085, 511);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // panelPeer
             // 
             this.panelPeer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelPeer.Location = new System.Drawing.Point(616, 3);
+            this.panelPeer.Location = new System.Drawing.Point(540, 2);
+            this.panelPeer.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panelPeer.Name = "panelPeer";
-            this.panelPeer.Size = new System.Drawing.Size(621, 633);
+            this.panelPeer.Size = new System.Drawing.Size(542, 507);
             this.panelPeer.TabIndex = 0;
             this.panelPeer.Paint += new System.Windows.Forms.PaintEventHandler(this.panelPeer_Paint);
             // 
             // panelCanvas
             // 
             this.panelCanvas.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelCanvas.Location = new System.Drawing.Point(3, 3);
+            this.panelCanvas.Location = new System.Drawing.Point(3, 2);
+            this.panelCanvas.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panelCanvas.Name = "panelCanvas";
-            this.panelCanvas.Size = new System.Drawing.Size(607, 633);
+            this.panelCanvas.Size = new System.Drawing.Size(531, 507);
             this.panelCanvas.TabIndex = 1;
             this.panelCanvas.Paint += new System.Windows.Forms.PaintEventHandler(this.panelCanvas_Paint);
             this.panelCanvas.MouseClick += new System.Windows.Forms.MouseEventHandler(this.panelCanvas_MouseClick);
             // 
             // numPixelSize
             // 
-            this.numPixelSize.Location = new System.Drawing.Point(99, -127);
+            this.numPixelSize.Location = new System.Drawing.Point(87, -102);
             this.numPixelSize.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.numPixelSize.Name = "numPixelSize";
-            this.numPixelSize.Size = new System.Drawing.Size(133, 25);
+            this.numPixelSize.Size = new System.Drawing.Size(116, 21);
             this.numPixelSize.TabIndex = 23;
             // 
             // btnColorAll
             // 
-            this.btnColorAll.Location = new System.Drawing.Point(146, -67);
-            this.btnColorAll.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnColorAll.Location = new System.Drawing.Point(128, -54);
             this.btnColorAll.Name = "btnColorAll";
-            this.btnColorAll.Size = new System.Drawing.Size(86, 29);
+            this.btnColorAll.Size = new System.Drawing.Size(75, 23);
             this.btnColorAll.TabIndex = 18;
             this.btnColorAll.Text = "전체 색칠";
             this.btnColorAll.UseVisualStyleBackColor = true;
@@ -103,45 +106,45 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(14, -124);
+            this.label1.Location = new System.Drawing.Point(12, -99);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(87, 15);
+            this.label1.Size = new System.Drawing.Size(69, 12);
             this.label1.TabIndex = 21;
             this.label1.Text = "가로 픽셀수";
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(126, -99);
+            this.btnSave.Location = new System.Drawing.Point(110, -79);
             this.btnSave.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(107, 26);
+            this.btnSave.Size = new System.Drawing.Size(94, 21);
             this.btnSave.TabIndex = 20;
             this.btnSave.Text = "결과 저장";
             this.btnSave.UseVisualStyleBackColor = true;
             // 
             // btnGenerate
             // 
-            this.btnGenerate.Location = new System.Drawing.Point(12, -99);
+            this.btnGenerate.Location = new System.Drawing.Point(10, -79);
             this.btnGenerate.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnGenerate.Name = "btnGenerate";
-            this.btnGenerate.Size = new System.Drawing.Size(107, 26);
+            this.btnGenerate.Size = new System.Drawing.Size(94, 21);
             this.btnGenerate.TabIndex = 19;
             this.btnGenerate.Text = "도안 생성";
             this.btnGenerate.UseVisualStyleBackColor = true;
             // 
             // btnLoadImage
             // 
-            this.btnLoadImage.Location = new System.Drawing.Point(12, -156);
+            this.btnLoadImage.Location = new System.Drawing.Point(10, -125);
             this.btnLoadImage.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnLoadImage.Name = "btnLoadImage";
-            this.btnLoadImage.Size = new System.Drawing.Size(219, 22);
+            this.btnLoadImage.Size = new System.Drawing.Size(192, 18);
             this.btnLoadImage.TabIndex = 17;
             this.btnLoadImage.Text = "이미지 불러오기";
             this.btnLoadImage.UseVisualStyleBackColor = true;
             // 
             // numPixelSizeDual
             // 
-            this.numPixelSizeDual.Location = new System.Drawing.Point(110, 49);
+            this.numPixelSizeDual.Location = new System.Drawing.Point(96, 39);
             this.numPixelSizeDual.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.numPixelSizeDual.Minimum = new decimal(new int[] {
             20,
@@ -149,7 +152,7 @@
             0,
             0});
             this.numPixelSizeDual.Name = "numPixelSizeDual";
-            this.numPixelSizeDual.Size = new System.Drawing.Size(133, 25);
+            this.numPixelSizeDual.Size = new System.Drawing.Size(116, 21);
             this.numPixelSizeDual.TabIndex = 30;
             this.numPixelSizeDual.Value = new decimal(new int[] {
             20,
@@ -159,10 +162,9 @@
             // 
             // btnColorAllDual
             // 
-            this.btnColorAllDual.Location = new System.Drawing.Point(157, 109);
-            this.btnColorAllDual.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnColorAllDual.Location = new System.Drawing.Point(137, 87);
             this.btnColorAllDual.Name = "btnColorAllDual";
-            this.btnColorAllDual.Size = new System.Drawing.Size(86, 29);
+            this.btnColorAllDual.Size = new System.Drawing.Size(75, 23);
             this.btnColorAllDual.TabIndex = 25;
             this.btnColorAllDual.Text = "전체 색칠";
             this.btnColorAllDual.Click += new System.EventHandler(this.btnColorAll_Click);
@@ -170,37 +172,37 @@
             // panelPalette
             // 
             this.panelPalette.AutoScroll = true;
-            this.panelPalette.Location = new System.Drawing.Point(23, 153);
+            this.panelPalette.Location = new System.Drawing.Point(20, 122);
             this.panelPalette.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panelPalette.Name = "panelPalette";
-            this.panelPalette.Size = new System.Drawing.Size(219, 506);
+            this.panelPalette.Size = new System.Drawing.Size(192, 405);
             this.panelPalette.TabIndex = 29;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(25, 52);
+            this.label2.Location = new System.Drawing.Point(22, 42);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(87, 15);
+            this.label2.Size = new System.Drawing.Size(69, 12);
             this.label2.TabIndex = 28;
             this.label2.Text = "가로 픽셀수";
             // 
             // btnSaveDual
             // 
-            this.btnSaveDual.Location = new System.Drawing.Point(137, 77);
+            this.btnSaveDual.Location = new System.Drawing.Point(120, 62);
             this.btnSaveDual.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnSaveDual.Name = "btnSaveDual";
-            this.btnSaveDual.Size = new System.Drawing.Size(107, 26);
+            this.btnSaveDual.Size = new System.Drawing.Size(94, 21);
             this.btnSaveDual.TabIndex = 27;
             this.btnSaveDual.Text = "결과 저장";
             this.btnSaveDual.UseVisualStyleBackColor = true;
             // 
             // btnGenerateDual
             // 
-            this.btnGenerateDual.Location = new System.Drawing.Point(23, 77);
+            this.btnGenerateDual.Location = new System.Drawing.Point(20, 62);
             this.btnGenerateDual.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnGenerateDual.Name = "btnGenerateDual";
-            this.btnGenerateDual.Size = new System.Drawing.Size(107, 26);
+            this.btnGenerateDual.Size = new System.Drawing.Size(94, 21);
             this.btnGenerateDual.TabIndex = 26;
             this.btnGenerateDual.Text = "도안 생성";
             this.btnGenerateDual.UseVisualStyleBackColor = true;
@@ -208,10 +210,10 @@
             // 
             // btnLoadImageDual
             // 
-            this.btnLoadImageDual.Location = new System.Drawing.Point(23, 20);
+            this.btnLoadImageDual.Location = new System.Drawing.Point(20, 16);
             this.btnLoadImageDual.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnLoadImageDual.Name = "btnLoadImageDual";
-            this.btnLoadImageDual.Size = new System.Drawing.Size(219, 22);
+            this.btnLoadImageDual.Size = new System.Drawing.Size(192, 18);
             this.btnLoadImageDual.TabIndex = 24;
             this.btnLoadImageDual.Text = "이미지 불러오기";
             this.btnLoadImageDual.UseVisualStyleBackColor = true;
@@ -219,9 +221,9 @@
             // 
             // dualModeColoring
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1519, 676);
+            this.ClientSize = new System.Drawing.Size(1329, 541);
             this.Controls.Add(this.numPixelSizeDual);
             this.Controls.Add(this.btnColorAllDual);
             this.Controls.Add(this.panelPalette);
@@ -236,8 +238,10 @@
             this.Controls.Add(this.btnGenerate);
             this.Controls.Add(this.btnLoadImage);
             this.Controls.Add(this.tableLayoutPanel1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "dualModeColoring";
-            this.Text = "Form1";
+            this.Text = "듀얼모드 색칠하기";
             this.tableLayoutPanel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.numPixelSize)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numPixelSizeDual)).EndInit();
