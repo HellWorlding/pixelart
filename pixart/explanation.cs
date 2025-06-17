@@ -27,8 +27,10 @@ namespace pixart
             ApplyRetroStyle(label1);
             ApplyRetroStyle(label2);
             ApplyRetroStyle(label3);
-            ApplyRetroStyle(label4);
-
+            ApplyRetroStyle(label5);
+            ApplyRetroStyle(label6);
+            ApplyRetroStyle(label7);
+            ApplyRetroStyle(button2);
             
         }
         
@@ -89,6 +91,14 @@ namespace pixart
                         Color.Gray, 2, ButtonBorderStyle.Inset);
                 };
             }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            dualMode dualForm = new dualMode();
+            this.Hide();
+            dualForm.FormClosed += (s, args) => this.Close();
+            dualForm.Show();
         }
     }
 
