@@ -34,8 +34,50 @@ namespace pixart
             }
 
             this.Load += SaveForm_Load;
-        }
 
+            ApplyRetroStyle(this.Controls);
+        }
+        private void ApplyRetroStyle(Control.ControlCollection controls)
+        {
+            foreach (Control ctrl in controls)
+            {
+                ctrl.Font = new Font("Courier New", 9F, FontStyle.Bold);
+
+                if (ctrl is Button btn)
+                {
+                    btn.BackColor = Color.FromArgb(192, 192, 192);
+                    btn.ForeColor = Color.Black;
+                    btn.FlatStyle = FlatStyle.Flat;
+                    btn.FlatAppearance.BorderSize = 0;
+
+                    btn.MouseEnter += (s, e) => btn.BackColor = Color.DarkGray;
+                    btn.MouseLeave += (s, e) => btn.BackColor = Color.FromArgb(192, 192, 192);
+                    btn.MouseDown += (s, e) => btn.BackColor = Color.DimGray;
+                    btn.MouseUp += (s, e) =>
+                    {
+                        btn.BackColor = btn.ClientRectangle.Contains(btn.PointToClient(Cursor.Position))
+                            ? Color.DarkGray : Color.FromArgb(192, 192, 192);
+                    };
+
+                    btn.Paint += (s, e) =>
+                    {
+                        ControlPaint.DrawBorder(e.Graphics, btn.ClientRectangle,
+                            Color.White, 2, ButtonBorderStyle.Outset,
+                            Color.White, 2, ButtonBorderStyle.Outset,
+                            Color.Gray, 2, ButtonBorderStyle.Inset,
+                            Color.Gray, 2, ButtonBorderStyle.Inset);
+                    };
+                }
+
+                // 그룹 내 컨트롤도 재귀적으로 처리
+                if (ctrl.HasChildren)
+                    ApplyRetroStyle(ctrl.Controls);
+            }
+
+            // 💡 폼 배경색도 변경 (스타일 통일)
+            if (this is Form f)
+                f.BackColor = Color.FromArgb(224, 224, 224);  // 약간 더 밝은 회색
+        }
 
         private void SaveForm_Load(object sender, EventArgs e)
         {

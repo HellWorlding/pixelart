@@ -74,6 +74,7 @@ namespace pixel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.FromArgb(210, 210, 215); // startpage와 어울리는 배경색
             this.ClientSize = new System.Drawing.Size(1154, 637);
             this.Controls.Add(this.btnImgSave);
             this.Controls.Add(this.cmbSaveForm);
@@ -82,7 +83,6 @@ namespace pixel
             this.Text = "Form2";
             ((System.ComponentModel.ISupportInitialize)(this.picSavePreview)).EndInit();
             this.ResumeLayout(false);
-
         }
 
         #endregion

@@ -22,6 +22,13 @@ namespace pixel
         private Dictionary<int, Color> numberToColor;
         private Dictionary<Point, Color> pixelColors;
         private int k;
+
+
+        private Color retroBackColor = Color.FromArgb(240, 240, 240);
+        private Color retroButtonColor = Color.FromArgb(200, 200, 200);
+        private Color retroBorderColor = Color.Gray;
+        private Font retroFont = new Font("Courier New", 10, FontStyle.Bold);
+
         enum Direction
         {
             None = 0,           // x
@@ -97,6 +104,10 @@ namespace pixel
         public SaveKMeansForm(Bitmap original, Bitmap pixelated, int pixelSize)
         {
             InitializeComponent();
+            ApplyRetroStyle(btnImgSave);
+            ApplyRetroStyle(cmbSaveForm);
+            
+
 
             this.originalImage = original;
             this.pixelatedImage = pixelated;
@@ -113,7 +124,7 @@ namespace pixel
                     g.DrawImage(paintedBitmap, 0, 0, resizedImage.Width, resizedImage.Height);
                 }
             }
-            GenerateGridsFromPixelatedImage();  // 👈 핵심 기능
+            GenerateGridsFromPixelatedImage();  //  핵심 기능
             this.k = numberToColor.Count;
 
             clusterSymbolMap = GenerateRandomSymbolMap(k);
@@ -123,6 +134,41 @@ namespace pixel
 
             UpdatePreview();
         }
+
+        private void ApplyRetroStyle(Control ctl)
+        {
+            ctl.BackColor = Color.FromArgb(192, 192, 192);
+            ctl.ForeColor = Color.Black;
+            ctl.Font = new Font("Courier New", 9F, FontStyle.Bold);
+
+            if (ctl is Button btn)
+            {
+                btn.FlatStyle = FlatStyle.Flat;
+                btn.FlatAppearance.BorderSize = 0;
+                btn.FlatAppearance.BorderColor = Color.Black;
+
+                btn.MouseEnter += (s, e) => btn.BackColor = Color.DarkGray;
+                btn.MouseLeave += (s, e) => btn.BackColor = Color.FromArgb(192, 192, 192);
+                btn.MouseDown += (s, e) => btn.BackColor = Color.DimGray;
+                btn.MouseUp += (s, e) =>
+                {
+                    btn.BackColor = btn.ClientRectangle.Contains(btn.PointToClient(Cursor.Position))
+                        ? Color.DarkGray : Color.FromArgb(192, 192, 192);
+                };
+
+                // 버튼일 경우 3D 테두리 효과도 추가
+                btn.Paint += (s, e) =>
+                {
+                    ControlPaint.DrawBorder(e.Graphics, btn.ClientRectangle,
+                        Color.White, 2, ButtonBorderStyle.Outset,
+                        Color.White, 2, ButtonBorderStyle.Outset,
+                        Color.Gray, 2, ButtonBorderStyle.Inset,
+                        Color.Gray, 2, ButtonBorderStyle.Inset);
+                };
+            }
+        }
+
+
 
 
 

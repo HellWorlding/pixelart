@@ -73,6 +73,31 @@ namespace PixelColorling
         {
             InitializeComponent();
             this.Load += Coloring_Load;
+
+
+            // 배경색
+            this.BackColor = Color.LightGray;
+
+            // 버튼 스타일 적용
+            ApplyRetroStyle(btnLoadImage);
+            ApplyRetroStyle(btnGenerate);
+            ApplyRetroStyle(btnSave);
+            ApplyRetroStyle(btnColorAll);
+            //ApplyRetroStyle(btnColorSelect);
+            //ApplyRetroStyle(btnSize);
+            ApplyRetroStyle(btnSize1);
+            ApplyRetroStyle(btnSize3);
+            ApplyRetroStyle(btnSize5);
+            ApplyRetroStyle(btnColorPartition);
+
+            // 콤보박스 스타일 적용
+            ApplyRetroStyle(cbxColorType);
+            ApplyRetroStyle(cbxDifficulty);
+
+            // 라벨도 필요하면 여기 추가
+            ApplyRetroStyle(label1);
+            ApplyRetroStyle(label2);
+            ApplyRetroStyle(label3);
         }
 
         private void Coloring_Load(object sender, EventArgs e)
@@ -91,6 +116,44 @@ namespace PixelColorling
             panel1.Visible = !panel1.Visible;
             this.KeyPreview = true;
         }
+
+        private void ApplyRetroStyle(Control ctrl)
+        {
+            ctrl.Font = new Font("Courier New", 9F, FontStyle.Bold);
+
+            if (ctrl is Button btn)
+            {
+                btn.BackColor = Color.FromArgb(192, 192, 192);
+                btn.ForeColor = Color.Black;
+                btn.FlatStyle = FlatStyle.Flat;
+                btn.FlatAppearance.BorderSize = 0;
+
+                btn.MouseEnter += (s, e) => btn.BackColor = Color.DarkGray;
+                btn.MouseLeave += (s, e) => btn.BackColor = Color.FromArgb(192, 192, 192);
+                btn.MouseDown += (s, e) => btn.BackColor = Color.DimGray;
+                btn.MouseUp += (s, e) =>
+                {
+                    btn.BackColor = btn.ClientRectangle.Contains(btn.PointToClient(Cursor.Position))
+                        ? Color.DarkGray : Color.FromArgb(192, 192, 192);
+                };
+
+                btn.Paint += (s, e) =>
+                {
+                    ControlPaint.DrawBorder(e.Graphics, btn.ClientRectangle,
+                        Color.White, 2, ButtonBorderStyle.Outset,
+                        Color.White, 2, ButtonBorderStyle.Outset,
+                        Color.Gray, 2, ButtonBorderStyle.Inset,
+                        Color.Gray, 2, ButtonBorderStyle.Inset);
+                };
+            }
+            else if (ctrl is ComboBox cbx)
+            {
+                cbx.BackColor = Color.White;
+                cbx.ForeColor = Color.Black;
+                cbx.FlatStyle = FlatStyle.Flat;
+            }
+        }
+
 
 
         private void btnGenerate_Click(object sender, EventArgs e)

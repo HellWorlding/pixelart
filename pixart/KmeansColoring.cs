@@ -69,9 +69,71 @@ namespace pixel
         public KmeansColoring()
         {
             InitializeComponent();
+
+            this.BackColor = Color.LightGray;
+
+
+            ApplyRetroStyle(btnPixelate);
+            ApplyRetroStyle(btnColoringKmeans);
+            ApplyRetroStyle(btnSave);
+            //ApplyRetroStyle(btnColorSelect);
+            //ApplyRetroStyle(btnSize);
+            //ApplyRetroStyle(btnSize1);
+            //ApplyRetroStyle(btnSize3);
+            //ApplyRetroStyle(btnSize5);
+            //ApplyRetroStyle(btnColorPartition);
+            ApplyRetroStyle(btnLoad);
+
+
+
+            // 레이블들도 포함 가능
+            ApplyRetroStyle(label1);
+            ApplyRetroStyle(lblFixelCount);
+            ApplyRetroStyle(lblKnumber);
+            ApplyRetroStyle(lblKmeansiter);
+
+
+            //panel1.BackColor = this.BackColor;
+            //panelLegend.BackColor = this.BackColor;
+            //panelCompare.BackColor = this.BackColor;
+
         }
 
         private Color selectedCustomColor = Color.Black;
+
+
+        private void ApplyRetroStyle(Control ctrl)
+        {
+            ctrl.Font = new Font("Courier New", 9F, FontStyle.Bold);
+
+            if (ctrl is System.Windows.Forms.Button btn)
+            {
+                btn.BackColor = Color.FromArgb(192, 192, 192);
+                btn.ForeColor = Color.Black;
+                btn.FlatStyle = FlatStyle.Flat;
+                btn.FlatAppearance.BorderSize = 0;
+
+                btn.MouseEnter += (s, e) => btn.BackColor = Color.DarkGray;
+                btn.MouseLeave += (s, e) => btn.BackColor = Color.FromArgb(192, 192, 192);
+                btn.MouseDown += (s, e) => btn.BackColor = Color.DimGray;
+                btn.MouseUp += (s, e) =>
+                {
+                    btn.BackColor = btn.ClientRectangle.Contains(btn.PointToClient(Cursor.Position))
+                        ? Color.DarkGray : Color.FromArgb(192, 192, 192);
+                };
+
+                btn.Paint += (s, e) =>
+                {
+                    ControlPaint.DrawBorder(e.Graphics, btn.ClientRectangle,
+                        Color.White, 2, ButtonBorderStyle.Outset,
+                        Color.White, 2, ButtonBorderStyle.Outset,
+                        Color.Gray, 2, ButtonBorderStyle.Inset,
+                        Color.Gray, 2, ButtonBorderStyle.Inset);
+                };
+            }
+        }
+
+
 
 
 

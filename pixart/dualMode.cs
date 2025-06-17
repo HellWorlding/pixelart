@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Drawing;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection.Emit;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -15,6 +17,47 @@ namespace pixart
         public dualMode()
         {
             InitializeComponent();
+
+            // 배경색 적용
+            this.BackColor = Color.LightGray;
+
+            // 버튼과 라벨 스타일 적용
+            ApplyRetroStyle(btnHostStart);
+            ApplyRetroStyle(btnClientConnect);
+            ApplyRetroStyle(btnBack);
+            ApplyRetroStyle(lblIP);  
+        }
+
+        private void ApplyRetroStyle(Control ctrl)
+        {
+            ctrl.Font = new Font("Courier New", 9F, FontStyle.Bold);
+
+            if (ctrl is Button btn)
+            {
+                btn.BackColor = Color.FromArgb(192, 192, 192);
+                btn.ForeColor = Color.Black;
+                btn.FlatStyle = FlatStyle.Flat;
+                btn.FlatAppearance.BorderSize = 0;
+
+                btn.MouseEnter += (s, e) => btn.BackColor = Color.DarkGray;
+                btn.MouseLeave += (s, e) => btn.BackColor = Color.FromArgb(192, 192, 192);
+                btn.MouseDown += (s, e) => btn.BackColor = Color.DimGray;
+                btn.MouseUp += (s, e) =>
+                {
+                    btn.BackColor = btn.ClientRectangle.Contains(btn.PointToClient(Cursor.Position))
+                        ? Color.DarkGray : Color.FromArgb(192, 192, 192);
+                };
+
+                // 3D 테두리
+                btn.Paint += (s, e) =>
+                {
+                    ControlPaint.DrawBorder(e.Graphics, btn.ClientRectangle,
+                        Color.White, 2, ButtonBorderStyle.Outset,
+                        Color.White, 2, ButtonBorderStyle.Outset,
+                        Color.Gray, 2, ButtonBorderStyle.Inset,
+                        Color.Gray, 2, ButtonBorderStyle.Inset);
+                };
+            }
         }
 
         private void btnBack_Click(object sender, EventArgs e)

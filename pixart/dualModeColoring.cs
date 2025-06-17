@@ -43,8 +43,50 @@ namespace pixart
             // 디자이너 속성 창에서 이벤트를 연결합니다.
             // (Events are subscribed in the designer's property window.)
 
+            ApplyRetroStyle(this);  // 이 폼 내의 모든 컨트롤에 적용
+
+
             StartReceiveThread();
         }
+
+
+
+        private void ApplyRetroStyle(Control ctrl)
+        {
+            ctrl.Font = new Font("Courier New", 9F, FontStyle.Bold);
+
+            if (ctrl is Button btn)
+            {
+                btn.BackColor = Color.FromArgb(192, 192, 192);
+                btn.ForeColor = Color.Black;
+                btn.FlatStyle = FlatStyle.Flat;
+                btn.FlatAppearance.BorderSize = 0;
+
+                btn.MouseEnter += (s, e) => btn.BackColor = Color.DarkGray;
+                btn.MouseLeave += (s, e) => btn.BackColor = Color.FromArgb(192, 192, 192);
+                btn.MouseDown += (s, e) => btn.BackColor = Color.DimGray;
+                btn.MouseUp += (s, e) =>
+                {
+                    btn.BackColor = btn.ClientRectangle.Contains(btn.PointToClient(Cursor.Position))
+                        ? Color.DarkGray : Color.FromArgb(192, 192, 192);
+                };
+
+                btn.Paint += (s, e) =>
+                {
+                    ControlPaint.DrawBorder(e.Graphics, btn.ClientRectangle,
+                        Color.White, 2, ButtonBorderStyle.Outset,
+                        Color.White, 2, ButtonBorderStyle.Outset,
+                        Color.Gray, 2, ButtonBorderStyle.Inset,
+                        Color.Gray, 2, ButtonBorderStyle.Inset);
+                };
+            }
+
+            // 자식 컨트롤에도 재귀 적용
+            foreach (Control child in ctrl.Controls)
+                ApplyRetroStyle(child);
+        }
+
+
 
         /// <summary>
         /// 네트워크 스트림으로부터 데이터를 수신하는 스레드를 시작합니다.

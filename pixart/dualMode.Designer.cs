@@ -37,9 +37,10 @@
             // 
             // btnHostStart
             // 
-            this.btnHostStart.Location = new System.Drawing.Point(82, 280);
+            this.btnHostStart.Location = new System.Drawing.Point(102, 336);
+            this.btnHostStart.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnHostStart.Name = "btnHostStart";
-            this.btnHostStart.Size = new System.Drawing.Size(280, 107);
+            this.btnHostStart.Size = new System.Drawing.Size(350, 128);
             this.btnHostStart.TabIndex = 0;
             this.btnHostStart.Text = "호스트로 시작하기";
             this.btnHostStart.UseVisualStyleBackColor = true;
@@ -47,9 +48,10 @@
             // 
             // btnClientConnect
             // 
-            this.btnClientConnect.Location = new System.Drawing.Point(400, 280);
+            this.btnClientConnect.Location = new System.Drawing.Point(500, 336);
+            this.btnClientConnect.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnClientConnect.Name = "btnClientConnect";
-            this.btnClientConnect.Size = new System.Drawing.Size(290, 107);
+            this.btnClientConnect.Size = new System.Drawing.Size(362, 128);
             this.btnClientConnect.TabIndex = 1;
             this.btnClientConnect.Text = "게스트로 접속하기";
             this.btnClientConnect.UseVisualStyleBackColor = true;
@@ -57,9 +59,10 @@
             // 
             // btnBack
             // 
-            this.btnBack.Location = new System.Drawing.Point(680, 406);
+            this.btnBack.Location = new System.Drawing.Point(850, 487);
+            this.btnBack.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnBack.Name = "btnBack";
-            this.btnBack.Size = new System.Drawing.Size(108, 32);
+            this.btnBack.Size = new System.Drawing.Size(135, 38);
             this.btnBack.TabIndex = 2;
             this.btnBack.Text = "뒤로 가기";
             this.btnBack.UseVisualStyleBackColor = true;
@@ -68,29 +71,32 @@
             // lblIP
             // 
             this.lblIP.AutoSize = true;
-            this.lblIP.Location = new System.Drawing.Point(83, 111);
+            this.lblIP.Location = new System.Drawing.Point(104, 133);
+            this.lblIP.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblIP.Name = "lblIP";
-            this.lblIP.Size = new System.Drawing.Size(90, 15);
+            this.lblIP.Size = new System.Drawing.Size(106, 18);
             this.lblIP.TabIndex = 3;
             this.lblIP.Text = "서버 IP 주소";
             // 
             // txtIpAddress
             // 
-            this.txtIpAddress.Location = new System.Drawing.Point(82, 142);
+            this.txtIpAddress.Location = new System.Drawing.Point(102, 170);
+            this.txtIpAddress.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.txtIpAddress.Name = "txtIpAddress";
-            this.txtIpAddress.Size = new System.Drawing.Size(608, 25);
+            this.txtIpAddress.Size = new System.Drawing.Size(759, 28);
             this.txtIpAddress.TabIndex = 4;
             // 
             // dualMode
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(1000, 540);
             this.Controls.Add(this.txtIpAddress);
             this.Controls.Add(this.lblIP);
             this.Controls.Add(this.btnBack);
             this.Controls.Add(this.btnClientConnect);
             this.Controls.Add(this.btnHostStart);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "dualMode";
             this.Text = "Form1";
             this.ResumeLayout(false);
