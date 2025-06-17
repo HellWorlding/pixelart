@@ -47,6 +47,14 @@ namespace pixelart
                     btnOK.Visible = true;
                     btnCancel.Visible = true;
                     break;
+                case CustomMessageBoxButtons.YesNoCancel:
+                    btnYes.Visible = true;
+                    btnNo.Visible = true;
+                    btnCancel.Visible = true;
+                    btnOK.Visible = false;
+                    break;
+
+
             }
         }
 
@@ -79,6 +87,7 @@ namespace pixelart
     {
         OK,
         YesNo,
-        OKCancel
+        OKCancel,
+        YesNoCancel
     }
 }

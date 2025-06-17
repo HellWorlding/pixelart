@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
+using pixelart;
 namespace pixart
 {
     public partial class SaveForm : Form
@@ -116,7 +116,7 @@ namespace pixart
             }
             else
             {
-                MessageBox.Show("이미지가 없습니다.");
+                CustomMessageBoxHelper.Show("이미지가 없습니다.");
             }
         }
 
@@ -127,7 +127,7 @@ namespace pixart
         {
             if (pixelatedBitmap == null)
             {
-                MessageBox.Show("저장할 이미지가 없습니다.");
+                CustomMessageBoxHelper.Show("저장할 이미지가 없습니다.");
                 return;
             }
 
@@ -144,7 +144,7 @@ namespace pixart
                     else if (sfd.FileName.EndsWith(".bmp")) format = ImageFormat.Bmp;
 
                     pixelatedBitmap.Save(sfd.FileName, format);
-                    MessageBox.Show("저장 완료");
+                    CustomMessageBoxHelper.Show("저장 완료");
                 }
             }
         }

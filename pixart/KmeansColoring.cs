@@ -14,6 +14,7 @@ using System.Xml;
 using pixart;
 using PixelColorling;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using pixelart;
 
 namespace pixel
 {
@@ -134,31 +135,28 @@ namespace pixel
         }
 
 
-
-
-
         private void btnLoad_Click(object sender, EventArgs e)
         {
             // ✅ 기존 도안이 존재하는 경우 사용자에게 확인
             if (numberGrid != null)
             {
-                DialogResult overwrite = MessageBox.Show(
+                CustomDialogResult overwrite = CustomMessageBoxHelper.ShowWithResult(
                     "이미 도안이 있습니다.\n이미지를 불러오시겠습니까?\n(기존 도안은 사라질 수 있습니다.)",
                     "도안 덮어쓰기 확인",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Warning);
+                    CustomMessageBoxButtons.YesNo
+                );
 
-                if (overwrite == DialogResult.No)
+                if (overwrite == CustomDialogResult.No)
                     return;
 
                 // ✅ 저장 여부 추가 확인
-                DialogResult saveConfirm = MessageBox.Show(
+                CustomDialogResult saveConfirm = CustomMessageBoxHelper.ShowWithResult(
                     "기존 도안을 저장하시겠습니까?",
                     "도안 저장",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question);
+                    CustomMessageBoxButtons.YesNo
+                );
 
-                if (saveConfirm == DialogResult.Yes)
+                if (saveConfirm == CustomDialogResult.Yes)
                 {
                     tsmiSaveGrid.PerformClick(); // 저장 메뉴 동작 실행
                 }
@@ -221,16 +219,24 @@ namespace pixel
 
 
 
+
+
+
         private void btnPixelate_Click(object sender, EventArgs e)
         {
             if (originalImage == null)
             {
-                MessageBox.Show("이미지를 먼저 불러오세요.");
+                CustomMessageBoxHelper.Show("이미지를 먼저 불러오세요.");
                 return;
             }
 
-            DialogResult result = MessageBox.Show("픽셀화 하시겠습니까?", "확인", MessageBoxButtons.YesNo);
-            if (result == DialogResult.No)
+            CustomDialogResult result = CustomMessageBoxHelper.ShowWithResult(
+                "픽셀화 하시겠습니까?",
+                "확인",
+                CustomMessageBoxButtons.YesNo
+            );
+
+            if (result == CustomDialogResult.No)
                 return;
 
             pixelColors.Clear();
@@ -281,8 +287,6 @@ namespace pixel
                 }
             }
 
-            
-
             panelLegend.Controls.Clear();
 
             foreach (var pair in colorToNumber.OrderBy(p => p.Value))
@@ -324,6 +328,7 @@ namespace pixel
             picPreview.Image = null;
             picPreview.Invalidate();
         }
+
 
         private void LegendColor_Click(object sender, EventArgs e)
         {
@@ -815,11 +820,17 @@ namespace pixel
         {
             if (numberGrid == null || numberToColor == null)
             {
-                MessageBox.Show("먼저 픽셀화를 해주세요.");
+                CustomMessageBoxHelper.Show("먼저 픽셀화를 해주세요.");
                 return;
             }
-            DialogResult result = MessageBox.Show("K-Means 색상으로 전체 픽셀을 색칠하시겠습니까?", "확인", MessageBoxButtons.YesNo);
-            if (result == DialogResult.No)
+
+            CustomDialogResult result = CustomMessageBoxHelper.ShowWithResult(
+                "K-Means 색상으로 전체 픽셀을 색칠하시겠습니까?",
+                "확인",
+                CustomMessageBoxButtons.YesNo
+            );
+
+            if (result == CustomDialogResult.No)
                 return;
 
             // ✅ 전체 색칠 시 히스토리 초기화
@@ -846,6 +857,7 @@ namespace pixel
 
             picPreview.Invalidate(); // 다시 그리기
         }
+
 
 
         private void Form1_Load(object sender, EventArgs e)
@@ -1262,23 +1274,23 @@ namespace pixel
             // 1️⃣ 기존 도안이 있는 경우 경고
             if (numberGrid != null)
             {
-                DialogResult confirm = MessageBox.Show(
+                CustomDialogResult confirm = CustomMessageBoxHelper.ShowWithResult(
                     "이미 도안이 있습니다.\n도안을 불러오시겠습니까?\n(기존 도안은 사라질 수 있습니다.)",
                     "도안 덮어쓰기 확인",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Warning);
+                    CustomMessageBoxButtons.YesNo
+                );
 
-                if (confirm == DialogResult.No)
+                if (confirm == CustomDialogResult.No)
                     return;
 
                 // 2️⃣ 저장 여부 확인
-                DialogResult saveConfirm = MessageBox.Show(
+                CustomDialogResult saveConfirm = CustomMessageBoxHelper.ShowWithResult(
                     "기존 도안을 저장하시겠습니까?",
                     "도안 저장",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question);
+                    CustomMessageBoxButtons.YesNo
+                );
 
-                if (saveConfirm == DialogResult.Yes)
+                if (saveConfirm == CustomDialogResult.Yes)
                 {
                     tsmiSaveGrid.PerformClick(); // 저장 메뉴 항목 실행
                 }
@@ -1333,9 +1345,10 @@ namespace pixel
             }
             catch (Exception ex)
             {
-                MessageBox.Show("불러오기 중 오류 발생: " + ex.Message);
+                CustomMessageBoxHelper.Show("불러오기 중 오류 발생: " + ex.Message);
             }
         }
+
 
 
 
@@ -1408,23 +1421,24 @@ namespace pixel
         {
             if (numberGrid != null) // 도안이 있는 경우만 경고
             {
-                DialogResult result = MessageBox.Show(
+                CustomDialogResult result = CustomMessageBoxHelper.ShowWithResult(
                     "도안을 저장하시겠습니까?",
                     "종료 전 저장",
-                    MessageBoxButtons.YesNoCancel,
-                    MessageBoxIcon.Question);
+                    CustomMessageBoxButtons.YesNoCancel
+                );
 
-                if (result == DialogResult.Yes)
+                if (result == CustomDialogResult.Yes)
                 {
                     tsmiSaveGrid.PerformClick(); // 저장 호출
                 }
-                else if (result == DialogResult.Cancel)
+                else if (result == CustomDialogResult.Cancel)
                 {
                     e.Cancel = true; // 닫기 취소
                 }
                 // 아니오 선택 시 그냥 닫힘
             }
         }
+
 
         private void tsbtnUndo_Click(object sender, EventArgs e)
         {

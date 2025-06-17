@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Windows.Forms;
+using pixelart;
 
 namespace pixart
 {
@@ -144,7 +145,7 @@ namespace pixart
                 {
                     if (this.IsHandleCreated)
                     {
-                        MessageBox.Show("수신 중 오류 발생: " + ex.Message);
+                        CustomMessageBoxHelper.Show("수신 중 오류 발생: " + ex.Message);
                     }
                 }
             });
@@ -174,7 +175,7 @@ namespace pixart
             }
             catch (Exception ex)
             {
-                MessageBox.Show("전송 오류: " + ex.Message);
+                CustomMessageBoxHelper.Show("전송 오류: " + ex.Message);
             }
         }
 
@@ -286,7 +287,7 @@ namespace pixart
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("이미지 로드 실패: " + ex.Message);
+                        CustomMessageBoxHelper.Show("이미지 로드 실패: " + ex.Message);
                     }
                 }
             }
@@ -296,7 +297,7 @@ namespace pixart
         {
             if (originalImage == null)
             {
-                MessageBox.Show("먼저 이미지를 불러와주세요.");
+                CustomMessageBoxHelper.Show("먼저 이미지를 불러와주세요.");
                 return;
             }
 
@@ -346,12 +347,12 @@ namespace pixart
         {
             if (blockColors == null)
             {
-                MessageBox.Show("먼저 도안을 생성해주세요.");
+                CustomMessageBoxHelper.Show("먼저 도안을 생성해주세요.");
                 return;
             }
             if (selectedColor == Color.Transparent)
             {
-                MessageBox.Show("먼저 팔레트에서 색상을 선택해주세요.");
+                CustomMessageBoxHelper.Show("먼저 팔레트에서 색상을 선택해주세요.");
                 return;
             }
 
@@ -390,12 +391,12 @@ namespace pixart
                 }
                 else
                 {
-                    MessageBox.Show("선택한 색상과 셀의 색상 번호가 다릅니다!");
+                    CustomMessageBoxHelper.Show("선택한 색상과 셀의 색상 번호가 다릅니다!");
                 }
             }
             else
             {
-                MessageBox.Show("오류: 선택한 색상이 팔레트의 색상 맵에 존재하지 않습니다.");
+                CustomMessageBoxHelper.Show("오류: 선택한 색상이 팔레트의 색상 맵에 존재하지 않습니다.");
             }
         }
 
@@ -403,7 +404,7 @@ namespace pixart
         {
             if (blockColors == null || colorMap.Count == 0)
             {
-                MessageBox.Show("먼저 도안을 생성해주세요.");
+                CustomMessageBoxHelper.Show("먼저 도안을 생성해주세요.");
                 return;
             }
 

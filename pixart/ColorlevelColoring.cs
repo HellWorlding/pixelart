@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using pixart;
 using pixel;
+using pixelart;
 
 namespace PixelColorling
 {
@@ -119,7 +120,11 @@ namespace PixelColorling
 
         private void ApplyRetroStyle(Control ctrl)
         {
-            ctrl.Font = new Font("Courier New", 9F, FontStyle.Bold);
+            // ComboBox는 기본 폰트 유지
+            if (!(ctrl is ComboBox))
+            {
+                ctrl.Font = new Font("Courier New", 9F, FontStyle.Bold);
+            }
 
             if (ctrl is Button btn)
             {
@@ -156,34 +161,43 @@ namespace PixelColorling
 
 
 
+
+
         private void btnGenerate_Click(object sender, EventArgs e)
         {
 
             if (originalImage == null)
             {
-                MessageBox.Show("먼저 이미지를 불러와주세요.");
+                CustomMessageBoxHelper.Show("먼저 이미지를 불러와주세요.");
                 return;
             }
 
             // ✅ 이미 도안이 있다면 사용자 확인
+            if (originalImage == null)
+            {
+                CustomMessageBoxHelper.Show("먼저 이미지를 불러와주세요.");
+                return;
+            }
+
+            // 도안 덮어쓰기 확인
             if (isPatternGenerated)
             {
-                DialogResult overwrite = MessageBox.Show(
-                    "기존 도안을 새로 생성하시겠습니까?", "도안 생성 확인",
-                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                var result = CustomMessageBoxHelper.ShowWithResult(
+                    "기존 도안을 새로 생성하시겠습니까?",
+                    "도안 생성 확인",
+                    CustomMessageBoxButtons.YesNo
+                );
+                if (result != CustomDialogResult.Yes) return;
 
-                if (overwrite == DialogResult.No)
-                    return;
-
-                DialogResult save = MessageBox.Show(
-                    "기존 도안을 저장하시겠습니까?", "도안 저장",
-                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-                if (save == DialogResult.Yes)
-                {
+                result = CustomMessageBoxHelper.ShowWithResult(
+                    "기존 도안을 저장하시겠습니까?",
+                    "도안 저장",
+                    CustomMessageBoxButtons.YesNo
+                );
+                if (result == CustomDialogResult.Yes)
                     tsmiSaveGrid_Click(null, null);
-                }
             }
+
             isPatternGenerated = false;
             undoStack.Clear();
             redoStack.Clear();
@@ -374,8 +388,9 @@ namespace PixelColorling
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("이미지 로드 실패: " + ex.Message);
+                    CustomMessageBoxHelper.Show("이미지 로드 실패: " + ex.Message, "에러", CustomMessageBoxButtons.OK);
                 }
+
             }
         }
         private Bitmap ResizeToFit(Bitmap src, int maxWidth, int maxHeight)
@@ -558,18 +573,18 @@ namespace PixelColorling
         {
             if (colorNumbers == null || blockColors == null || filledColors == null || isFilled == null)
             {
-                MessageBox.Show("먼저 도안을 생성하고 색칠해주세요.");
+                CustomMessageBoxHelper.Show("먼저 도안을 생성하고 색칠해주세요.", "알림");
                 return;
             }
 
             if (originalImage == null)
             {
-                MessageBox.Show("이미지 또는 색칠된 결과가 없습니다.");
+                CustomMessageBoxHelper.Show("이미지 또는 색칠된 결과가 없습니다.");
                 return;
             }
             if (paintedResultBitmap == null)
             {
-                MessageBox.Show("이미지 또는 색칠x된 결과가 없습니다.");
+                CustomMessageBoxHelper.Show("이미지 또는 색칠x된 결과가 없습니다.");
                 return;
             }
 
@@ -588,7 +603,8 @@ namespace PixelColorling
                 selectedColor = (Color)btn.Tag;
 
 
-                MessageBox.Show($"색상 {btn.Text}번 선택됨");
+                CustomMessageBoxHelper.Show($"색상 {btn.Text}번 선택됨", "색상 선택");
+
                 btnColorSelect.BackColor = selectedColor;
                 btnColorSelect.ForeColor = selectedColor;
             }
@@ -715,8 +731,9 @@ namespace PixelColorling
             }
             catch (Exception ex)
             {
-                MessageBox.Show("에러: " + ex.Message);
+                CustomMessageBoxHelper.Show("에러: " + ex.Message, "에러");
             }
+
         }
 
 
@@ -734,14 +751,14 @@ namespace PixelColorling
             if (colorNumbers == null || colorMap == null || blockSize == 0)
                 return;
 
-            DialogResult confirm = MessageBox.Show(
+            // ✅ CustomMessageBox로 변경
+            CustomDialogResult confirm = CustomMessageBoxHelper.ShowWithResult(
                 "전체를 자동으로 색칠하시겠습니까?",
                 "자동 색칠 확인",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question
+                CustomMessageBoxButtons.YesNo
             );
 
-            if (confirm != DialogResult.Yes)
+            if (confirm != CustomDialogResult.Yes)
                 return; // 아니오 선택 시 취소
 
             int height = colorNumbers.GetLength(0);
@@ -771,7 +788,6 @@ namespace PixelColorling
             RepaintCanvas();           // panelCanvas.Invalidate()
             panelCompare.Invalidate(); // 비교 패널 갱신
         }
-
 
 
 
@@ -911,7 +927,7 @@ namespace PixelColorling
         {
             colorPartitionMode = true;
             penThickness = 1; // 부분 색칠 모드에서는 기본 굵기 사용
-            MessageBox.Show("번호 기준 색칠 모드: 색칠할 셀을 클릭하세요.");
+            CustomMessageBoxHelper.Show("번호 기준 색칠 모드: 색칠할 셀을 클릭하세요.");
             panel1.Visible = !panel1.Visible;
         }
 
@@ -1127,7 +1143,7 @@ namespace PixelColorling
         {
             colorPartitionMode = true;
             penThickness = 1; // 부분 색칠 모드에서는 기본 굵기 사용
-            MessageBox.Show("번호 기준 색칠 모드: 색칠할 셀을 클릭하세요.");
+            CustomMessageBoxHelper.Show("번호 기준 색칠 모드: 색칠할 셀을 클릭하세요.");
             panel1.Visible = false;
         }
 
@@ -1149,7 +1165,7 @@ namespace PixelColorling
                     // 사전 유효성 검사
                     if (originalImage == null || paintedResultBitmap == null)
                     {
-                        MessageBox.Show("이미지 또는 결과가 없습니다. 먼저 도안을 생성하세요.");
+                        CustomMessageBoxHelper.Show("이미지 또는 결과가 없습니다. 먼저 도안을 생성하세요.");
                         return;
                     }
 
@@ -1157,7 +1173,7 @@ namespace PixelColorling
                     int width = colorNumbers?.GetLength(1) ?? 0;
                     if (height == 0 || width == 0)
                     {
-                        MessageBox.Show("도안 정보가 유효하지 않습니다.");
+                        CustomMessageBoxHelper.Show("도안 정보가 유효하지 않습니다.");
                         return;
                     }
 
@@ -1211,11 +1227,11 @@ namespace PixelColorling
                         writer.Write(kvp.Value);
                     }
 
-                    MessageBox.Show("도안 저장이 완료되었습니다.");
+                    CustomMessageBoxHelper.Show("도안 저장이 완료되었습니다.");
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("저장 중 오류 발생: " + ex.Message);
+                    CustomMessageBoxHelper.Show("저장 중 오류 발생: " + ex.Message);
                 }
                 finally
                 {
@@ -1239,27 +1255,25 @@ namespace PixelColorling
             // ✅ 안전장치 추가: 기존 도안이 있을 경우 확인
             if (isPatternGenerated)
             {
-                DialogResult confirm = MessageBox.Show(
+                var confirm = CustomMessageBoxHelper.ShowWithResult(
                     "기존 도안을 불러오시겠습니까?\n현재 작업 내용은 사라질 수 있습니다.",
                     "도안 불러오기 확인",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Warning
+                    CustomMessageBoxButtons.YesNo
                 );
 
-                if (confirm == DialogResult.No)
+                if (confirm == CustomDialogResult.No)
                     return;
 
-                DialogResult save = MessageBox.Show(
+                var save = CustomMessageBoxHelper.ShowWithResult(
                     "기존 도안을 저장하시겠습니까?",
                     "도안 저장 확인",
-                    MessageBoxButtons.YesNoCancel,
-                    MessageBoxIcon.Question
+                    CustomMessageBoxButtons.YesNoCancel
                 );
 
-                if (save == DialogResult.Cancel)
+                if (save == CustomDialogResult.Cancel)
                     return;
 
-                if (save == DialogResult.Yes)
+                if (save == CustomDialogResult.Yes)
                     tsmiSaveGrid_Click(null, null);
             }
 
@@ -1269,6 +1283,7 @@ namespace PixelColorling
                 Filter = "Grid Coloring Save (*.gcsave)|*.gcsave",
                 Title = "Load Coloring Project"
             };
+
             if (ofd.ShowDialog() == DialogResult.OK)
             {
                 FileStream fs = null;
@@ -1372,11 +1387,11 @@ namespace PixelColorling
                     panelCanvas.Invalidate();
                     panelCompare.Invalidate();
 
-                    MessageBox.Show("도안 불러오기 완료!");
+                    CustomMessageBoxHelper.Show("도안 불러오기 완료!");
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("불러오기 실패: " + ex.Message);
+                    CustomMessageBoxHelper.Show("불러오기 실패: " + ex.Message);
                 }
                 finally
                 {
@@ -1385,6 +1400,7 @@ namespace PixelColorling
                 }
             }
         }
+
 
 
 
@@ -1467,23 +1483,23 @@ namespace PixelColorling
             if (!isPatternGenerated)
                 return; // 도안 없으면 그냥 종료
 
-            DialogResult result = MessageBox.Show(
+            CustomDialogResult result = CustomMessageBoxHelper.ShowWithResult(
                 "도안을 저장하시겠습니까?",
                 "종료 확인",
-                MessageBoxButtons.YesNoCancel,
-                MessageBoxIcon.Question
+                CustomMessageBoxButtons.YesNoCancel
             );
 
-            if (result == DialogResult.Yes)
+            if (result == CustomDialogResult.Yes)
             {
                 tsmiSaveGrid_Click(null, null); // 저장
             }
-            else if (result == DialogResult.Cancel)
+            else if (result == CustomDialogResult.Cancel)
             {
                 e.Cancel = true; // 종료 취소
             }
             // 아니오 → 그냥 종료
         }
+
 
         private void tsbtnColorAll_Click(object sender, EventArgs e)
         {
