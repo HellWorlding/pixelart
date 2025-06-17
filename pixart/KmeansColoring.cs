@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
 using pixart;
+using PixelColorling;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace pixel
@@ -58,6 +59,12 @@ namespace pixel
         // 비교용 비트맵
         private Bitmap compareBitmap = null;
 
+        // 스택 선언
+        private Stack<CompoundAction> undoStack = new Stack<CompoundAction>();
+        private Stack<CompoundAction> redoStack = new Stack<CompoundAction>();
+
+
+
 
         public KmeansColoring()
         {
@@ -70,161 +77,88 @@ namespace pixel
 
         private void btnLoad_Click(object sender, EventArgs e)
         {
+            // ✅ 기존 도안이 존재하는 경우 사용자에게 확인
+            if (numberGrid != null)
+            {
+                DialogResult overwrite = MessageBox.Show(
+                    "이미 도안이 있습니다.\n이미지를 불러오시겠습니까?\n(기존 도안은 사라질 수 있습니다.)",
+                    "도안 덮어쓰기 확인",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning);
+
+                if (overwrite == DialogResult.No)
+                    return;
+
+                // ✅ 저장 여부 추가 확인
+                DialogResult saveConfirm = MessageBox.Show(
+                    "기존 도안을 저장하시겠습니까?",
+                    "도안 저장",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+
+                if (saveConfirm == DialogResult.Yes)
+                {
+                    tsmiSaveGrid.PerformClick(); // 저장 메뉴 동작 실행
+                }
+            }
+
+            // 🧹 기존 상태 완전 초기화
+            originalImage?.Dispose();
+            pixelatedImage?.Dispose();
+            compareBitmap?.Dispose();
+
+            originalImage = null;
+            pixelatedImage = null;
+            compareBitmap = null;
+            numberGrid = null;
+            pixelColors.Clear();
+            selectedPoint = null;
+            numberToColor.Clear();
+            undoStack.Clear();
+            redoStack.Clear();
+
             picOriginalThumb.Image = null;
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Filter = "이미지 파일|*.jpg;*.jpeg;*.png;*.bmp";
+            picPreview.Image = null;
+            panelLegend.Controls.Clear();
+            panelCompare.Invalidate();
+            picPreview.Invalidate();
+
+            // 이미지 선택 다이얼로그
+            OpenFileDialog ofd = new OpenFileDialog
+            {
+                Filter = "이미지 파일|*.jpg;*.jpeg;*.png;*.bmp",
+                Title = "이미지 불러오기"
+            };
 
             if (ofd.ShowDialog() == DialogResult.OK)
             {
                 originalImage = new Bitmap(ofd.FileName);
-                picPreview.Image = null;
 
-                //int minSide = Math.Min(originalImage.Width, originalImage.Height);
-                //int maxSide = Math.Max(originalImage.Width, originalImage.Height);
-                //// 최소 줄이기 사이즈(픽셀화 크기) 설정, 원본의 1/2 또는 긴 셀 개수 100
-                //numPixelSize.Minimum = Math.Max(2, maxSide / 100);
-                //// 최대 줄이기 사이즈 (픽셀화 크기) 설정, 원본중 작은 사이드의 1 /10
-                //numPixelSize.Maximum = minSide / 10;
+                // 썸네일 출력 (비율 유지하며 꽉 채움)
+                picOriginalThumb.SizeMode = PictureBoxSizeMode.Zoom;
+                picOriginalThumb.Image = originalImage;
 
+                // 파라미터 초기화
                 int imageWidth = originalImage.Width;
+                numPixelSize.Minimum = 10;
+                numPixelSize.Maximum = imageWidth / 2;
 
-                // 가로 셀 수를 기준으로 설정
-                numPixelSize.Minimum = 10; // 최소 가로 셀 수 (직관적 최소값)
-                numPixelSize.Maximum = imageWidth / 2; // 셀 하나가 최소 2픽셀은 되도록 제한
-
-
-                // 그리드 크기 최소 설정
-                //numPixelSize.Value = Math.Min(10, numPixelSize.Maximum);
-
-                //k means 클러스터링 수 설정
                 numKsize.Minimum = 2;
                 numKsize.Maximum = 100;
                 numKsize.Value = 8;
 
-                // k means 반복 횟수 설정
                 numKmeansIter.Minimum = 3;
                 numKmeansIter.Maximum = 200;
+                numKmeansIter.Value = 40;
+
+                // 선택 색상 초기화
+                selectedCustomColor = Color.Black;
+                btnColorSelect.BackColor = selectedCustomColor;
             }
         }
 
-        //private void btnPixelate_Click(object sender, EventArgs e)
-        //{
-        //    if (originalImage == null)
-        //    {
-        //        MessageBox.Show("이미지를 먼저 불러오세요.");
-        //        return;
-        //    }
-
-        //    // 픽셀 메시지 박스 확인(하던 작업 초기화 방지)
-        //    DialogResult result = MessageBox.Show("픽셀화 하시겠습니까?", "확인", MessageBoxButtons.YesNo);
-        //    if (result == DialogResult.No)
-        //        return;
-
-        //    // 이전 색칠 정보 초기화
-        //    pixelColors.Clear();
-        //    selectedPoint = null;
-
-        //    // 이미지 축소
-        //    int desiredGridW = (int)numPixelSize.Value;       // 사용자가 지정한 가로 셀 수
-        //    pixelSize = originalImage.Width / desiredGridW;   // 자동 계산된 셀 크기
-        //    int smallW = desiredGridW;                        // 줄일 이미지의 너비 = 셀 개수
-        //    int smallH = originalImage.Height / pixelSize;    // 셀 크기로 나눈 줄일 이미지의 높이
-
-        //    //pixelSize = (int)numPixelSize.Value;
-        //    //int smallW = originalImage.Width / pixelSize;
-        //    //int smallH = originalImage.Height / pixelSize;
 
 
-        //    // 줄인 이미지
-        //    Bitmap smallImage = new Bitmap(originalImage, new Size(smallW, smallH));
-        //    pixelatedImage = new Bitmap(smallW, smallH);  // 새 비트맵 초기화
-
-        //    int gridW = smallImage.Width;
-        //    int gridH = smallImage.Height;
-        //    // 색 번호 도안
-        //    numberGrid = new int[gridH, gridW];
-        //    // 축소 이미지 저장용
-        //    Color[,] colorGrid = new Color[gridH, gridW];
-
-        //    // K means 위한 픽셀 리스트
-        //    List<double[]> pixels = new List<double[]>();
-
-        //    for (int y = 0; y < gridH; y++)
-        //    {
-        //        for (int x = 0; x < gridW; x++)
-        //        {
-        //            Color c = smallImage.GetPixel(x, y); //x, y 색 추출
-        //            colorGrid[y, x] = c; //축소 이미지 색 저장
-        //            pixels.Add(new double[] { c.R, c.G, c.B }); //rgb 리스트에 추가
-        //        }
-        //    }
-
-        //    // k means 클러스터링 색상들
-        //    k = (int)numKsize.Value;
-        //    List<double[]> centroids = RunKMeans(pixels, k);
-
-        //    // 대표 색상 리스트
-        //    List<Color> representativeColors = centroids
-        //        .Select(c => Color.FromArgb((int)c[0], (int)c[1], (int)c[2]))
-        //        .ToList();
-        //    // k means로 구한 대표 색상으로 색상 번호 매핑 (도안 숫자)
-        //    Dictionary<Color, int> colorToNumber = new Dictionary<Color, int>();
-        //    for (int i = 0; i < representativeColors.Count; i++)
-        //        colorToNumber[representativeColors[i]] = i + 1;
-
-        //    // 색상 번호와 색상 매핑
-        //    numberToColor = colorToNumber.ToDictionary(kv => kv.Value, kv => kv.Key);
-
-        //    // 축소 이미지 클러스터링 번호 매핑
-        //    for (int y = 0; y < gridH; y++)
-        //    {
-        //        for (int x = 0; x < gridW; x++)
-        //        {
-        //            Color original = colorGrid[y, x];
-        //            Color closest = FindClosestColor(original, representativeColors);
-        //            numberGrid[y, x] = colorToNumber[closest];
-        //        }
-        //    }
-
-        //    // 썸네일 표시
-        //    int thumbWidth = picOriginalThumb.Width;
-        //    int thumbHeight = picOriginalThumb.Height;
-        //    Bitmap thumbImage = new Bitmap(originalImage, new Size(thumbWidth, thumbHeight));
-        //    picOriginalThumb.Image = thumbImage;
-
-        //    // 색상 가이드 표시 
-        //    panelLegend.Controls.Clear();
-
-
-        //    foreach (var pair in colorToNumber.OrderBy(p => p.Value))
-        //    {
-        //        // 색상과 번호 쌍을 패널에 추가
-        //        Panel swatch = new Panel();
-        //        swatch.BackColor = pair.Key;
-        //        swatch.Size = new Size(20, 20);
-        //        swatch.Margin = new Padding(2);
-
-        //        Label label = new Label();
-        //        label.Text = pair.Value.ToString();
-        //        label.AutoSize = true;
-        //        label.TextAlign = ContentAlignment.MiddleCenter;
-        //        label.Padding = new Padding(0);
-
-        //        FlowLayoutPanel itemPanel = new FlowLayoutPanel();
-        //        itemPanel.FlowDirection = FlowDirection.TopDown;  //  세로 정렬
-        //        itemPanel.WrapContents = false;
-        //        itemPanel.Size = new Size(40, 40);  // 너비 제한
-
-        //        itemPanel.Controls.Add(swatch);
-        //        itemPanel.Controls.Add(label);
-
-        //        panelLegend.Controls.Add(itemPanel);
-        //    }
-
-        //    // 이미지 새로고침
-        //    picPreview.Image = null;
-        //    picPreview.Invalidate();
-        //}
         private void btnPixelate_Click(object sender, EventArgs e)
         {
             if (originalImage == null)
@@ -285,10 +219,7 @@ namespace pixel
                 }
             }
 
-            int thumbWidth = picOriginalThumb.Width;
-            int thumbHeight = picOriginalThumb.Height;
-            Bitmap thumbImage = new Bitmap(originalImage, new Size(thumbWidth, thumbHeight));
-            picOriginalThumb.Image = thumbImage;
+            
 
             panelLegend.Controls.Clear();
 
@@ -378,13 +309,6 @@ namespace pixel
         }
 
 
-        double ColorDistanceSquared(Color a, Color b)
-        {
-            return
-                Math.Pow((int)a.R - b.R, 2) +
-                Math.Pow((int)a.G - b.G, 2) +
-                Math.Pow((int)a.B - b.B, 2);
-        }
 
         Color FindClosestColor(Color input, List<Color> palette, ColorMode mode)
         {
@@ -597,12 +521,20 @@ namespace pixel
                     Point pt = new Point(x, y);
 
                     // 색칠된 셀은 색만 표시, 숫자는 생략
-                    if (pixelColors.ContainsKey(pt))
+                    /* if (pixelColors.ContainsKey(pt))
                     {
                         using (Brush b = new SolidBrush(pixelColors[pt]))
                         {
                             g.FillRectangle(b, cellRect);
                         }
+                    }*/
+                    if (pixelColors.TryGetValue(pt, out Color userColor))
+                    {
+                        using (Brush b = new SolidBrush(userColor))
+                        {
+                            g.FillRectangle(b, cellRect);
+                        }
+
                     }
                     else
                     {
@@ -640,7 +572,7 @@ namespace pixel
             }
         }
 
-        
+
         // byte 범위 내에서 색상 값 설정
         private int ClampColorComponent(int value)
         {
@@ -673,6 +605,12 @@ namespace pixel
             // ✅ 고정된 사용자 색상 사용
             Color newColor = selectedCustomColor;
 
+            // 새로운 작업을 시작하기 전에 redo 스택을 비움
+            redoStack.Clear();
+
+            // 마우스 클릭으로 발생하는 모든 변경을 담을 '작업 그룹'을 생성
+            var compoundAction = new CompoundAction();
+
             if (paintPartition) // 전체 색칠 모드
             {
                 for (int i = 0; i < gridH; i++)
@@ -682,8 +620,20 @@ namespace pixel
                         if (numberGrid[i, j] == targetNumber)
                         {
                             Point pt = new Point(j, i);
+                            Color prevColor = pixelColors.TryGetValue(pt, out var c) ? c : Color.Transparent;
+
+                            // 같은 색으로 칠하는 것은 작업으로 기록하지 않음
+                            if (prevColor == newColor) continue;
+
+                            // 개별 변경을 생성하여 작업 그룹에 추가합니다.
+                            compoundAction.AddChange(new ColoringAction(j, i, prevColor, newColor));
                             pixelColors[pt] = newColor;
                             pixelatedImage.SetPixel(j, i, newColor);
+
+                            /*
+                            pixelColors[pt] = newColor;
+                            pixelatedImage.SetPixel(j, i, newColor);
+                            */
                         }
                     }
                 }
@@ -701,11 +651,27 @@ namespace pixel
                         if (nx >= 0 && nx < gridW && ny >= 0 && ny < gridH)
                         {
                             Point pt = new Point(nx, ny);
+                            Color prevColor = pixelColors.TryGetValue(pt, out var c) ? c : Color.Transparent;
+
+                            if (prevColor == newColor) continue;
+
+                            // 개별 변경을 생성하여 작업 그룹에 추가
+                            compoundAction.AddChange(new ColoringAction(nx, ny, prevColor, newColor));
                             pixelColors[pt] = newColor;
                             pixelatedImage.SetPixel(nx, ny, newColor);
+
+                            /*
+                            pixelColors[pt] = newColor;
+                            pixelatedImage.SetPixel(nx, ny, newColor);
+                            */
                         }
                     }
                 }
+            }
+
+            if (compoundAction.Changes.Any())
+            {
+                undoStack.Push(compoundAction);
             }
 
             picPreview.Invalidate();
@@ -794,12 +760,15 @@ namespace pixel
             if (result == DialogResult.No)
                 return;
 
+            // ✅ 전체 색칠 시 히스토리 초기화
+            undoStack.Clear();
+            redoStack.Clear();
 
             int gridH = numberGrid.GetLength(0);
             int gridW = numberGrid.GetLength(1);
             pixelColors.Clear(); // 기존 색칠 초기화
-            pixelatedImage = new Bitmap(numberGrid.GetLength(1), numberGrid.GetLength(0)); // 새로 생성
-            // 색상 번호에 해당하는 색상으로 픽셀화된 이미지 채우기
+            pixelatedImage = new Bitmap(gridW, gridH); // 새로 생성
+
             for (int y = 0; y < gridH; y++)
             {
                 for (int x = 0; x < gridW; x++)
@@ -808,13 +777,14 @@ namespace pixel
                     if (numberToColor.TryGetValue(number, out Color color))
                     {
                         pixelColors[new Point(x, y)] = color;
-                        pixelatedImage.SetPixel(x, y, color);  // 반영
+                        pixelatedImage.SetPixel(x, y, color);
                     }
                 }
             }
 
             picPreview.Invalidate(); // 다시 그리기
         }
+
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -826,6 +796,9 @@ namespace pixel
             numKsize.Value = 8;
             numPixelSize.Value = 30;
             numKmeansIter.Value = 40;
+            this.KeyPreview = true;
+
+
         }
 
 
@@ -1390,8 +1363,121 @@ namespace pixel
                 // 아니오 선택 시 그냥 닫힘
             }
         }
+
+        private void tsbtnUndo_Click(object sender, EventArgs e)
+        {
+            if (undoStack.Count > 0)
+            {
+                // 1. 마지막 '작업 그룹'을 undo 스택에서 꺼냄
+                var compoundActionToUndo = undoStack.Pop();
+
+                // 2. 이 작업 그룹을 redo 스택에 넣음
+                redoStack.Push(compoundActionToUndo);
+
+                // 3. 작업 그룹에 포함된 모든 픽셀 변경을 되돌림
+                foreach (var action in compoundActionToUndo.Changes)
+                {
+                    Point pt = new Point(action.X, action.Y);
+                    if (action.PreviousColor == Color.Transparent)
+                    {
+                        pixelColors.Remove(pt);
+                        pixelatedImage.SetPixel(pt.X, pt.Y, Color.White);
+                    }
+                    else
+                    {
+                        pixelColors[pt] = action.PreviousColor;
+                        pixelatedImage.SetPixel(pt.X, pt.Y, action.PreviousColor);
+                    }
+                }
+
+                // 4. 모든 변경이 끝난 후 화면을 한 번만 새로 고침
+                if (compoundActionToUndo.Changes.Any())
+                {
+                    var lastAction = compoundActionToUndo.Changes.First();
+                    selectedPoint = new Point(lastAction.X, lastAction.Y);
+                    UpdatePanelCompare(lastAction.X, lastAction.Y);
+                }
+                picPreview.Invalidate();
+            }
+        }
+
+        private void tsbtnRedo_Click(object sender, EventArgs e)
+        {
+            if (redoStack.Count > 0)
+            {
+                // 1. 취소했던 '작업 그룹'을 redo 스택에서 꺼냄
+                var compoundActionToRedo = redoStack.Pop();
+
+                // 2. 이 작업 그룹을 다시 undo 스택에 넣음
+                undoStack.Push(compoundActionToRedo);
+
+                // 3. 작업 그룹에 포함된 모든 픽셀 변경을 다시 실행함
+                foreach (var action in compoundActionToRedo.Changes)
+                {
+                    Point pt = new Point(action.X, action.Y);
+                    pixelColors[pt] = action.NewColor;
+                    pixelatedImage.SetPixel(action.X, action.Y, action.NewColor);
+                }
+
+                // 4. 모든 변경이 끝난 후 화면을 한 번만 새로 고침
+                if (compoundActionToRedo.Changes.Any())
+                {
+                    var lastAction = compoundActionToRedo.Changes.First();
+                    selectedPoint = new Point(lastAction.X, lastAction.Y);
+                    UpdatePanelCompare(lastAction.X, lastAction.Y);
+                }
+                picPreview.Invalidate();
+            }
+        }
+
+        private void KmeansColoring_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control && e.KeyCode == Keys.Z)
+            {
+                if (e.Shift)
+                {
+                    tsbtnRedo.PerformClick(); // Ctrl + Shift + Z → Redo
+                }
+                else
+                {
+                    tsbtnUndo.PerformClick(); // Ctrl + Z → Undo
+                }
+
+                e.Handled = true; // 이벤트 전파 방지
+            }
+        }
+
+        private void tsmiColorAll_Click(object sender, EventArgs e)
+        {
+            btnColoringKmeans.PerformClick();
+        }
+
+        private void tsmiUndo_Click(object sender, EventArgs e)
+        {
+            tsbtnUndo.PerformClick();
+        }
+
+        private void tsmiRedo_Click(object sender, EventArgs e)
+        {
+            tsbtnRedo.PerformClick();
+        }
     }
 }
+
+public class ColoringAction
+{
+    public int X, Y;
+    public Color PreviousColor, NewColor;
+
+    public ColoringAction(int x, int y, Color previousColor, Color newColor)
+    {
+        X = x;
+        Y = y;
+        PreviousColor = previousColor;
+        NewColor = newColor;
+    }
+}
+
 
 [Serializable]
 public class GridSaveDataSimple
@@ -1429,5 +1515,19 @@ public class CellEntry
         new CellEntry { X = pt.X, Y = pt.Y, R = c.R, G = c.G, B = c.B };
 }
 
+public class CompoundAction
+{
+    public List<ColoringAction> Changes { get; private set; }
+
+    public CompoundAction()
+    {
+        Changes = new List<ColoringAction>();
+    }
+
+    public void AddChange(ColoringAction change)
+    {
+        Changes.Add(change);
+    }
+}
 
 

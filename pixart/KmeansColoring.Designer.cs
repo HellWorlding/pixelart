@@ -58,7 +58,9 @@
             this.tsmiThick3x3 = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiThick5x5 = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiThickPartition = new System.Windows.Forms.ToolStripMenuItem();
-            this.도안전체색칠하기ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiColorAll = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiUndo = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiRedo = new System.Windows.Forms.ToolStripMenuItem();
             this.panelCompare = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
             this.cbxMode = new System.Windows.Forms.ComboBox();
@@ -70,6 +72,8 @@
             this.tsButtonImgSave = new System.Windows.Forms.ToolStripButton();
             this.tsButtonGridDownload = new System.Windows.Forms.ToolStripButton();
             this.tsButtonGridLoad = new System.Windows.Forms.ToolStripButton();
+            this.tsbtnUndo = new System.Windows.Forms.ToolStripButton();
+            this.tsbtnRedo = new System.Windows.Forms.ToolStripButton();
             this.panel1 = new System.Windows.Forms.Panel();
             this.btnColorPartition = new System.Windows.Forms.Button();
             this.btnSize5 = new System.Windows.Forms.Button();
@@ -267,7 +271,9 @@
             this.tsmiGenerate,
             this.tsmiPickPaletteColor,
             this.펜굵기ToolStripMenuItem,
-            this.도안전체색칠하기ToolStripMenuItem});
+            this.tsmiColorAll,
+            this.tsmiUndo,
+            this.tsmiRedo});
             this.실행ToolStripMenuItem.Name = "실행ToolStripMenuItem";
             this.실행ToolStripMenuItem.Size = new System.Drawing.Size(43, 20);
             this.실행ToolStripMenuItem.Text = "실행";
@@ -275,14 +281,14 @@
             // tsmiGenerate
             // 
             this.tsmiGenerate.Name = "tsmiGenerate";
-            this.tsmiGenerate.Size = new System.Drawing.Size(178, 22);
+            this.tsmiGenerate.Size = new System.Drawing.Size(180, 22);
             this.tsmiGenerate.Text = "도안 생성하기";
             this.tsmiGenerate.Click += new System.EventHandler(this.tsmiGenerate_Click);
             // 
             // tsmiPickPaletteColor
             // 
             this.tsmiPickPaletteColor.Name = "tsmiPickPaletteColor";
-            this.tsmiPickPaletteColor.Size = new System.Drawing.Size(178, 22);
+            this.tsmiPickPaletteColor.Size = new System.Drawing.Size(180, 22);
             this.tsmiPickPaletteColor.Text = "색 선택하기";
             this.tsmiPickPaletteColor.Click += new System.EventHandler(this.tsmiPickPaletteColor_Click);
             // 
@@ -294,7 +300,7 @@
             this.tsmiThick5x5,
             this.tsmiThickPartition});
             this.펜굵기ToolStripMenuItem.Name = "펜굵기ToolStripMenuItem";
-            this.펜굵기ToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
+            this.펜굵기ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.펜굵기ToolStripMenuItem.Text = "펜 굵기";
             // 
             // tsmiThick1x1
@@ -325,11 +331,26 @@
             this.tsmiThickPartition.Text = "부분 색칠하기";
             this.tsmiThickPartition.Click += new System.EventHandler(this.tsmiThickPartition_Click);
             // 
-            // 도안전체색칠하기ToolStripMenuItem
+            // tsmiColorAll
             // 
-            this.도안전체색칠하기ToolStripMenuItem.Name = "도안전체색칠하기ToolStripMenuItem";
-            this.도안전체색칠하기ToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
-            this.도안전체색칠하기ToolStripMenuItem.Text = "도안 전체 색칠하기";
+            this.tsmiColorAll.Name = "tsmiColorAll";
+            this.tsmiColorAll.Size = new System.Drawing.Size(180, 22);
+            this.tsmiColorAll.Text = "도안 전체 색칠하기";
+            this.tsmiColorAll.Click += new System.EventHandler(this.tsmiColorAll_Click);
+            // 
+            // tsmiUndo
+            // 
+            this.tsmiUndo.Name = "tsmiUndo";
+            this.tsmiUndo.Size = new System.Drawing.Size(180, 22);
+            this.tsmiUndo.Text = "되돌리기";
+            this.tsmiUndo.Click += new System.EventHandler(this.tsmiUndo_Click);
+            // 
+            // tsmiRedo
+            // 
+            this.tsmiRedo.Name = "tsmiRedo";
+            this.tsmiRedo.Size = new System.Drawing.Size(180, 22);
+            this.tsmiRedo.Text = "다시하기";
+            this.tsmiRedo.Click += new System.EventHandler(this.tsmiRedo_Click);
             // 
             // panelCompare
             // 
@@ -372,7 +393,9 @@
             this.tsbtnColorAll,
             this.tsButtonImgSave,
             this.tsButtonGridDownload,
-            this.tsButtonGridLoad});
+            this.tsButtonGridLoad,
+            this.tsbtnUndo,
+            this.tsbtnRedo});
             this.toolStrip1.Location = new System.Drawing.Point(0, 24);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
@@ -452,6 +475,26 @@
             this.tsButtonGridLoad.Size = new System.Drawing.Size(28, 20);
             this.tsButtonGridLoad.Text = "toolStripButton2";
             this.tsButtonGridLoad.Click += new System.EventHandler(this.tsButtonGridLoad_Click);
+            // 
+            // tsbtnUndo
+            // 
+            this.tsbtnUndo.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsbtnUndo.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnUndo.Image")));
+            this.tsbtnUndo.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsbtnUndo.Name = "tsbtnUndo";
+            this.tsbtnUndo.Size = new System.Drawing.Size(28, 20);
+            this.tsbtnUndo.Text = "되돌리기";
+            this.tsbtnUndo.Click += new System.EventHandler(this.tsbtnUndo_Click);
+            // 
+            // tsbtnRedo
+            // 
+            this.tsbtnRedo.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsbtnRedo.Image = ((System.Drawing.Image)(resources.GetObject("tsbtnRedo.Image")));
+            this.tsbtnRedo.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsbtnRedo.Name = "tsbtnRedo";
+            this.tsbtnRedo.Size = new System.Drawing.Size(28, 20);
+            this.tsbtnRedo.Text = "다시하기";
+            this.tsbtnRedo.Click += new System.EventHandler(this.tsbtnRedo_Click);
             // 
             // panel1
             // 
@@ -539,6 +582,7 @@
             this.Text = "Form1";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.KmeansColoring_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KmeansColoring_KeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.picPreview)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numPixelSize)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picOriginalThumb)).EndInit();
@@ -595,12 +639,16 @@
         private System.Windows.Forms.ToolStripMenuItem tsmiThick3x3;
         private System.Windows.Forms.ToolStripMenuItem tsmiThick5x5;
         private System.Windows.Forms.ToolStripMenuItem tsmiThickPartition;
-        private System.Windows.Forms.ToolStripMenuItem 도안전체색칠하기ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem tsmiColorAll;
         private System.Windows.Forms.ToolStripButton tsButtonImageLoad;
         private System.Windows.Forms.ToolStripButton tsbtnColorAll;
         private System.Windows.Forms.ToolStripButton tsButtonGridDownload;
         private System.Windows.Forms.ToolStripButton tsButtonImgSave;
         private System.Windows.Forms.ToolStripButton tsButtonGridLoad;
+        private System.Windows.Forms.ToolStripButton tsbtnUndo;
+        private System.Windows.Forms.ToolStripButton tsbtnRedo;
+        private System.Windows.Forms.ToolStripMenuItem tsmiUndo;
+        private System.Windows.Forms.ToolStripMenuItem tsmiRedo;
     }
 }
 

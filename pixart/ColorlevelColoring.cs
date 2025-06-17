@@ -1394,6 +1394,16 @@ namespace PixelColorling
         {
             tsmiLoadGrid.PerformClick();
         }
+
+        private void tsmiUndo_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void tsmiRedo_Click(object sender, EventArgs e)
+        {
+            
+        }
     }
 
 

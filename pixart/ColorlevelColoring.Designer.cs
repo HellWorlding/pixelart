@@ -72,6 +72,8 @@
             this.tsmiThick5x5 = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiThickPartition = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiColorAll = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiUndo = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiRedo = new System.Windows.Forms.ToolStripMenuItem();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.numPixelSize)).BeginInit();
             this.toolStrip1.SuspendLayout();
@@ -423,7 +425,9 @@
             this.tsmiGenerate,
             this.tsmiPickPaletteColor,
             this.펜굵기선택하기ToolStripMenuItem,
-            this.tsmiColorAll});
+            this.tsmiColorAll,
+            this.tsmiUndo,
+            this.tsmiRedo});
             this.저장ToolStripMenuItem1.Name = "저장ToolStripMenuItem1";
             this.저장ToolStripMenuItem1.Size = new System.Drawing.Size(43, 20);
             this.저장ToolStripMenuItem1.Text = "실행";
@@ -488,6 +492,20 @@
             this.tsmiColorAll.Size = new System.Drawing.Size(180, 22);
             this.tsmiColorAll.Text = "도안 전체 색칠하기";
             this.tsmiColorAll.Click += new System.EventHandler(this.tsmiColorAll_Click);
+            // 
+            // tsmiUndo
+            // 
+            this.tsmiUndo.Name = "tsmiUndo";
+            this.tsmiUndo.Size = new System.Drawing.Size(180, 22);
+            this.tsmiUndo.Text = "되돌리기";
+            this.tsmiUndo.Click += new System.EventHandler(this.tsmiUndo_Click);
+            // 
+            // tsmiRedo
+            // 
+            this.tsmiRedo.Name = "tsmiRedo";
+            this.tsmiRedo.Size = new System.Drawing.Size(180, 22);
+            this.tsmiRedo.Text = "다시하기";
+            this.tsmiRedo.Click += new System.EventHandler(this.tsmiRedo_Click);
             // 
             // Coloring
             // 
@@ -574,5 +592,7 @@
         private System.Windows.Forms.ToolStripButton tsImgSave;
         private System.Windows.Forms.ToolStripButton tsButtonGridDownload;
         private System.Windows.Forms.ToolStripButton tsButtonGridLoad;
+        private System.Windows.Forms.ToolStripMenuItem tsmiUndo;
+        private System.Windows.Forms.ToolStripMenuItem tsmiRedo;
     }
 }
