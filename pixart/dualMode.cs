@@ -5,6 +5,8 @@ using System.Net.Sockets;
 using System.Reflection.Emit;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using pixelart;
+
 
 namespace pixart
 {
@@ -85,7 +87,7 @@ namespace pixart
                     // UI 스레드에서 폼 전환
                     this.Invoke((MethodInvoker)(() =>
                     {
-                        MessageBox.Show("클라이언트 연결됨!");
+                        CustomMessageBoxHelper.Show("클라이언트 연결됨!");
                         dualModeColoring form = new dualModeColoring(stream, true); // 호스트
                         this.Hide();
                         form.FormClosed += (s, args) => this.Close();
@@ -94,7 +96,7 @@ namespace pixart
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("서버 오류: " + ex.Message);
+                    CustomMessageBoxHelper.Show("서버 오류: " + ex.Message);
                 }
             });
         }
@@ -108,7 +110,7 @@ namespace pixart
                 client = new TcpClient(ip, 9000);
                 stream = client.GetStream();
 
-                MessageBox.Show("서버에 연결됨!");
+                CustomMessageBoxHelper.Show("서버에 연결됨!");
 
                 dualModeColoring form = new dualModeColoring(stream, false); // 클라이언트
                 this.Hide();
@@ -117,7 +119,7 @@ namespace pixart
             }
             catch (Exception ex)
             {
-                MessageBox.Show("연결 실패: " + ex.Message);
+                CustomMessageBoxHelper.Show("연결 실패: " + ex.Message);
             }
         }
     }

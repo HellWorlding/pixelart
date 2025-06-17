@@ -28,7 +28,11 @@ namespace pixart
             ApplyRetroStyle(label2);
             ApplyRetroStyle(label3);
             ApplyRetroStyle(label4);
+
+            
         }
+        
+
 
         private void btnMain_Click(object sender, EventArgs e)
         {
